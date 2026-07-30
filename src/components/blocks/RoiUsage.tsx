@@ -65,7 +65,13 @@ export function RoiUsage({ content }: { content?: RoiUsageContent }) {
             </h2>
             <div className="space-y-4 text-slate-600 text-sm sm:text-base leading-relaxed">
               {usageParagraphs.map((p, idx) => (
-                <p key={idx}>{p}</p>
+                <p key={idx}>
+                  {typeof p === 'string' && (p.includes('<p>') || p.includes('<')) ? (
+                    <span dangerouslySetInnerHTML={{ __html: p }} />
+                  ) : (
+                    p
+                  )}
+                </p>
               ))}
             </div>
           </motion.div>
@@ -149,8 +155,8 @@ export function RoiUsage({ content }: { content?: RoiUsageContent }) {
           <div className="space-y-4 text-slate-600 text-sm sm:text-base leading-relaxed whitespace-pre-line">
             {faqs.map((faq, idx) => (
               <div key={idx} className="space-y-3">
-                {faq.question && (
-                  <h4 className="font-bold text-slate-800 text-base">{faq.question}</h4>
+                {(faq.question || (faq as any).quotation) && (
+                  <h4 className="font-bold text-slate-800 text-base">{faq.question || (faq as any).quotation}</h4>
                 )}
                 <p>{faq.answer}</p>
               </div>

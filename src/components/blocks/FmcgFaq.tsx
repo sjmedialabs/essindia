@@ -16,8 +16,8 @@ interface FmcgFaqContent {
 }
 
 export function FmcgFaq({ content }: { content?: FmcgFaqContent }) {
-  const title = content?.title || 'Frequently Asked Questions';
-  const subtitle = content?.subtitle || 'Get the information you need with our frequently asked questions.';
+  const title = content?.title !== undefined ? content.title : 'Frequently Asked Questions';
+  const subtitle = content?.subtitle !== undefined ? content.subtitle : 'Get the information you need with our frequently asked questions.';
 
   const defaultFaqs: FaqItem[] = [
     {
@@ -74,14 +74,20 @@ export function FmcgFaq({ content }: { content?: FmcgFaqContent }) {
       <div className="container mx-auto max-w-4xl text-center space-y-6">
 
         {/* Title Block */}
-        <div className="space-y-2 max-w-2xl mx-auto">
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-[#2a2b6a] leading-tight">
-            {title}
-          </h2>
-          <p className="text-slate-500 text-sm sm:text-base leading-relaxed">
-            {subtitle}
-          </p>
-        </div>
+        {(title || subtitle) && (
+          <div className="space-y-2 max-w-2xl mx-auto">
+            {title && (
+              <h2 className="text-3xl sm:text-4xl font-extrabold text-[#2a2b6a] leading-tight">
+                {title}
+              </h2>
+            )}
+            {subtitle && (
+              <p className="text-slate-500 text-sm sm:text-base leading-relaxed">
+                {subtitle}
+              </p>
+            )}
+          </div>
+        )}
 
         {/* FAQs List */}
         <div className="space-y-4 text-left">

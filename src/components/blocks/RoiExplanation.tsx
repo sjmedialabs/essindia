@@ -69,7 +69,13 @@ export function RoiExplanation({ content }: { content?: RoiExplanationContent })
 
             <div className="space-y-4 text-slate-600 text-sm sm:text-base leading-relaxed">
               {paragraphs.map((p, idx) => (
-                <p key={idx}>{p}</p>
+                <p key={idx}>
+                  {typeof p === 'string' && (p.includes('<p>') || p.includes('<')) ? (
+                    <span dangerouslySetInnerHTML={{ __html: p }} />
+                  ) : (
+                    p
+                  )}
+                </p>
               ))}
             </div>
 

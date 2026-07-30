@@ -31,6 +31,7 @@ interface RichTextFieldProps {
   value: string;
   onChange: (value: string) => void;
   placeholder?: string;
+  maxLength?: number;
 }
 
 function ToolbarButton({
@@ -61,7 +62,7 @@ function ToolbarButton({
   );
 }
 
-export function RichTextField({ fieldKey, label, value, onChange, placeholder }: RichTextFieldProps) {
+export function RichTextField({ fieldKey, label, value, onChange, placeholder, maxLength }: RichTextFieldProps) {
   const isHtml = value.includes('<') && value.includes('>');
 
   const editor = useEditor({
@@ -81,12 +82,19 @@ export function RichTextField({ fieldKey, label, value, onChange, placeholder }:
     content: isHtml ? value : `<p>${value || ''}</p>`,
     onUpdate: ({ editor: ed }) => {
       const html = ed.getHTML();
-      if (html === '<p></p>') {
+      if (html === '<p></p>' || html === '') {
         onChange('');
-      } else if (isHtml || html.includes('<strong>') || html.includes('<em>') || html.includes('<h')) {
-        onChange(html);
       } else {
-        onChange(ed.getText());
+        // Detect if there are multiple paragraphs or any styling tags (e.g., strong, em, u, s, a, ul, ol, li, blockquote, h1-h3)
+        const pCount = (html.match(/<p>/g) || []).length;
+        const withoutP = html.replace(/<\/?p>/g, '').trim();
+        const hasFormatting = pCount > 1 || (withoutP.includes('<') && withoutP.includes('>'));
+        
+        if (hasFormatting) {
+          onChange(html);
+        } else {
+          onChange(ed.getText());
+        }
       }
     },
     editorProps: {
@@ -95,6 +103,19 @@ export function RichTextField({ fieldKey, label, value, onChange, placeholder }:
       },
     },
   });
+
+  // Sync editor content with parent value prop changes
+  React.useEffect(() => {
+    if (!editor) return;
+    const currentHtml = editor.getHTML();
+    const currentText = editor.getText();
+
+    if (value !== currentHtml && value !== currentText) {
+      const isValHtml = value.includes('<') && value.includes('>');
+      const newContent = isValHtml ? value : `<p>${value || ''}</p>`;
+      editor.commands.setContent(newContent, false); // false prevents triggering onUpdate loop
+    }
+  }, [value, editor]);
 
   if (!editor) return null;
 
@@ -107,7 +128,17 @@ export function RichTextField({ fieldKey, label, value, onChange, placeholder }:
 
   return (
     <div className="space-y-1.5">
-      <label className="text-xs font-semibold text-slate-500">{label || humanLabel(fieldKey)}</label>
+      <div className="flex justify-between items-center">
+        <label className="text-xs font-semibold text-slate-500">{label || humanLabel(fieldKey)}</label>
+        {maxLength && (
+          <span className={cn(
+            "text-[10px] font-medium",
+            (value?.replace(/<[^>]*>/g, '')?.length || 0) > maxLength ? "text-red-500 font-bold" : "text-slate-400"
+          )}>
+            {(value?.replace(/<[^>]*>/g, '')?.length || 0)}/{maxLength} characters (Recommended)
+          </span>
+        )}
+      </div>
       <div className="rounded-xl border border-slate-200 bg-white overflow-hidden focus-within:ring-2 focus-within:ring-[#4B2A63]/10 focus-within:border-[#4B2A63]/20">
         <div className="flex items-center gap-0.5 px-2 py-1.5 border-b border-slate-100 bg-slate-50/50 flex-wrap">
           <ToolbarButton

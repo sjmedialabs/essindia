@@ -75,7 +75,7 @@ export function FmcgTabs({ content }: { content?: FmcgTabsContent }) {
   const title = content?.title || 'FMCG BI Personas';
   const tabs = content?.tabs && content.tabs.length > 0 ? content.tabs : defaultTabs;
 
-  const [activeTabIdx, setActiveTabIdx] = useState(1); // FMCG CFO by default
+  const [activeTabIdx, setActiveTabIdx] = useState(0); // FMCG CEO by default
   const activeTab = tabs[activeTabIdx] || tabs[0];
 
   return (
@@ -107,14 +107,22 @@ export function FmcgTabs({ content }: { content?: FmcgTabsContent }) {
           <div className="pt-12 flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
 
             {/* Left Content Column (Questions list) */}
-            <div className="flex-1 space-y-8 text-left w-full">
+             <div className="flex-1 space-y-8 text-left w-full">
               <div className="space-y-3">
                 <h3 className="text-3xl sm:text-4xl font-extrabold tracking-tight">
-                  {activeTab.heading}
+                  {typeof activeTab.heading === 'string' && (activeTab.heading.includes('<p>') || activeTab.heading.includes('<')) ? (
+                    <span dangerouslySetInnerHTML={{ __html: activeTab.heading }} />
+                  ) : (
+                    activeTab.heading
+                  )}
                 </h3>
                 {activeTab.subheading && (
                   <p className="text-slate-300 text-sm sm:text-base font-medium">
-                    {activeTab.subheading}
+                    {typeof activeTab.subheading === 'string' && (activeTab.subheading.includes('<p>') || activeTab.subheading.includes('<')) ? (
+                      <span dangerouslySetInnerHTML={{ __html: activeTab.subheading }} />
+                    ) : (
+                      activeTab.subheading
+                    )}
                   </p>
                 )}
               </div>
@@ -127,7 +135,11 @@ export function FmcgTabs({ content }: { content?: FmcgTabsContent }) {
                       key={qIdx}
                       className="bg-white text-[#2a2b6a] font-semibold text-sm sm:text-base px-6 py-4 rounded-xl border-l-4 border-[#2b2a6c] shadow-md transition-all duration-300 hover:translate-x-1"
                     >
-                      {question}
+                      {typeof question === 'string' && (question.includes('<p>') || question.includes('<')) ? (
+                        <span dangerouslySetInnerHTML={{ __html: question }} />
+                      ) : (
+                        question
+                      )}
                     </div>
                   ))}
                 </div>

@@ -79,15 +79,19 @@ export function RpaOverview({ content }: { content?: RpaOverviewContent }) {
             </motion.h2>
           )}
           {description && (
-            <motion.p
+            <motion.div
               initial={{ opacity: 0, y: 10 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: 0.1 }}
               className="text-slate-600 font-light text-base sm:text-lg leading-relaxed"
             >
-              {description}
-            </motion.p>
+              {typeof description === 'string' && (description.includes('<p>') || description.includes('<')) ? (
+                <div dangerouslySetInnerHTML={{ __html: description }} />
+              ) : (
+                description
+              )}
+            </motion.div>
           )}
         </div>
 
@@ -134,7 +138,11 @@ export function RpaOverview({ content }: { content?: RpaOverviewContent }) {
                   {card.title}
                 </span>
                 <span className="text-sm font-medium text-slate-500 block uppercase tracking-wider">
-                  {card.description}
+                  {typeof card.description === 'string' && (card.description.includes('<p>') || card.description.includes('<')) ? (
+                    <span dangerouslySetInnerHTML={{ __html: card.description }} />
+                  ) : (
+                    card.description
+                  )}
                 </span>
               </div>
             </motion.div>

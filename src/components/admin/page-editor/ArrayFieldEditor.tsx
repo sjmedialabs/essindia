@@ -52,12 +52,14 @@ export function ArrayFieldEditor({
   };
 
   const duplicateItem = (index: number) => {
+    if (sectionType === 'landing1-process' && fieldKey === 'process' && value.length >= 7) return;
     const copy = [...value];
     copy.splice(index + 1, 0, structuredClone(value[index]));
     onChange(copy);
   };
 
   const addItem = () => {
+    if (sectionType === 'landing1-process' && fieldKey === 'process' && value.length >= 7) return;
     if (value.length > 0) {
       const template = createEmptyFromTemplate(value[0]);
       onChange([...value, template]);
@@ -98,6 +100,8 @@ export function ArrayFieldEditor({
         defaultObj = { quotation: '', question: '', answer: '', arrowIcon: '/BI-industy solution-FMGC/arrow-right-circle_svgrepo.com.png' };
       } else if (lowerKey === 'locations') {
         defaultObj = { city: '', address: '', name: '', phone: '', email: '' };
+      } else if (lowerKey === 'process') {
+        defaultObj = { icon: '', title: '', description: '' };
       } else if (lowerKey === 'processes') {
         defaultObj = { title: '', description: '' };
       } else if (lowerKey === 'cards') {
@@ -113,17 +117,43 @@ export function ArrayFieldEditor({
       } else if (lowerKey === 'categories') {
         defaultObj = { name: '', items: [], tabs: [] };
       } else if (lowerKey === 'items') {
-        defaultObj = { image: '', title: '', description: '', ctaText: '', ctaUrl: '' };
+        if (sectionType === 'staffing-technologies') {
+          defaultObj = { label: '' };
+        } else {
+          defaultObj = { image: '', title: '', description: '', ctaText: '', ctaUrl: '' };
+        }
       } else if (lowerKey.includes('items')) {
         defaultObj = { icon: '', image: '', title: '', description: '', text: '' };
       } else if (lowerKey === 'sections') {
         defaultObj = { title: '', items: [''] };
       } else if (lowerKey === 'stats') {
         defaultObj = { value: '', label: '' };
-      } else if (['blocks', 'steps'].includes(lowerKey)) {
+      } else if (lowerKey === 'features') {
+        if (sectionType === 'hospital-features') {
+          defaultObj = { label: '' };
+        } else {
+          defaultObj = { iconType: 'copilot', title: '', desc: '' };
+        }
+      } else if (lowerKey === 'testimonials') {
+        defaultObj = { avatar: '', name: '', role: '', quote: '' };
+      } else if (lowerKey === 'industries') {
+        defaultObj = { icon: '', name: '', desc: '' };
+      } else if (lowerKey === 'tabs') {
+        defaultObj = { name: '', title: '', desc: '', image: '' };
+      } else if (lowerKey === 'steps') {
+        defaultObj = { number: '', title: '', desc: '', image: '', description: '' };
+      } else if (lowerKey === 'challenges') {
+        defaultObj = { iconType: 'manual', title: '', desc: '', solution: 'Solved by ESS ERP' };
+      } else if (['blocks'].includes(lowerKey)) {
         defaultObj = { image: '', title: '', description: '' };
+      } else if (lowerKey === 'intromodules') {
+        defaultObj = { name: '', iconType: 'finance' };
       } else if (lowerKey === 'points') {
-        defaultObj = '';
+        if (sectionType === 'hospital-regulatory') {
+          defaultObj = { label: '' };
+        } else {
+          defaultObj = '';
+        }
       }
       
       onChange([...value, defaultObj]);
@@ -297,7 +327,7 @@ export function ArrayFieldEditor({
                 );
               })}
 
-              {!isLocked && !(sectionType === 'portfolio' && fieldKey === 'projects') && (
+              {!isLocked && !(sectionType === 'portfolio' && fieldKey === 'projects') && !(sectionType === 'landing1-process' && fieldKey === 'process' && value.length >= 7) && (
                 <Button
                   variant="outline"
                   size="sm"

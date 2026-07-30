@@ -33,7 +33,11 @@ export function FmcgOverview({ content }: { content?: FmcgOverviewContent }) {
             <div className="space-y-4 text-slate-600 text-sm sm:text-base leading-relaxed">
               {paragraphs.map((para, index) => (
                 <p key={index}>
-                  {para}
+                  {typeof para === 'string' && (para.includes('<p>') || para.includes('<')) ? (
+                    <span dangerouslySetInnerHTML={{ __html: para }} />
+                  ) : (
+                    para
+                  )}
                 </p>
               ))}
             </div>

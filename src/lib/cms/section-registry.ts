@@ -1650,7 +1650,7 @@ export const SECTION_REGISTRY: SectionTypeDefinition[] = [
     color: 'bg-blue-50 text-blue-600',
     defaultVariant: 'default',
     supportsVariants: false,
-    fieldOrder: ['title', 'description', 'items']
+    fieldOrder: ['title', 'description', 'hubTitle', 'hubSubtitle', 'items']
   },
   {
     type: 'rpa-faq',
@@ -2010,6 +2010,176 @@ export const SECTION_REGISTRY: SectionTypeDefinition[] = [
       'primaryButtonText', 'primaryButtonUrl', 'primaryButtonBgColor', 'primaryButtonTextColor',
       'secondaryButtonText', 'secondaryButtonUrl',
     ],
+  },
+  {
+    type: 'landing1-hero',
+    label: 'Landing 1 Hero',
+    description: 'Hero banner section with title, subtitle, buttons and visual mockup',
+    icon: Layout,
+    color: 'bg-[#4B2A63]/10 text-[#4B2A63]',
+    defaultVariant: 'default',
+    supportsVariants: false,
+    fieldOrder: ['title', 'primaryCtaText', 'primaryCtaUrl', 'secondaryCtaText', 'secondaryCtaUrl', 'image']
+  },
+  {
+    type: 'landing2-hero',
+    label: 'Landing 2 Hero',
+    description: 'Hero banner section with #462294 bg, title, subtitle, buttons and visual mockup',
+    icon: Layout,
+    color: 'bg-[#4B2A63]/10 text-[#4B2A63]',
+    defaultVariant: 'default',
+    supportsVariants: false,
+    fieldOrder: ['title', 'primaryCtaText', 'primaryCtaUrl', 'secondaryCtaText', 'secondaryCtaUrl', 'image']
+  },
+  {
+    type: 'landing1-value',
+    label: 'Landing 1 Value',
+    description: '3 horizontal stats layout (Value Section)',
+    icon: Grid,
+    color: 'bg-[#4B2A63]/10 text-[#4B2A63]',
+    defaultVariant: 'default',
+    supportsVariants: false,
+    fieldOrder: ['value1', 'title1', 'value2', 'title2', 'value3', 'title3']
+  },
+  {
+    type: 'landing1-brands',
+    label: 'Landing 1 Brands',
+    description: 'Logo strip of trusted partner brands/logos',
+    icon: Grid,
+    color: 'bg-[#4B2A63]/10 text-[#4B2A63]',
+    defaultVariant: 'default',
+    supportsVariants: false,
+    fieldOrder: ['badge', 'title', 'description', 'logos']
+  },
+  {
+    type: 'landing1-intro',
+    label: 'Landing 1 Intro',
+    description: '2-column value proposition section with visual image and bullet points',
+    icon: Type,
+    color: 'bg-[#4B2A63]/10 text-[#4B2A63]',
+    defaultVariant: 'default',
+    supportsVariants: false,
+    fieldOrder: ['badge', 'titlePart1', 'titlePart2', 'description', 'image', 'ctaText', 'ctaUrl', 'introModules']
+  },
+  {
+    type: 'landing1-industries',
+    label: 'Landing 1 Industries',
+    description: 'Interactive grid listing verticals/industries we serve',
+    icon: Grid,
+    color: 'bg-[#4B2A63]/10 text-[#4B2A63]',
+    defaultVariant: 'default',
+    supportsVariants: false,
+    fieldOrder: ['badge', 'title', 'description', 'image', 'industries']
+  },
+  {
+    type: 'landing1-features',
+    label: 'Landing 1 Features',
+    description: '3-column feature grid showcasing core capabilities',
+    icon: Grid,
+    color: 'bg-[#4B2A63]/10 text-[#4B2A63]',
+    defaultVariant: 'default',
+    supportsVariants: false,
+    fieldOrder: ['badge', 'title', 'description', 'features', 'ctaText', 'ctaUrl']
+  },
+  {
+    type: 'landing1-suite',
+    label: 'Landing 1 Suite',
+    description: 'Grid of enterprise suite modules with highlight options',
+    icon: Grid,
+    color: 'bg-[#4B2A63]/10 text-[#4B2A63]',
+    defaultVariant: 'default',
+    supportsVariants: false,
+    fieldOrder: ['badge', 'title', 'description', 'modules', 'ctaText', 'ctaUrl']
+  },
+  {
+    type: 'landing1-stats',
+    label: 'Landing 1 Stats',
+    description: 'Statistics count/summary row',
+    icon: Grid,
+    color: 'bg-[#4B2A63]/10 text-[#4B2A63]',
+    defaultVariant: 'default',
+    supportsVariants: false,
+    fieldOrder: ['badge', 'title', 'stats']
+  },
+  {
+    type: 'landing1-integration',
+    label: 'Landing 1 Integration',
+    description: 'Split section showcasing software integrations',
+    icon: Layout,
+    color: 'bg-[#4B2A63]/10 text-[#4B2A63]',
+    defaultVariant: 'default',
+    supportsVariants: false,
+    fieldOrder: ['badge', 'title', 'description', 'image']
+  },
+  {
+    type: 'landing1-process',
+    label: 'Landing 1 Process',
+    description: 'Step-by-step workflow flow section',
+    icon: Grid,
+    color: 'bg-[#4B2A63]/10 text-[#4B2A63]',
+    defaultVariant: 'default',
+    supportsVariants: false,
+    fieldOrder: ['badge', 'title', 'description', 'process']
+  },
+  {
+    type: 'landing1-works',
+    label: 'Landing 1 Works',
+    description: 'Grid of work items/case study cards with highlights',
+    icon: Grid,
+    color: 'bg-[#4B2A63]/10 text-[#4B2A63]',
+    defaultVariant: 'default',
+    supportsVariants: false,
+    fieldOrder: ['badge', 'title', 'description', 'works']
+  },
+  {
+    type: 'landing1-showcase',
+    label: 'Landing 1 Showcase',
+    description: 'Tabbed product features/mockups showcase',
+    icon: Layout,
+    color: 'bg-[#4B2A63]/10 text-[#4B2A63]',
+    defaultVariant: 'default',
+    supportsVariants: false,
+    fieldOrder: ['title', 'tabs']
+  },
+  {
+    type: 'landing1-testimonials',
+    label: 'Landing 1 Testimonials',
+    description: 'Grid of client success quotes/testimonials with avatars',
+    icon: Type,
+    color: 'bg-[#4B2A63]/10 text-[#4B2A63]',
+    defaultVariant: 'default',
+    supportsVariants: false,
+    fieldOrder: ['badge', 'title', 'description', 'testimonials']
+  },
+  {
+    type: 'landing1-faq',
+    label: 'Landing 1 FAQ',
+    description: 'Accordions of frequently asked questions',
+    icon: Type,
+    color: 'bg-[#4B2A63]/10 text-[#4B2A63]',
+    defaultVariant: 'default',
+    supportsVariants: false,
+    fieldOrder: ['badge', 'title', 'description', 'faqs']
+  },
+  {
+    type: 'landing1-cta',
+    label: 'Landing 1 CTA',
+    description: 'Direct call to action block with customizable colors',
+    icon: Layout,
+    color: 'bg-[#4B2A63]/10 text-[#4B2A63]',
+    defaultVariant: 'default',
+    supportsVariants: false,
+    fieldOrder: ['badge', 'title', 'description', 'whatWeGet', 'mobileNumber']
+  },
+  {
+    type: 'landing1-challenges',
+    label: 'Landing 1 Challenges',
+    description: 'Grid of business growth challenges and solutions',
+    icon: Grid,
+    color: 'bg-[#4B2A63]/10 text-[#4B2A63]',
+    defaultVariant: 'default',
+    supportsVariants: false,
+    fieldOrder: ['badge', 'title', 'description', 'challenges']
   },
 ];
 

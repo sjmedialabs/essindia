@@ -197,6 +197,8 @@ function baseHumanLabel(key: string): string {
   if (key === 'button1FormType') return 'Button 1 Form Action';
   if (key === 'button2FormType') return 'Button 2 Form Action';
   if (key === 'ctaFormType') return 'CTA Form Action';
+  if (key === 'whatWeGet') return 'What You Get';
+  if (key === 'mobileNumber') return 'Mobile Number';
   if (key === 'sectionTitle') return 'Section Title';
   if (key.toLowerCase().endsWith('pdfurl') || key.toLowerCase().endsWith('pdf')) {
     const prefix = key.replace(/PdfUrl$|pdfUrl$|Pdf$|pdf$/, '');
@@ -223,6 +225,17 @@ export function humanLabel(
   key: string,
   options?: { sectionType?: string; keyPath?: string }
 ): string {
+  if (options?.sectionType === 'landing1-showcase' && options?.keyPath?.includes('tabs.')) {
+    if (key === 'name') return 'Tab';
+    if (key === 'title') return 'Tab Title';
+    if (key === 'desc') return 'Tab Description';
+    if (key === 'primaryCtaText') return 'Tab CTA 1';
+    if (key === 'primaryCtaUrl') return 'Tab CTA 1 URL';
+    if (key === 'secondaryCtaText') return 'Tab CTA 2';
+    if (key === 'secondaryCtaUrl') return 'Tab CTA 2 URL';
+    if (key === 'image') return 'Image or Video Upload';
+  }
+
   const base = baseHumanLabel(key);
   const tag = getHeadingTagForField(key, options?.sectionType, options?.keyPath);
   if (!tag) return base;
@@ -249,6 +262,9 @@ export function detectFieldType(key: string, value: JsonValue, sectionType?: str
     const lower = key.toLowerCase();
 
     if (lower === 'tabdesc') return 'text';
+    if (sectionType?.startsWith('landing1-') && (lower === 'desc' || lower === 'description')) {
+      return 'textarea';
+    }
     if (lower === 'topic') return 'topicSelect';
     if (lower === 'industry') return 'industrySelect';
     if (lower.endsWith('formtype')) return 'formSelect';

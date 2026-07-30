@@ -53,7 +53,11 @@ export function RoiFormula({ content }: { content?: RoiFormulaContent }) {
                   key={idx}
                   className={isFormulaLine ? 'font-bold text-slate-800 text-base py-1 pl-3 border-l-2 border-[#2b2a6c]/40 font-mono' : ''}
                 >
-                  {p}
+                  {typeof p === 'string' && (p.includes('<p>') || p.includes('<')) ? (
+                    <span dangerouslySetInnerHTML={{ __html: p }} />
+                  ) : (
+                    p
+                  )}
                 </p>
               );
             })}

@@ -110,7 +110,7 @@ export function ErpModulesGrid({ content }: ErpModulesGridProps) {
                   <h3 className="text-base font-black tracking-wide text-[#4B2A63] leading-snug group-hover:text-slate-900 transition-colors duration-300">
                     {module.title}
                   </h3>
-                  {module.description?.includes('<p>') ? (
+                  {module.description?.includes('<p>') || module.description?.includes('<') ? (
                     <div 
                       className="text-[#777777] text-sm font-medium prose prose-sm max-w-none prose-p:my-1"
                       dangerouslySetInnerHTML={{ __html: module.description }}

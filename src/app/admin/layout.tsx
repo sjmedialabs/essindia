@@ -42,6 +42,7 @@ const navGroups = [
       { icon: Briefcase, label: 'Categories', href: '/admin/categories' },
       { icon: Navigation, label: 'Navigation', href: '/admin/navigation' },
       { icon: Layers, label: 'Templates', href: '/admin/templates' },
+      { icon: Layers, label: 'Landing Pages', href: '/admin/landing-pages' },
       { icon: ClipboardList, label: 'Forms', href: '/admin/forms/definitions' },
     ]
   },
@@ -61,7 +62,7 @@ const navGroups = [
     items: [
       { icon: Shield, label: 'SEO Settings', href: '/admin/seo' },
       { icon: ArrowRightLeft, label: 'Redirects', href: '/admin/redirects' },
-      { icon: MessageSquare, label: 'Forms', href: '/admin/forms' },
+      { icon: MessageSquare, label: 'Leads', href: '/admin/forms' },
       // { icon: BarChart3, label: 'Analytics', href: '/admin/analytics' },
     ]
   },
