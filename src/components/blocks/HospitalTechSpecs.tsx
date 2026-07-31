@@ -52,7 +52,11 @@ export function HospitalTechSpecs({ content }: HospitalTechSpecsProps) {
               {heading}
             </h2>
             <p className="text-gray-500 text-sm md:text-base leading-relaxed mb-10 max-w-lg">
-              {description}
+              {typeof description === 'string' && (description.includes('<p>') || description.includes('<')) ? (
+                <span dangerouslySetInnerHTML={{ __html: description }} />
+              ) : (
+                description
+              )}
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

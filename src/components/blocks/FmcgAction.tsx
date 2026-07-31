@@ -99,9 +99,13 @@ export function FmcgAction({ content }: { content?: FmcgActionContent }) {
           <h2 className="text-3xl sm:text-4xl font-extrabold text-[#2a2b6a] leading-tight">
             {title}
           </h2>
-          <p className="text-slate-500 text-sm sm:text-base leading-relaxed">
-            {description}
-          </p>
+          <div className="text-slate-500 text-sm sm:text-base leading-relaxed">
+            {typeof description === 'string' && (description.includes('<p>') || description.includes('<')) ? (
+              <div dangerouslySetInnerHTML={{ __html: description }} />
+            ) : (
+              description
+            )}
+          </div>
         </div>
 
         {/* Cards Grid */}
@@ -132,9 +136,13 @@ export function FmcgAction({ content }: { content?: FmcgActionContent }) {
                   </h3>
 
                   {/* Description */}
-                  <p className="text-slate-500 text-sm leading-relaxed max-w-[240px]">
-                    {card.description}
-                  </p>
+                  <div className="text-slate-500 text-sm leading-relaxed max-w-[240px]">
+                    {typeof card.description === 'string' && (card.description.includes('<p>') || card.description.includes('<')) ? (
+                      <div dangerouslySetInnerHTML={{ __html: card.description }} />
+                    ) : (
+                      card.description
+                    )}
+                  </div>
                 </div>
 
                 {/* Card Image at Bottom Right */}

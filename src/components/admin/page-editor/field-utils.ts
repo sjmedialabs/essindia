@@ -197,6 +197,8 @@ function baseHumanLabel(key: string): string {
   if (key === 'button1FormType') return 'Button 1 Form Action';
   if (key === 'button2FormType') return 'Button 2 Form Action';
   if (key === 'ctaFormType') return 'CTA Form Action';
+  if (key === 'whatWeGet') return 'What You Get';
+  if (key === 'mobileNumber') return 'Mobile Number';
   if (key === 'sectionTitle') return 'Section Title';
   if (key.toLowerCase().endsWith('pdfurl') || key.toLowerCase().endsWith('pdf')) {
     const prefix = key.replace(/PdfUrl$|pdfUrl$|Pdf$|pdf$/, '');
@@ -223,6 +225,55 @@ export function humanLabel(
   key: string,
   options?: { sectionType?: string; keyPath?: string }
 ): string {
+  if (options?.sectionType === 'landing1-showcase' && options?.keyPath?.includes('tabs.')) {
+    if (key === 'name') return 'Tab';
+    if (key === 'title') return 'Tab Title';
+    if (key === 'desc') return 'Tab Description';
+    if (key === 'primaryCtaText') return 'Tab CTA 1';
+    if (key === 'primaryCtaUrl') return 'Tab CTA 1 URL';
+    if (key === 'secondaryCtaText') return 'Tab CTA 2';
+    if (key === 'secondaryCtaUrl') return 'Tab CTA 2 URL';
+    if (key === 'image') return 'Image or Video Upload';
+  }
+
+  if (options?.sectionType === 'landing2-carousel' && options?.keyPath?.includes('slides.')) {
+    if (key === 'badge') return 'Card Small Badge';
+    if (key === 'title') return 'Right Card Big Title';
+    if (key === 'description') return 'Right Card Description';
+    if (key === 'mediaUrl') return 'Left Side Image or Video Upload';
+    if (key === 'videoUrl') return 'Optional Popup Video Upload';
+  }
+
+  if (options?.sectionType === 'landing2-capabilities' && options?.keyPath?.includes('tabs.')) {
+    if (key === 'name') return 'Tab Name';
+    if (key === 'image') return 'Tab Dashboard Image Upload';
+  }
+
+  if (options?.sectionType === 'landing2-industries' && options?.keyPath?.includes('industries.')) {
+    if (key === 'name' || key === 'title') return 'Industry Name';
+    if (key === 'image') return 'Industry Tile Image Upload';
+  }
+
+  if (options?.sectionType === 'landing2-testimonials' && options?.keyPath?.includes('testimonials.')) {
+    if (key === 'quote') return 'Customer Quote';
+    if (key === 'author') return 'Customer Name';
+    if (key === 'role') return 'Customer Role & Company';
+    if (key === 'image') return 'Thumbnail Image Upload';
+    if (key === 'videoUrl') return 'Testimonial Video Upload / URL';
+  }
+
+  if (options?.sectionType === 'landing2-why-ess' && options?.keyPath?.includes('features.')) {
+    if (key === 'title') return 'Feature Title';
+    if (key === 'description') return 'Feature Description';
+    if (key === 'iconType') return 'Icon Type (rupee|security|flexibility|analytics|user|time)';
+  }
+
+  if (options?.sectionType === 'landing2-footer-banner') {
+    if (key === 'logo') return 'Company Logo Upload';
+    if (key === 'navLinks') return 'Navigation Links Array';
+    if (key === 'socialLinks') return 'Social Icons Array';
+  }
+
   const base = baseHumanLabel(key);
   const tag = getHeadingTagForField(key, options?.sectionType, options?.keyPath);
   if (!tag) return base;
@@ -249,6 +300,9 @@ export function detectFieldType(key: string, value: JsonValue, sectionType?: str
     const lower = key.toLowerCase();
 
     if (lower === 'tabdesc') return 'text';
+    if (sectionType?.startsWith('landing1-') && (lower === 'desc' || lower === 'description')) {
+      return 'textarea';
+    }
     if (lower === 'topic') return 'topicSelect';
     if (lower === 'industry') return 'industrySelect';
     if (lower.endsWith('formtype')) return 'formSelect';

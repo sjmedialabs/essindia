@@ -38,6 +38,7 @@ export default function TemplateEditPage() {
   const [sections, setSections] = React.useState<TemplateSection[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
   const [isSaving, setIsSaving] = React.useState(false);
+  const isLandingPage = template?.name?.toLowerCase().includes('landing page');
 
   React.useEffect(() => {
     (async () => {
@@ -165,10 +166,12 @@ export default function TemplateEditPage() {
       <div className="bg-white rounded-[28px] border border-slate-100 p-8 space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-bold text-slate-900">Sections</h2>
-          <Button variant="outline" onClick={addSection} className="rounded-full font-bold">
-            <Plus className="w-4 h-4 mr-2" />
-            Add section
-          </Button>
+          {!isLandingPage && (
+            <Button variant="outline" onClick={addSection} className="rounded-full font-bold">
+              <Plus className="w-4 h-4 mr-2" />
+              Add section
+            </Button>
+          )}
         </div>
 
         {sections.length === 0 ? (
@@ -181,15 +184,16 @@ export default function TemplateEditPage() {
                 layout
                 className="flex items-center gap-3 p-4 rounded-2xl bg-slate-50 border border-slate-100"
               >
-                <GripVertical className="w-4 h-4 text-slate-300 shrink-0" />
+                {!isLandingPage && <GripVertical className="w-4 h-4 text-slate-300 shrink-0" />}
                 <select
                   value={section.type}
+                  disabled={isLandingPage}
                   onChange={(e) => {
                     const next = [...sections];
                     next[index] = { ...next[index], type: e.target.value };
                     setSections(next);
                   }}
-                  className="flex-1 bg-white rounded-xl px-4 py-2 font-bold text-sm outline-none"
+                  className="flex-1 bg-white disabled:bg-white rounded-xl px-4 py-2 font-bold text-sm outline-none border border-slate-200/50"
                 >
                   {SECTION_REGISTRY.filter((s) => {
                     if (s.type === 'mfg-icons') {
@@ -202,34 +206,36 @@ export default function TemplateEditPage() {
                     </option>
                   ))}
                 </select>
-                <div className="flex gap-1">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="rounded-xl"
-                    disabled={index === 0}
-                    onClick={() => moveSection(index, -1)}
-                  >
-                    ↑
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="rounded-xl"
-                    disabled={index === sections.length - 1}
-                    onClick={() => moveSection(index, 1)}
-                  >
-                    ↓
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="rounded-xl text-rose-400"
-                    onClick={() => removeSection(index)}
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </Button>
-                </div>
+                {!isLandingPage && (
+                  <div className="flex gap-1">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="rounded-xl"
+                      disabled={index === 0}
+                      onClick={() => moveSection(index, -1)}
+                    >
+                      ↑
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="rounded-xl"
+                      disabled={index === sections.length - 1}
+                      onClick={() => moveSection(index, 1)}
+                    >
+                      ↓
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="rounded-xl text-rose-400"
+                      onClick={() => removeSection(index)}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                )}
               </motion.div>
             ))}
           </div>

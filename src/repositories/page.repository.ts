@@ -6,6 +6,23 @@ import { logger } from '@/lib/logger';
 import { getPostgresErrorCode, isConnectionError, isMissingSchemaError } from '@/lib/cms/pg-error';
 import { cache } from 'react';
 
+function replaceEmptyStringsWithZeroWidthSpace(obj: any): any {
+  if (obj === '') {
+    return '\u200B';
+  }
+  if (Array.isArray(obj)) {
+    return obj.map(replaceEmptyStringsWithZeroWidthSpace);
+  }
+  if (typeof obj === 'object' && obj !== null) {
+    const res: Record<string, any> = {};
+    for (const k in obj) {
+      res[k] = replaceEmptyStringsWithZeroWidthSpace(obj[k]);
+    }
+    return res;
+  }
+  return obj;
+}
+
 export class PageRepository {
   /**
    * Fetches a page by its slug with caching and React cache()
@@ -42,6 +59,15 @@ export class PageRepository {
               }
             }
           });
+
+          if (page && page.sections) {
+            page.sections = page.sections.map((section: any) => {
+              if (section.content) {
+                section.content = replaceEmptyStringsWithZeroWidthSpace(section.content);
+              }
+              return section;
+            });
+          }
 
           return page || null;
         } catch (dbError: unknown) {

@@ -58,10 +58,16 @@ async function seed() {
       order: 10
     },
     {
-      type: 'rpa-overview',
+      type: 'rpa-overview-intro',
       content: {
         title: 'Robotic Process Automation Solutions',
-        description: 'At ESS, we help businesses streamline operations through intelligent RPA solutions tailored to their unique workflows and existing systems. From identifying automation opportunities to implementing scalable processes, we focus on improving efficiency, accuracy, visibility, and operational consistency. Whether organizations are beginning their automation journey or expanding across departments, our expert team ensures every solution integrates smoothly, delivers measurable business impact, and supports long-term digital transformation with confidence.',
+        description: 'At ESS, we help businesses streamline operations through intelligent RPA solutions tailored to their unique workflows and existing systems. From identifying automation opportunities to implementing scalable processes, we focus on improving efficiency, accuracy, visibility, and operational consistency. Whether organizations are beginning their automation journey or expanding across departments, our expert team ensures every solution integrates smoothly, delivers measurable business impact, and supports long-term digital transformation with confidence.'
+      },
+      order: 20
+    },
+    {
+      type: 'rpa-overview-metrics',
+      content: {
         subtitle: 'A successful RPA Journey Starts with Selecting the Right Implementation Partner',
         cards: [
           {
@@ -79,7 +85,14 @@ async function seed() {
             title: '1000+',
             description: 'Saved Manhours'
           }
-        ],
+        ]
+      },
+      order: 25
+    },
+    {
+      type: 'rpa-overview-logos',
+      content: {
+        autoScroll: true,
         logos: [
           { image: '/RPA-Robotic Process Automation (RPA)/image 58.png' },
           { image: '/RPA-Robotic Process Automation (RPA)/image 59.png' },
@@ -89,7 +102,7 @@ async function seed() {
           { image: '/RPA-Robotic Process Automation (RPA)/image 63.png' }
         ]
       },
-      order: 20
+      order: 28
     },
     {
       type: 'rpa-industries',

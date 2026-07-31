@@ -122,13 +122,21 @@ export function AboutUsCompanyIntro({
               </h2>
 
               <div className="space-y-2">
-                <p className="text-[#71717A] text-base">
-                  {description}
-                </p>
+                <div className="text-[#71717A] text-base">
+                  {typeof description === 'string' && (description.includes('<p>') || description.includes('<')) ? (
+                    <div dangerouslySetInnerHTML={{ __html: description }} />
+                  ) : (
+                    description
+                  )}
+                </div>
 
-                <p className="text-[#71717A] text-base">
-                  {description2}
-                </p>
+                <div className="text-[#71717A] text-base">
+                  {typeof description2 === 'string' && (description2.includes('<p>') || description2.includes('<')) ? (
+                    <div dangerouslySetInnerHTML={{ __html: description2 }} />
+                  ) : (
+                    description2
+                  )}
+                </div>
               </div>
 
             </MotionSection>
@@ -188,9 +196,13 @@ export function AboutUsCompanyIntro({
                           {item.title}
                         </h3>
 
-                        <p className="text-[#71717A] text-sm leading-relaxed">
-                          {item.description}
-                        </p>
+                        <div className="text-[#71717A] text-sm leading-relaxed">
+                          {typeof item.description === 'string' && (item.description.includes('<p>') || item.description.includes('<')) ? (
+                            <div dangerouslySetInnerHTML={{ __html: item.description }} />
+                          ) : (
+                            item.description
+                          )}
+                        </div>
                       </div>
 
                     </div>

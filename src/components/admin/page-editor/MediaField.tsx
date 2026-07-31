@@ -64,7 +64,7 @@ export function MediaField({ fieldKey, label, value, onChange, hint, sectionType
     if (key.includes('gif')) {
       return ['gifs'];
     }
-    if (sectionType === 'europe-case-study-slider' && (key === 'image' || key.includes('image'))) {
+    if ((sectionType === 'europe-case-study-slider' || sectionType === 'landing1-showcase') && (key === 'image' || key.includes('image'))) {
       return ['images', 'videos'];
     }
     // Default fallback to images only

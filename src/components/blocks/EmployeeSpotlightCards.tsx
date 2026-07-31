@@ -99,9 +99,13 @@ export function EmployeeSpotlightCards({ content }: { content?: any }) {
                     </h3>
                   </div>
 
-                  <p className="text-gray-500 leading-relaxed text-sm md:text-[15px] font-medium max-w-3xl whitespace-pre-line">
-                    {emp.description}
-                  </p>
+                  <div className="text-gray-500 leading-relaxed text-sm md:text-[15px] font-medium max-w-3xl whitespace-pre-line">
+                    {typeof emp.description === 'string' && (emp.description.includes('<p>') || emp.description.includes('<')) ? (
+                      <div dangerouslySetInnerHTML={{ __html: emp.description }} />
+                    ) : (
+                      emp.description
+                    )}
+                  </div>
 
                   <div className="font-bold text-black text-xl md:text-2xl pt-2">
                     {emp.quote.split('\n').map((line: string, idx: number) => (

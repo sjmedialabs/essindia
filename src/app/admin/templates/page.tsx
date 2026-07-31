@@ -11,6 +11,7 @@ import Link from 'next/link';
 interface TemplateRow {
   id: string;
   name: string;
+  slug: string;
   description: string | null;
   status: string;
   usageCount: number;
@@ -19,6 +20,11 @@ interface TemplateRow {
   createdAt: string;
   updatedAt: string;
   templateSections?: Array<{ id: string; type: string }>;
+  category?: {
+    id: string;
+    name: string;
+    slug: string;
+  } | null;
 }
 
 export default function TemplatesModule() {
@@ -28,10 +34,12 @@ export default function TemplatesModule() {
   const [searchQuery, setSearchQuery] = React.useState('');
 
   const itemsPerPage = 10;
-  const filteredTemplates = templates.filter(t => 
-    t.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    (t.description && t.description.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
+  const filteredTemplates = templates.filter(t => {
+    const isLanding = t.slug === 'landing-page-template-1' || t.slug === 'landing-page-template-2';
+    const matchesSearch = t.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
+      (t.description && t.description.toLowerCase().includes(searchQuery.toLowerCase()));
+    return !isLanding && matchesSearch;
+  });
   
   const totalPages = Math.ceil(filteredTemplates.length / itemsPerPage);
   const paginatedTemplates = filteredTemplates.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage);

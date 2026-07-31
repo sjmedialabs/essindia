@@ -35,8 +35,8 @@ export default function CareerCta({ content }: { content?: any }) {
           </button>
         </motion.div>
       </div>
-      
-      <CtaLeadModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} pdfUrl={pdfUrl} />
+
+      <CtaLeadModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} pdfUrl={pdfUrl} isCareerCta={true} formType="career-cta" />
     </section>
   );
 }

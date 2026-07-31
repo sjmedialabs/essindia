@@ -64,7 +64,13 @@ export function RetailNurture({ content }: { content: RetailNurtureContent }) {
 
             <div className="space-y-4 text-left md:text-left text-[#b2b2b2] text-sm leading-relaxed">
               {paragraphs.map((para, idx) => (
-                <p key={idx}>{para}</p>
+                <p key={idx}>
+                  {typeof para === 'string' && (para.includes('<p>') || para.includes('<')) ? (
+                    <span dangerouslySetInnerHTML={{ __html: para }} />
+                  ) : (
+                    para
+                  )}
+                </p>
               ))}
             </div>
           </motion.div>

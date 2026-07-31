@@ -29,9 +29,11 @@ interface CtaLeadModalProps {
   onClose: () => void;
   pdfUrl?: string;
   pageName?: string;
+  isCareerCta?: boolean;
+  formType?: string;
 }
 
-export function CtaLeadModal({ isOpen, onClose, pdfUrl, pageName }: CtaLeadModalProps) {
+export function CtaLeadModal({ isOpen, onClose, pdfUrl, pageName, isCareerCta, formType }: CtaLeadModalProps) {
   const pathname = usePathname();
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [formData, setFormData] = React.useState({
@@ -39,6 +41,7 @@ export function CtaLeadModal({ isOpen, onClose, pdfUrl, pageName }: CtaLeadModal
     email: '',
     phone: '',
   });
+  const [resumeFile, setResumeFile] = React.useState<File | null>(null);
 
   const [selectedCountry, setSelectedCountry] = React.useState<string>('');
   const [searchQuery, setSearchQuery] = React.useState<string>('');
@@ -71,9 +74,29 @@ export function CtaLeadModal({ isOpen, onClose, pdfUrl, pageName }: CtaLeadModal
       return;
     }
 
+    if (isCareerCta && !resumeFile) {
+      toast.error('Please upload your resume to apply.');
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
+      let uploadedResumeUrl = '';
+      if (isCareerCta && resumeFile) {
+        const uploadData = new FormData();
+        uploadData.append('file', resumeFile);
+        const uploadRes = await fetch('/api/admin/media', {
+          method: 'POST',
+          body: uploadData,
+        });
+        if (!uploadRes.ok) {
+          throw new Error('Failed to upload resume file.');
+        }
+        const uploadJson = await uploadRes.json();
+        uploadedResumeUrl = uploadJson.url || uploadJson.secure_url || '';
+      }
+
       const dialInfo = DIAL_CODES.find((c) => c.code === selectedDialCode);
       const fullPhone = dialInfo && formData.phone ? `${dialInfo.dialCode} ${formData.phone}` : formData.phone;
       const countryInfo = ALL_COUNTRIES_LIST.find((c) => c.code === selectedCountry);
@@ -85,9 +108,10 @@ export function CtaLeadModal({ isOpen, onClose, pdfUrl, pageName }: CtaLeadModal
           ...formData,
           phone: fullPhone,
           country: countryInfo?.name || '',
-          formType: 'cta',
+          formType: formType || (isCareerCta ? 'career-cta' : 'cta'),
           pageName: pageName || pathname || document.title,
-          pdfUrl,
+          pdfUrl: uploadedResumeUrl || pdfUrl,
+          message: uploadedResumeUrl ? `Resume URL: ${uploadedResumeUrl}` : undefined,
         }),
       });
 
@@ -96,9 +120,11 @@ export function CtaLeadModal({ isOpen, onClose, pdfUrl, pageName }: CtaLeadModal
         throw new Error(data.error || 'Failed to submit');
       }
 
-      toast.success('Submitted successfully!');
+      toast.success(isCareerCta ? 'Application submitted successfully!' : 'Submitted successfully!');
       onClose();
-      await completeFormSuccess('cta', pdfUrl);
+      if (!isCareerCta) {
+        await completeFormSuccess('cta', pdfUrl);
+      }
     } catch (err: any) {
       toast.error(err.message || 'Something went wrong. Please try again.');
     } finally {
@@ -110,9 +136,11 @@ export function CtaLeadModal({ isOpen, onClose, pdfUrl, pageName }: CtaLeadModal
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Access Document</DialogTitle>
+          <DialogTitle>{isCareerCta ? 'Submit Your Resume' : 'Access Document'}</DialogTitle>
           <DialogDescription>
-            Please provide your details below to access the requested document.
+            {isCareerCta
+              ? 'Fill out your details and upload your resume to apply directly.'
+              : 'Please provide your details below to access the requested document.'}
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 mt-4">
@@ -220,6 +248,19 @@ export function CtaLeadModal({ isOpen, onClose, pdfUrl, pageName }: CtaLeadModal
               </SelectContent>
             </Select>
           </div>
+
+          {isCareerCta && (
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-slate-700">Upload Resume (PDF, DOC, DOCX) *</label>
+              <input
+                type="file"
+                required
+                accept=".pdf,.doc,.docx"
+                onChange={(e) => setResumeFile(e.target.files?.[0] || null)}
+                className="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-[#4B2A63]/10 file:text-[#4B2A63] hover:file:bg-[#4B2A63]/20 cursor-pointer border border-slate-200 rounded-md p-1"
+              />
+            </div>
+          )}
           
           <div className="pt-2">
             <div className="flex items-center space-x-3 mb-2">

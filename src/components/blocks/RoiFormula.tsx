@@ -53,7 +53,11 @@ export function RoiFormula({ content }: { content?: RoiFormulaContent }) {
                   key={idx}
                   className={isFormulaLine ? 'font-bold text-slate-800 text-base py-1 pl-3 border-l-2 border-[#2b2a6c]/40 font-mono' : ''}
                 >
-                  {p}
+                  {typeof p === 'string' && (p.includes('<p>') || p.includes('<')) ? (
+                    <span dangerouslySetInnerHTML={{ __html: p }} />
+                  ) : (
+                    p
+                  )}
                 </p>
               );
             })}
@@ -68,22 +72,24 @@ export function RoiFormula({ content }: { content?: RoiFormulaContent }) {
               transition={{ delay: 0.2, duration: 0.6 }}
               className="pt-10 w-full flex flex-col md:flex-row justify-center items-center gap-8"
             >
-              {image1 && (
+              {image1 && image1.trim() !== '' && (
                 <div className={`relative aspect-[3.5/1] w-full ${image2 ? 'md:w-1/2' : 'max-w-4xl'} h-[120px] sm:h-[160px] lg:h-[180px]`}>
                   <Image
-                    src={image1}
+                    src={image1.startsWith('/') || image1.startsWith('http') ? image1 : `/${image1}`}
                     alt="Formula 1"
                     fill
+                    sizes="(max-width: 768px) 100vw, 50vw"
                     className="object-contain"
                   />
                 </div>
               )}
-              {image2 && (
+              {image2 && image2.trim() !== '' && (
                 <div className="relative aspect-[3.5/1] w-full md:w-1/2 h-[120px] sm:h-[160px] lg:h-[180px]">
                   <Image
-                    src={image2}
+                    src={image2.startsWith('/') || image2.startsWith('http') ? image2 : `/${image2}`}
                     alt="Formula 2"
                     fill
+                    sizes="(max-width: 768px) 100vw, 50vw"
                     className="object-contain"
                   />
                 </div>

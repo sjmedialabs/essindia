@@ -86,7 +86,7 @@ export function HospitalHero({ content }: HospitalHeroProps) {
               />
             )}
 
-            {description.includes('<p>') ? (
+            {description.includes('<p>') || description.includes('<') ? (
               <div
                 className="text-base sm:text-lg max-w-xl leading-relaxed mb-8 prose prose-invert max-w-none prose-p:my-2"
                 style={{ color: descriptionColor }}

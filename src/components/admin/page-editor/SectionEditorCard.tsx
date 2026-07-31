@@ -11,6 +11,7 @@ import {
   Loader2,
   Eye,
   EyeOff,
+  RotateCcw,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -1413,6 +1414,8 @@ const DEFAULT_RPA_BENEFITS_CONTENT: Record<string, any> = {
 const DEFAULT_RPA_CAPABILITIES_CONTENT: Record<string, any> = {
   title: 'ESS RPA Offerings / Capabilities',
   description: 'From consulting and design to bot deployment and maintenance, we offer end-to-end RPA capabilities.',
+  hubTitle: 'RPA Core Offerings',
+  hubSubtitle: 'ESS INDIA',
   items: [
     { title: 'RPA Advisory', description: 'Identify and analyze workflows to construct a feasibility roadmap for robotic automation.', icon: '/RPA-Robotic Process Automation (RPA)/problem-process-solution_svgrepo.com.png' },
     { title: 'Bot Development', description: 'Build resilient software bots using modern RPA tools to mimic user clicks and actions.', icon: '/RPA-Robotic Process Automation (RPA)/exchange-personel_svgrepo.com.png' },
@@ -1973,9 +1976,11 @@ interface SectionEditorCardProps {
   onToggleExpand: () => void;
   onContentChange: (sectionId: string, keyPath: string, value: JsonValue) => void;
   onSave: (section: PageSection) => Promise<void>;
+  onDiscard?: (sectionId: string) => void;
   onDelete: (sectionId: string) => void;
   onMove: (index: number, direction: 'up' | 'down') => void;
   isSectionDirty: boolean;
+  disableStructureChanges?: boolean;
 }
 
 export function SectionEditorCard({
@@ -1987,9 +1992,11 @@ export function SectionEditorCard({
   onToggleExpand,
   onContentChange,
   onSave,
+  onDiscard,
   onDelete,
   onMove,
   isSectionDirty,
+  disableStructureChanges = false,
 }: SectionEditorCardProps) {
   const [saving, setSaving] = React.useState(false);
   const [activeTab, setActiveTab] = React.useState<string>('basic');
@@ -2173,7 +2180,7 @@ export function SectionEditorCard({
       meta.fieldOrder.forEach((key) => {
         if (!(key in finalMerged)) {
           // Default arrays/booleans for known list fields
-          if (['items', 'processes', 'features', 'faqs', 'cards', 'values', 'modules', 'paragraphs', 'leftItems', 'rightItems', 'steps', 'logos', 'stats', 'statistics', 'slides', 'categories', 'tabs', 'benefits', 'industries', 'solutions', 'points', 'topics', 'links'].includes(key)) {
+          if (['items', 'processes', 'features', 'faqs', 'cards', 'values', 'modules', 'paragraphs', 'leftItems', 'rightItems', 'steps', 'logos', 'stats', 'statistics', 'slides', 'categories', 'tabs', 'benefits', 'industries', 'solutions', 'points', 'topics', 'links', 'testimonials', 'challenges', 'introModules'].includes(key)) {
             finalMerged[key] = [];
           } else if (['autoScroll', 'isActive', 'supportsVariants'].includes(key)) {
             finalMerged[key] = true;
@@ -2200,7 +2207,7 @@ export function SectionEditorCard({
   const contentKeys = React.useMemo(() => {
     const keys = Object.keys(mergedContent);
     let finalKeys = keys;
-    if ((section.type.startsWith('contact-') || section.type.startsWith('europe-') || section.type.startsWith('uganda-') || section.type === 'job-detail-hero' || section.type === 'job-detail-content' || section.type === 'bi-highlight-strip' || section.type === 'bi-industries' || section.type === 'career-positions' || section.type === 'about-us-cta' || section.type === 'career-cta' || section.type === 'blog' || section.type === 'about-us-services-overview' || section.type.startsWith('oracle-') || (section.type.startsWith('rpa-') && section.type !== 'rpa-hero') || section.type.startsWith('ass-') || section.type.startsWith('aom-') || section.type.startsWith('fmcg-') || section.type.startsWith('roi-') || section.type.startsWith('retail-')) && meta?.fieldOrder) {
+    if ((section.type.startsWith('landing1-') || section.type.startsWith('contact-') || section.type.startsWith('europe-') || section.type.startsWith('uganda-') || section.type === 'job-detail-hero' || section.type === 'job-detail-content' || section.type === 'bi-highlight-strip' || section.type === 'bi-industries' || section.type === 'career-positions' || section.type === 'about-us-cta' || section.type === 'career-cta' || section.type === 'blog' || section.type === 'about-us-services-overview' || section.type.startsWith('oracle-') || (section.type.startsWith('rpa-') && section.type !== 'rpa-hero') || section.type.startsWith('ass-') || section.type.startsWith('aom-') || section.type.startsWith('fmcg-') || section.type.startsWith('roi-') || section.type.startsWith('retail-')) && meta?.fieldOrder) {
       finalKeys = meta.fieldOrder;
     } else if (meta?.fieldOrder) {
       finalKeys = keys.sort((a, b) => {
@@ -2308,8 +2315,11 @@ export function SectionEditorCard({
         isSectionDirty && 'ring-2 ring-amber-200'
       )}
     >
-      <div className="flex items-center gap-3 p-4 cursor-grab active:cursor-grabbing">
-        <GripVertical className="w-4 h-4 text-slate-300 shrink-0" />
+      <div className={cn(
+        "flex items-center gap-3 p-4",
+        !disableStructureChanges && "cursor-grab active:cursor-grabbing"
+      )}>
+        {!disableStructureChanges && <GripVertical className="w-4 h-4 text-slate-300 shrink-0" />}
         <button
           type="button"
           onClick={onToggleExpand}
@@ -2349,34 +2359,36 @@ export function SectionEditorCard({
             <ChevronDown className="w-4 h-4 text-slate-400 shrink-0" />
           )}
         </button>
-        <div className="flex gap-0.5 shrink-0">
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8"
-            onClick={() => onMove(index, 'up')}
-            disabled={index === 0}
-          >
-            <ChevronUp className="w-4 h-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8"
-            onClick={() => onMove(index, 'down')}
-            disabled={index === total - 1}
-          >
-            <ChevronDown className="w-4 h-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 text-rose-400 hover:text-rose-600 hover:bg-rose-50"
-            onClick={() => onDelete(section.id)}
-          >
-            <Trash2 className="w-4 h-4" />
-          </Button>
-        </div>
+        {!disableStructureChanges && (
+          <div className="flex gap-0.5 shrink-0">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8"
+              onClick={() => onMove(index, 'up')}
+              disabled={index === 0}
+            >
+              <ChevronUp className="w-4 h-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8"
+              onClick={() => onMove(index, 'down')}
+              disabled={index === total - 1}
+            >
+              <ChevronDown className="w-4 h-4" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 text-rose-400 hover:text-rose-600 hover:bg-rose-50"
+              onClick={() => onDelete(section.id)}
+            >
+              <Trash2 className="w-4 h-4" />
+            </Button>
+          </div>
+        )}
       </div>
 
       <AnimatePresence>
@@ -2503,19 +2515,34 @@ export function SectionEditorCard({
                     </span>
                   )}
                 </div>
-                <Button
-                  size="sm"
-                  onClick={handleSave}
-                  disabled={saving || !isSectionDirty}
-                  className="bg-[#4B2A63] text-white rounded-full gap-1.5 px-5"
-                >
-                  {saving ? (
-                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                  ) : (
-                    <Save className="w-3.5 h-3.5" />
+                <div className="flex items-center gap-2">
+                  {onDiscard && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      type="button"
+                      onClick={() => onDiscard(section.id)}
+                      disabled={saving || !isSectionDirty}
+                      className="rounded-full gap-1.5 px-4 text-slate-600 border-slate-200 hover:bg-slate-100"
+                    >
+                      <RotateCcw className="w-3.5 h-3.5" />
+                      Discard
+                    </Button>
                   )}
-                  {saving ? 'Saving…' : 'Save Section'}
-                </Button>
+                  <Button
+                    size="sm"
+                    onClick={handleSave}
+                    disabled={saving || !isSectionDirty}
+                    className="bg-[#4B2A63] text-white rounded-full gap-1.5 px-5"
+                  >
+                    {saving ? (
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    ) : (
+                      <Save className="w-3.5 h-3.5" />
+                    )}
+                    {saving ? 'Saving…' : 'Save Section'}
+                  </Button>
+                </div>
               </div>
             </div>
           </motion.div>

@@ -12,6 +12,7 @@ export class TemplateRepository {
         templateSections: {
           orderBy: [asc(templateSections.orderIndex)],
         },
+        category: true,
       },
     });
 
