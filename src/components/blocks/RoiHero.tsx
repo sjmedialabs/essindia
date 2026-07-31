@@ -67,12 +67,7 @@ export function RoiHero({ content }: { content?: RoiHeroContent }) {
   const { handleClick: handleBtn2Click, modalNode: modal2 } = useCtaAction(button2Url, button2FormType, content?.button2PdfUrl);
   const rightImage = content?.image || '/BI-ROI caluculator/image 123.png';
 
-  const hasCustomBg = content?.bgColor && content.bgColor !== '#13444f';
-  const bgStyles = getHeroBackgroundStyles({
-    gradientColor1: content?.gradientColor1,
-    gradientColor2: content?.gradientColor2,
-    gradientColor3: content?.gradientColor3,
-  }, hasCustomBg ? { backgroundColor: bgColor } : { backgroundImage: 'linear-gradient(135deg, #13444f 0%, #0e3038 100%)' });
+  const bgStyles = getHeroBackgroundStyles(content, { backgroundColor: content?.bgColor || '#13444f' });
 
   return (
     <section

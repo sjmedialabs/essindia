@@ -236,6 +236,44 @@ export function humanLabel(
     if (key === 'image') return 'Image or Video Upload';
   }
 
+  if (options?.sectionType === 'landing2-carousel' && options?.keyPath?.includes('slides.')) {
+    if (key === 'badge') return 'Card Small Badge';
+    if (key === 'title') return 'Right Card Big Title';
+    if (key === 'description') return 'Right Card Description';
+    if (key === 'mediaUrl') return 'Left Side Image or Video Upload';
+    if (key === 'videoUrl') return 'Optional Popup Video Upload';
+  }
+
+  if (options?.sectionType === 'landing2-capabilities' && options?.keyPath?.includes('tabs.')) {
+    if (key === 'name') return 'Tab Name';
+    if (key === 'image') return 'Tab Dashboard Image Upload';
+  }
+
+  if (options?.sectionType === 'landing2-industries' && options?.keyPath?.includes('industries.')) {
+    if (key === 'name' || key === 'title') return 'Industry Name';
+    if (key === 'image') return 'Industry Tile Image Upload';
+  }
+
+  if (options?.sectionType === 'landing2-testimonials' && options?.keyPath?.includes('testimonials.')) {
+    if (key === 'quote') return 'Customer Quote';
+    if (key === 'author') return 'Customer Name';
+    if (key === 'role') return 'Customer Role & Company';
+    if (key === 'image') return 'Thumbnail Image Upload';
+    if (key === 'videoUrl') return 'Testimonial Video Upload / URL';
+  }
+
+  if (options?.sectionType === 'landing2-why-ess' && options?.keyPath?.includes('features.')) {
+    if (key === 'title') return 'Feature Title';
+    if (key === 'description') return 'Feature Description';
+    if (key === 'iconType') return 'Icon Type (rupee|security|flexibility|analytics|user|time)';
+  }
+
+  if (options?.sectionType === 'landing2-footer-banner') {
+    if (key === 'logo') return 'Company Logo Upload';
+    if (key === 'navLinks') return 'Navigation Links Array';
+    if (key === 'socialLinks') return 'Social Icons Array';
+  }
+
   const base = baseHumanLabel(key);
   const tag = getHeadingTagForField(key, options?.sectionType, options?.keyPath);
   if (!tag) return base;

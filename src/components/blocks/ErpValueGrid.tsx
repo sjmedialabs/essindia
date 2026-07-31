@@ -64,7 +64,7 @@ export function ErpValueGrid({ content }: ErpValueGridProps) {
         {/* Header Block */}
         <div className="text-center max-w-3xl mx-auto mb-12">
           <MotionSection variant="fadeUp" className="">
-            <h2 className="text-3xl md:text-4xl lg:[42px] font-bold text-[#462294] tracking-tight">
+            <h2 className="text-3xl md:text-4xl lg:text-[42px] font-bold text-[#462294] tracking-tight mb-4">
               {heading}
             </h2>
             {description.includes('<p>') ? (
@@ -144,7 +144,7 @@ export function ErpValueGrid({ content }: ErpValueGridProps) {
 
               {/* Content */}
               <div className="py-4 px-4">
-                <h3 className="text-[28px] leading-tight mb-1 font-bold text-[#462294] group-hover:text-[#391781] transition-colors duration-300">
+                <h3 className="text-[28px] leading-tight mb-3 font-bold text-[#462294] group-hover:text-[#391781] transition-colors duration-300">
                   {card.title}
                 </h3>
 

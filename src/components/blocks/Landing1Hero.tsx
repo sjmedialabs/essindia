@@ -5,7 +5,13 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Play } from 'lucide-react';
 
+import { getHeroBackgroundStyles } from '@/lib/utils';
+
 export interface Landing1HeroContent {
+  gradientColor1?: string;
+  gradientColor2?: string;
+  gradientColor3?: string;
+  bgColor?: string;
   title?: string;
   primaryCtaText?: string;
   primaryCtaUrl?: string;
@@ -25,9 +31,13 @@ const DEFAULT_CONTENT: Landing1HeroContent = {
 
 export function Landing1Hero({ content }: { content?: Landing1HeroContent }) {
   const data = { ...DEFAULT_CONTENT, ...content };
+  const heroStyles = getHeroBackgroundStyles(data, { backgroundColor: data.bgColor || '#F6F4FC' });
 
   return (
-    <section className="relative overflow-hidden bg-[#F6F4FC] pt-14 pb-0 flex flex-col items-center select-none font-sans">
+    <section
+      className="relative overflow-hidden pt-14 pb-0 flex flex-col items-center select-none font-sans"
+      style={heroStyles}
+    >
       {/* Curved background decoration */}
       <div className="absolute top-0 left-0 w-full h-full pointer-events-none opacity-40 z-0">
         <div className="absolute -left-[10%] -top-[20%] w-[60%] h-[80%] rounded-full bg-gradient-to-br from-pink-200/30 to-purple-300/30 blur-3xl" />

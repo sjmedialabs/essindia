@@ -13,6 +13,8 @@ interface CapabilityItem {
 interface RpaCapabilitiesContent {
   title?: string;
   description?: string;
+  hubSubtitle?: string;
+  hubTitle?: string;
   items?: CapabilityItem[];
 }
 

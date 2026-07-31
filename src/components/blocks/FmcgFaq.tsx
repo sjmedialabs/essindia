@@ -110,14 +110,16 @@ export function FmcgFaq({ content }: { content?: FmcgFaqContent }) {
                   </span>
 
                   {/* Arrow Icon */}
-                  <div className="w-6 h-6 relative shrink-0">
-                    <Image
-                      src={arrowSrc}
-                      alt="Toggle FAQ"
-                      fill
-                      className={`object-contain transition-transform duration-300 ${isOpen ? 'rotate-90' : ''}`}
-                    />
-                  </div>
+                  {arrowSrc && arrowSrc.trim() !== '' && (
+                    <div className="w-6 h-6 relative shrink-0">
+                      <Image
+                        src={arrowSrc.startsWith('/') || arrowSrc.startsWith('http') ? arrowSrc : `/${arrowSrc}`}
+                        alt="Toggle FAQ"
+                        fill
+                        className={`object-contain transition-transform duration-300 ${isOpen ? 'rotate-90' : ''}`}
+                      />
+                    </div>
+                  )}
                 </button>
 
                 {/* Answer Row */}

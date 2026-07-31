@@ -30,7 +30,7 @@ export function Landing1Brands({ content }: { content?: Landing1BrandsContent })
   const data = { ...DEFAULT_CONTENT, ...content };
 
   return (
-    <section className="py-20 bg-[#5026ac] text-center font-sans select-none relative overflow-hidden">
+    <section className="py-14 bg-[#5026ac] text-center font-sans select-none relative overflow-hidden">
       {/* Decorative Radial background details */}
       <div className="absolute top-0 right-0 w-96 h-96 bg-white/[0.03] rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-0 left-0 w-96 h-96 bg-purple-500/[0.05] rounded-full blur-3xl pointer-events-none" />

@@ -113,7 +113,7 @@ export function RichTextField({ fieldKey, label, value, onChange, placeholder, m
     if (value !== currentHtml && value !== currentText) {
       const isValHtml = value.includes('<') && value.includes('>');
       const newContent = isValHtml ? value : `<p>${value || ''}</p>`;
-      editor.commands.setContent(newContent, false); // false prevents triggering onUpdate loop
+      editor.commands.setContent(newContent, { emitUpdate: false });
     }
   }, [value, editor]);
 
