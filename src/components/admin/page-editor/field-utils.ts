@@ -16,6 +16,7 @@ export type FieldType =
   | 'topicSelect'
   | 'industrySelect'
   | 'formSelect'
+  | 'ratingSelect'
   | 'null';
 
 /** Fields editors should not change — heading level is fixed in the component. */
@@ -181,7 +182,8 @@ function baseHumanLabel(key: string): string {
   if (key === 'button2Text') return 'Button 2 Text';
   if (key === 'button2TextColor') return 'Button 2 Text Color';
   if (key === 'button2Url') return 'Button 2 URL';
-  if (key === 'mediaUrl') return 'Media Upload (Image or Video)';
+  if (key === 'mediaUrl') return 'Thumbnail Upload';
+  if (key === 'videoUrl') return 'Media Upload';
   if (key === 'buttonBgColor') return 'Button Background Color';
   if (key === 'buttonTextColor') return 'Button Text Color';
   if (key === 'tabs') return 'Category Tabs List';
@@ -225,27 +227,42 @@ export function humanLabel(
   key: string,
   options?: { sectionType?: string; keyPath?: string }
 ): string {
-  if (options?.sectionType === 'landing1-showcase' && options?.keyPath?.includes('tabs.')) {
-    if (key === 'name') return 'Tab';
+  if (options?.sectionType === 'landing1-challenges' && options?.keyPath?.includes('challenges.')) {
+    if (key === 'title') return 'Challenge Title';
+    if (key === 'desc') return 'Challenge Description';
+    if (key === 'icon' || key === 'iconType' || key === 'image') return 'Icon / Image Upload';
+    if (key === 'solution') return 'Solution Tag';
+  }
+
+  if (options?.sectionType === 'landing1-showcase') {
+    if (key === 'name') return 'Tab Name';
     if (key === 'title') return 'Tab Title';
     if (key === 'desc') return 'Tab Description';
     if (key === 'primaryCtaText') return 'Tab CTA 1';
     if (key === 'primaryCtaUrl') return 'Tab CTA 1 URL';
+    if (key === 'primaryCtaFormType') return 'Tab CTA 1 Form Action';
     if (key === 'secondaryCtaText') return 'Tab CTA 2';
     if (key === 'secondaryCtaUrl') return 'Tab CTA 2 URL';
-    if (key === 'image') return 'Image or Video Upload';
+    if (key === 'secondaryCtaFormType') return 'Tab CTA 2 Form Action';
+    if (key === 'image' || key === 'videoUrl') return 'Video Upload';
   }
 
-  if (options?.sectionType === 'landing2-carousel' && options?.keyPath?.includes('slides.')) {
-    if (key === 'badge') return 'Card Small Badge';
-    if (key === 'title') return 'Right Card Big Title';
-    if (key === 'description') return 'Right Card Description';
-    if (key === 'mediaUrl') return 'Left Side Image or Video Upload';
-    if (key === 'videoUrl') return 'Optional Popup Video Upload';
+  if (options?.sectionType === 'landing2-carousel') {
+    if (key === 'badge') return 'Tag';
+    if (key === 'title') return 'Title';
+    if (key === 'description') return 'Description';
+    if (key === 'mediaUrl') return 'Thumbnail Upload';
+    if (key === 'videoUrl') return 'Media Upload';
   }
 
-  if (options?.sectionType === 'landing2-capabilities' && options?.keyPath?.includes('tabs.')) {
-    if (key === 'name') return 'Tab Name';
+  if (options?.sectionType === 'landing2-modules' && options?.keyPath?.includes('modules.')) {
+    if (key === 'title') return 'Module Title';
+    if (key === 'icon' || key === 'iconType' || key === 'image' || key === 'iconUrl') return 'Icon / Image Upload';
+    if (key === 'href') return 'Link URL';
+  }
+
+  if (options?.sectionType === 'landing2-capabilities') {
+    if (key === 'name' || key === 'tabName') return 'Tab Name';
     if (key === 'image') return 'Tab Dashboard Image Upload';
   }
 
@@ -255,17 +272,17 @@ export function humanLabel(
   }
 
   if (options?.sectionType === 'landing2-testimonials' && options?.keyPath?.includes('testimonials.')) {
-    if (key === 'quote') return 'Customer Quote';
-    if (key === 'author') return 'Customer Name';
-    if (key === 'role') return 'Customer Role & Company';
-    if (key === 'image') return 'Thumbnail Image Upload';
-    if (key === 'videoUrl') return 'Testimonial Video Upload / URL';
+    if (key === 'quote') return 'Title';
+    if (key === 'author') return 'Name';
+    if (key === 'role') return 'Role';
+    if (key === 'image') return 'Thumbnail Image';
+    if (key === 'videoUrl') return 'Video Upload';
   }
 
-  if (options?.sectionType === 'landing2-why-ess' && options?.keyPath?.includes('features.')) {
+  if (options?.sectionType === 'landing2-why-ess') {
     if (key === 'title') return 'Feature Title';
     if (key === 'description') return 'Feature Description';
-    if (key === 'iconType') return 'Icon Type (rupee|security|flexibility|analytics|user|time)';
+    if (key === 'icon' || key === 'iconType' || key === 'image') return 'Icon / Image Upload';
   }
 
   if (options?.sectionType === 'landing2-footer-banner') {
@@ -288,9 +305,13 @@ const TEXTAREA_PATTERNS = ['subtitle', 'subheading', 'note', 'message'];
 const COLOR_PATTERN = /^#([0-9a-f]{3}){1,2}$/i;
 const ICON_PATTERNS = ['icon'];
 
-export function detectFieldType(key: string, value: JsonValue, sectionType?: string): FieldType {
-  if (key === 'autoScroll') return 'boolean';
+export function detectFieldType(
+  key: string,
+  value: JsonValue,
+  sectionType?: string
+): FieldType {
   if (value === null || value === undefined) return 'null';
+  if (key.toLowerCase() === 'rating') return 'ratingSelect';
   if (typeof value === 'boolean') return 'boolean';
   if (typeof value === 'number') return 'number';
   if (Array.isArray(value)) return 'array';

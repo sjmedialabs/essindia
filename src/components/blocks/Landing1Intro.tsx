@@ -28,6 +28,8 @@ export interface Landing1IntroContent {
   image?: string;
   ctaText?: string;
   ctaUrl?: string;
+  ctaFormType?: string;
+  ctaPdfUrl?: string;
   introModules?: ModuleItem[];
 }
 
@@ -77,8 +79,17 @@ const renderModuleIcon = (type: string) => {
   }
 };
 
+import { useCtaAction, type CtaFormType } from '@/hooks/useCtaAction';
+
 export function Landing1Intro({ content }: { content?: Landing1IntroContent }) {
   const data = { ...DEFAULT_CONTENT, ...content };
+
+  const ctaFormType = (data.ctaFormType || '') as CtaFormType;
+  const { handleClick, modalNode } = useCtaAction(
+    data.ctaUrl || '/contact-us',
+    ctaFormType,
+    data.ctaPdfUrl
+  );
 
   return (
     <section className="py-14 bg-white font-sans select-none border-b border-slate-100">
@@ -145,13 +156,14 @@ export function Landing1Intro({ content }: { content?: Landing1IntroContent }) {
             {/* CTA Button */}
             {data.ctaText && (
               <div className="pt-4">
-                <Link
-                  href={data.ctaUrl || '#'}
-                  className="inline-flex items-center gap-2 px-8 py-3 rounded-full text-sm font-semibold text-white bg-[#4B2A63] hover:bg-[#3D2152] transition-colors shadow-md hover:shadow-lg"
+                <a
+                  href={data.ctaUrl || '/contact-us'}
+                  onClick={ctaFormType ? (e) => { e.preventDefault(); handleClick(); } : undefined}
+                  className="inline-flex items-center gap-2 px-8 py-3 rounded-full text-sm font-semibold text-white bg-[#4B2A63] hover:bg-[#3D2152] transition-colors shadow-md hover:shadow-lg cursor-pointer"
                 >
                   <span>{data.ctaText}</span>
                   <span>→</span>
-                </Link>
+                </a>
               </div>
             )}
 
@@ -159,6 +171,7 @@ export function Landing1Intro({ content }: { content?: Landing1IntroContent }) {
 
         </div>
       </div>
+      {modalNode}
     </section>
   );
 }

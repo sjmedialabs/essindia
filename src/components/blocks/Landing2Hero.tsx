@@ -2,23 +2,11 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Check, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { usePathname } from 'next/navigation';
+import { Check, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { validatePhoneNumber } from '@/lib/phone-validation';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { ALL_COUNTRIES_LIST } from '@/lib/countries';
-import countryCodesList from 'country-codes-list';
+import { useCtaAction, type CtaFormType } from '@/hooks/useCtaAction';
 
-const DIAL_CODES = (countryCodesList.customArray({
-  name: '{countryNameEn}',
-  code: '{countryCode}',
-  dialCode: '+{countryCallingCode}'
-}) as any as Array<{ name: string; code: string; dialCode: string }>).map(c => ({
-  ...c,
-  code: c.code.toLowerCase()
-})).filter((c, index, self) =>
-  index === self.findIndex((t) => t.dialCode === c.dialCode)
-);
 
 export interface BadgeItem {
   text: string;
@@ -34,8 +22,12 @@ export interface Landing2HeroContent {
   badges?: BadgeItem[];
   primaryCtaText?: string;
   primaryCtaUrl?: string;
+  primaryCtaFormType?: string;
+  primaryCtaPdfUrl?: string;
   secondaryCtaText?: string;
   secondaryCtaUrl?: string;
+  secondaryCtaFormType?: string;
+  secondaryCtaPdfUrl?: string;
   formTitle?: string;
   formSubtitle?: string;
   dataNotice?: string;
@@ -78,23 +70,33 @@ import { getHeroBackgroundStyles } from '@/lib/utils';
 export function Landing2Hero({ content }: { content?: Landing2HeroContent }) {
   const data = { ...DEFAULT_CONTENT, ...content };
 
+  const primaryCtaFormType = (data.primaryCtaFormType || '') as CtaFormType;
+  const secondaryCtaFormType = (data.secondaryCtaFormType || '') as CtaFormType;
+
+  const { handleClick: handlePrimaryClick, modalNode: primaryModal } = useCtaAction(
+    data.primaryCtaUrl || '#form',
+    primaryCtaFormType,
+    data.primaryCtaPdfUrl
+  );
+
+  const { handleClick: handleSecondaryClick, modalNode: secondaryModal } = useCtaAction(
+    data.secondaryCtaUrl || '/contact-us',
+    secondaryCtaFormType,
+    data.secondaryCtaPdfUrl
+  );
+
+  const pathname = usePathname();
+
   const [formData, setFormData] = useState({
+    name: '',
     company: '',
     industry: '',
     email: '',
-    password: '',
     phone: '',
   });
 
-  const [showPassword, setShowPassword] = useState(false);
-  const [selectedDialCode, setSelectedDialCode] = useState<string>('us');
-  const [searchDialQuery, setSearchDialQuery] = useState<string>('');
   const [acceptedTerms, setAcceptedTerms] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
-
-  const filteredDialCodes = DIAL_CODES.filter(c =>
-    c.name.toLowerCase().includes(searchDialQuery.toLowerCase()) || c.dialCode.includes(searchDialQuery)
-  );
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
@@ -107,13 +109,18 @@ export function Landing2Hero({ content }: { content?: Landing2HeroContent }) {
       return;
     }
 
+    if (!formData.name.trim()) {
+      toast.error('Please enter your full name.');
+      return;
+    }
+
     if (!formData.company.trim()) {
       toast.error('Please enter your company name.');
       return;
     }
 
-    if (!formData.industry) {
-      toast.error('Please select an industry.');
+    if (!formData.industry.trim()) {
+      toast.error('Please enter your industry.');
       return;
     }
 
@@ -122,29 +129,24 @@ export function Landing2Hero({ content }: { content?: Landing2HeroContent }) {
       return;
     }
 
-    const validation = validatePhoneNumber(formData.phone, selectedDialCode);
-    if (!validation.isValid) {
-      toast.error(validation.message);
+    if (!formData.phone.trim()) {
+      toast.error('Please enter your mobile number.');
       return;
     }
 
     setIsSubmitting(true);
     try {
-      const dialInfo = DIAL_CODES.find((c) => c.code === selectedDialCode);
-      const fullPhone = dialInfo && formData.phone ? `${dialInfo.dialCode} ${formData.phone}` : formData.phone;
-
       const res = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          name: formData.company,
+          name: formData.name,
           email: formData.email,
-          phone: fullPhone,
+          phone: formData.phone,
           company: formData.company,
-          country: dialInfo?.name || '',
-          message: `Industry: ${formData.industry}`,
-          formType: 'landing2-trial',
-          pageName: 'Landing Page 2 Hero',
+          message: JSON.stringify({ industry: formData.industry }),
+          formType: 'landing-2',
+          pageName: pathname || '',
         }),
       });
 
@@ -153,7 +155,7 @@ export function Landing2Hero({ content }: { content?: Landing2HeroContent }) {
       }
 
       toast.success('Registration submitted successfully! Our team will contact you shortly.');
-      setFormData({ company: '', industry: '', email: '', password: '', phone: '' });
+      setFormData({ name: '', company: '', industry: '', email: '', phone: '' });
       setAcceptedTerms(false);
     } catch (err: any) {
       toast.error(err.message || 'Something went wrong. Please try again.');
@@ -219,18 +221,20 @@ export function Landing2Hero({ content }: { content?: Landing2HeroContent }) {
             {data.primaryCtaText && (
               <a
                 href={data.primaryCtaUrl || '#form'}
-                className="bg-[#f5c234] hover:bg-[#e0b028] text-slate-900 px-8 py-3.5 rounded-md font-bold text-xs md:text-sm tracking-wider uppercase transition-colors shadow-md text-center"
+                onClick={primaryCtaFormType ? (e) => { e.preventDefault(); handlePrimaryClick(); } : undefined}
+                className="bg-[#f5c234] hover:bg-[#e0b028] text-slate-900 px-8 py-3.5 rounded-md font-bold text-xs md:text-sm tracking-wider uppercase transition-colors shadow-md text-center cursor-pointer"
               >
                 {data.primaryCtaText}
               </a>
             )}
             {data.secondaryCtaText && (
-              <Link
+              <a
                 href={data.secondaryCtaUrl || '/contact-us'}
-                className="bg-[#f5c234] hover:bg-[#e0b028] text-slate-900 px-8 py-3.5 rounded-md font-bold text-xs md:text-sm tracking-wider uppercase transition-colors shadow-md text-center"
+                onClick={secondaryCtaFormType ? (e) => { e.preventDefault(); handleSecondaryClick(); } : undefined}
+                className="bg-[#f5c234] hover:bg-[#e0b028] text-slate-900 px-8 py-3.5 rounded-md font-bold text-xs md:text-sm tracking-wider uppercase transition-colors shadow-md text-center cursor-pointer"
               >
                 {data.secondaryCtaText}
-              </Link>
+              </a>
             )}
           </div>
         </div>
@@ -250,6 +254,19 @@ export function Landing2Hero({ content }: { content?: Landing2HeroContent }) {
 
             {/* Registration Form */}
             <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Full Name Input */}
+              <div>
+                <input
+                  type="text"
+                  name="name"
+                  required
+                  value={formData.name}
+                  onChange={handleChange}
+                  placeholder="Full Name"
+                  className="w-full px-4 py-3 rounded-lg border border-slate-200 text-sm placeholder:text-slate-400 focus:outline-none focus:border-[#3f1885] transition-colors"
+                />
+              </div>
+
               {/* Company Input */}
               <div>
                 <input
@@ -263,20 +280,17 @@ export function Landing2Hero({ content }: { content?: Landing2HeroContent }) {
                 />
               </div>
 
-              {/* Industry Select Dropdown */}
+              {/* Industry Input */}
               <div>
-                <select
+                <input
+                  type="text"
                   name="industry"
                   required
                   value={formData.industry}
-                  onChange={(e) => setFormData(prev => ({ ...prev, industry: e.target.value }))}
-                  className="w-full px-4 py-3 rounded-lg border border-slate-200 text-sm text-slate-700 bg-white focus:outline-none focus:border-[#3f1885] transition-colors cursor-pointer"
-                >
-                  <option value="" disabled>Select Industry</option>
-                  {industriesList.map((ind, idx) => (
-                    <option key={idx} value={ind}>{ind}</option>
-                  ))}
-                </select>
+                  onChange={handleChange}
+                  placeholder="Industry"
+                  className="w-full px-4 py-3 rounded-lg border border-slate-200 text-sm placeholder:text-slate-400 focus:outline-none focus:border-[#3f1885] transition-colors"
+                />
               </div>
 
               {/* Email Input */}
@@ -292,67 +306,16 @@ export function Landing2Hero({ content }: { content?: Landing2HeroContent }) {
                 />
               </div>
 
-              {/* Password Input */}
-              <div className="relative">
+              {/* Phone Input */}
+              <div>
                 <input
-                  type={showPassword ? 'text' : 'password'}
-                  name="password"
-                  required
-                  value={formData.password}
-                  onChange={handleChange}
-                  placeholder="Password"
-                  className="w-full px-4 py-3 rounded-lg border border-slate-200 text-sm placeholder:text-slate-400 focus:outline-none focus:border-[#3f1885] transition-colors pr-10"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
-                >
-                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                </button>
-              </div>
-
-              {/* Phone Input with Dial Code Selector */}
-              <div className="flex rounded-lg border border-slate-200 overflow-hidden">
-                <Select value={selectedDialCode} onValueChange={(v) => setSelectedDialCode(v || '')} onOpenChange={(open) => !open && setSearchDialQuery('')}>
-                  <SelectTrigger className="w-[110px] px-3 !h-[44px] rounded-r-none border-0 border-r border-slate-200 focus-visible:outline-none focus-visible:ring-0 text-sm bg-slate-50 shadow-none z-10">
-                    <SelectValue>
-                      {selectedDialCode && (
-                        <span className="flex items-center gap-1 font-semibold text-slate-700">
-                          {DIAL_CODES.find((c) => c.code === selectedDialCode)?.dialCode}
-                        </span>
-                      )}
-                    </SelectValue>
-                  </SelectTrigger>
-                  <SelectContent className="w-[260px] max-h-60 p-0" alignItemWithTrigger={false} side="bottom">
-                    <div className="p-2 sticky top-0 bg-white z-10 border-b border-slate-100">
-                      <input
-                        type="text"
-                        placeholder="Search code..."
-                        className="w-full px-3 py-1.5 text-xs outline-none border border-slate-200 rounded-md focus:border-[#3f1885]"
-                        value={searchDialQuery}
-                        onChange={(e) => setSearchDialQuery(e.target.value)}
-                        onClick={(e) => e.stopPropagation()}
-                      />
-                    </div>
-                    <div className="p-1">
-                      {filteredDialCodes.map((c) => (
-                        <SelectItem key={c.code} value={c.code} className="cursor-pointer text-xs">
-                          <span className="text-slate-500 w-10">{c.dialCode}</span>
-                          <span className="truncate">{c.name}</span>
-                        </SelectItem>
-                      ))}
-                    </div>
-                  </SelectContent>
-                </Select>
-                <input
-                  type="text"
+                  type="tel"
                   name="phone"
                   required
                   value={formData.phone}
                   onChange={handleChange}
                   placeholder="Mobile Number"
-                  className="flex-1 px-4 py-3 text-sm placeholder:text-slate-400 focus:outline-none"
+                  className="w-full px-4 py-3 rounded-lg border border-slate-200 text-sm placeholder:text-slate-400 focus:outline-none focus:border-[#3f1885] transition-colors"
                 />
               </div>
 
@@ -404,6 +367,8 @@ export function Landing2Hero({ content }: { content?: Landing2HeroContent }) {
           </div>
         </div>
       </div>
+      {primaryModal}
+      {secondaryModal}
     </section>
   );
 }

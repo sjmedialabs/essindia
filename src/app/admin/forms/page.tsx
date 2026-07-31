@@ -44,10 +44,11 @@ function FormsAdminInner() {
   // Pagination & Tab State
   const searchParams = useSearchParams();
   const [currentPage, setCurrentPage] = React.useState(1);
-  const [activeTab, setActiveTab] = React.useState<'contact' | 'cta' | 'landing-page'>(() => {
+  const [activeTab, setActiveTab] = React.useState<'contact' | 'landing-1' | 'landing-2' | 'cta'>(() => {
     const t = searchParams?.get('tab');
     if (t === 'cta') return 'cta';
-    if (t === 'landing-page') return 'landing-page';
+    if (t === 'landing-2') return 'landing-2';
+    if (t === 'landing-1' || t === 'landing-page') return 'landing-1';
     return 'contact';
   });
   const itemsPerPage = 10;
@@ -80,7 +81,16 @@ function FormsAdminInner() {
       // Filter by tab
       if (activeTab === 'contact' && type !== 'contact') return false;
       if (activeTab === 'cta' && type !== 'cta') return false;
-      if (activeTab === 'landing-page' && type !== 'landing-page') return false;
+      
+      if (activeTab === 'landing-1') {
+        const isLanding1 = type === 'landing-1' || (type === 'landing-page' && sub.message?.includes('requirement'));
+        if (!isLanding1) return false;
+      }
+
+      if (activeTab === 'landing-2') {
+        const isLanding2 = type === 'landing-2' || type === 'landing2-trial' || (type === 'landing-page' && !sub.message?.includes('requirement'));
+        if (!isLanding2) return false;
+      }
       
       let dateMatch = true;
       let countryMatch = true;
@@ -113,14 +123,13 @@ function FormsAdminInner() {
   const exportToCSV = () => {
     if (filteredSubmissions.length === 0) return;
     
-    const isContact = activeTab === 'contact';
-    const isLanding = activeTab === 'landing-page';
-    
     let headers: string[] = [];
-    if (isContact) {
+    if (activeTab === 'contact') {
       headers = ['Date', 'Name', 'Email', 'Phone', 'Company', 'Country', 'Message'];
-    } else if (isLanding) {
-      headers = ['Date', 'Name', 'Email', 'Phone', 'Company', 'Page Name', 'Industry', 'Employees', 'Current ERP', 'Requirement'];
+    } else if (activeTab === 'landing-1') {
+      headers = ['Date', 'Page Name', 'Name', 'Email', 'Phone', 'Company', 'Industry', 'Employees', 'Current ERP', 'Requirement'];
+    } else if (activeTab === 'landing-2') {
+      headers = ['Date', 'Page Name', 'Company Name', 'Email', 'Phone', 'Industry', 'Country'];
     } else {
       headers = ['Date', 'Name', 'Email', 'Phone', 'Country', 'Page Name', 'PDF URL'];
     }
@@ -130,10 +139,12 @@ function FormsAdminInner() {
       try {
         if (sub.message && sub.message.startsWith('{')) {
           parsed = JSON.parse(sub.message);
+        } else if (sub.message && sub.message.startsWith('Industry:')) {
+          parsed.industry = sub.message.replace('Industry:', '').trim();
         }
       } catch (e) {}
 
-      if (isContact) {
+      if (activeTab === 'contact') {
         return [
           `"${new Date(sub.createdAt).toLocaleString().replace(/"/g, '""')}"`,
           `"${(sub.name || '').replace(/"/g, '""')}"`,
@@ -143,18 +154,28 @@ function FormsAdminInner() {
           `"${(sub.country || '').replace(/"/g, '""')}"`,
           `"${(sub.message || '').replace(/"/g, '""').replace(/\n|\r/g, ' ')}"`
         ];
-      } else if (isLanding) {
+      } else if (activeTab === 'landing-1') {
         return [
           `"${new Date(sub.createdAt).toLocaleString().replace(/"/g, '""')}"`,
+          `"${(formatPageName(sub.pageName) || '').replace(/"/g, '""')}"`,
           `"${(sub.name || '').replace(/"/g, '""')}"`,
           `"${(sub.email || '').replace(/"/g, '""')}"`,
           `"${(sub.phone || '').replace(/"/g, '""')}"`,
           `"${(sub.company || '').replace(/"/g, '""')}"`,
-          `"${(formatPageName(sub.pageName) || '').replace(/"/g, '""')}"`,
           `"${(parsed.industry || '').replace(/"/g, '""')}"`,
           `"${(parsed.employees || '').replace(/"/g, '""')}"`,
           `"${(parsed.currentErp || '').replace(/"/g, '""')}"`,
           `"${(parsed.requirement || '').replace(/"/g, '""')}"`
+        ];
+      } else if (activeTab === 'landing-2') {
+        return [
+          `"${new Date(sub.createdAt).toLocaleString().replace(/"/g, '""')}"`,
+          `"${(formatPageName(sub.pageName) || '').replace(/"/g, '""')}"`,
+          `"${(sub.company || sub.name || '').replace(/"/g, '""')}"`,
+          `"${(sub.email || '').replace(/"/g, '""')}"`,
+          `"${(sub.phone || '').replace(/"/g, '""')}"`,
+          `"${(parsed.industry || '').replace(/"/g, '""')}"`,
+          `"${(sub.country || '').replace(/"/g, '""')}"`
         ];
       } else {
         return [
@@ -163,7 +184,7 @@ function FormsAdminInner() {
           `"${(sub.email || '').replace(/"/g, '""')}"`,
           `"${(sub.phone || '').replace(/"/g, '""')}"`,
           `"${(sub.country || '').replace(/"/g, '""')}"`,
-          `"${(sub.pageName || '').replace(/"/g, '""')}"`,
+          `"${(formatPageName(sub.pageName) || '').replace(/"/g, '""')}"`,
           `"${(sub.pdfUrl || '').replace(/"/g, '""')}"`
         ];
       }
@@ -194,22 +215,40 @@ function FormsAdminInner() {
         </Button>
       </div>
 
-      <div className="flex gap-3 border-b border-slate-200">
+      <div className="flex flex-wrap items-center gap-3 border-b border-slate-200">
         <button
           onClick={() => setActiveTab('contact')}
-          className={`cursor-pointer pb-2 px-1.5 font-semibold text-xs transition-colors border-b-2 ${activeTab === 'contact' ? 'border-[#4B2A63] text-[#4B2A63]' : 'border-transparent text-slate-500 hover:text-slate-800'}`}
+          className={`cursor-pointer pb-2 px-2 font-semibold text-xs transition-colors border-b-2 ${activeTab === 'contact' ? 'border-[#4B2A63] text-[#4B2A63]' : 'border-transparent text-slate-500 hover:text-slate-800'}`}
         >
           Contact Leads
         </button>
-        <button
-          onClick={() => setActiveTab('landing-page')}
-          className={`cursor-pointer pb-2 px-1.5 font-semibold text-xs transition-colors border-b-2 ${activeTab === 'landing-page' ? 'border-[#4B2A63] text-[#4B2A63]' : 'border-transparent text-slate-500 hover:text-slate-800'}`}
-        >
-          Landing Page Leads
-        </button>
+
+        <div className="flex items-center gap-1 bg-slate-100/80 p-0.5 rounded-lg mb-1.5 border border-slate-200/60">
+          <button
+            onClick={() => setActiveTab('landing-1')}
+            className={`cursor-pointer px-3 py-1 text-xs font-bold rounded-md transition-all ${
+              activeTab === 'landing-1'
+                ? 'bg-[#4B2A63] text-white shadow-sm'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            Landing 1 Leads
+          </button>
+          <button
+            onClick={() => setActiveTab('landing-2')}
+            className={`cursor-pointer px-3 py-1 text-xs font-bold rounded-md transition-all ${
+              activeTab === 'landing-2'
+                ? 'bg-[#4B2A63] text-white shadow-sm'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            Landing 2 Leads
+          </button>
+        </div>
+
         <button
           onClick={() => setActiveTab('cta')}
-          className={`cursor-pointer pb-2 px-1.5 font-semibold text-xs transition-colors border-b-2 ${activeTab === 'cta' ? 'border-[#4B2A63] text-[#4B2A63]' : 'border-transparent text-slate-500 hover:text-slate-800'}`}
+          className={`cursor-pointer pb-2 px-2 font-semibold text-xs transition-colors border-b-2 ${activeTab === 'cta' ? 'border-[#4B2A63] text-[#4B2A63]' : 'border-transparent text-slate-500 hover:text-slate-800'}`}
         >
           Page Leads
         </button>
@@ -275,23 +314,31 @@ function FormsAdminInner() {
                  <thead className="bg-slate-50/60 text-slate-500 font-medium border-b border-slate-200">
                   <tr>
                     <th className="px-3 py-2 whitespace-nowrap">Date</th>
+                    {activeTab === 'landing-1' || activeTab === 'landing-2' ? (
+                      <th className="px-3 py-2 whitespace-nowrap">Page Name</th>
+                    ) : null}
                     <th className="px-3 py-2 whitespace-nowrap">Name</th>
                     <th className="px-3 py-2 whitespace-nowrap">Mail</th>
                     <th className="px-3 py-2 whitespace-nowrap">Contact</th>
-                    {(activeTab === 'contact' || activeTab === 'landing-page') && <th className="px-3 py-2 whitespace-nowrap">Company</th>}
-                    {activeTab === 'landing-page' ? (
-                      <th className="px-3 py-2 whitespace-nowrap">Page Name</th>
-                    ) : (
-                      <th className="px-3 py-2 whitespace-nowrap">Country</th>
-                    )}
+                    {activeTab === 'landing-1' || activeTab === 'contact' ? (
+                      <th className="px-3 py-2 whitespace-nowrap">Company</th>
+                    ) : null}
                     {activeTab === 'contact' ? (
-                      <th className="px-3 py-2 whitespace-nowrap w-1/3">Message</th>
-                    ) : activeTab === 'landing-page' ? (
+                      <>
+                        <th className="px-3 py-2 whitespace-nowrap">Country</th>
+                        <th className="px-3 py-2 whitespace-nowrap w-1/3">Message</th>
+                      </>
+                    ) : activeTab === 'landing-1' ? (
                       <>
                         <th className="px-3 py-2 whitespace-nowrap">Industry</th>
                         <th className="px-3 py-2 whitespace-nowrap">Employees</th>
                         <th className="px-3 py-2 whitespace-nowrap">Current ERP</th>
                         <th className="px-3 py-2 whitespace-nowrap">Requirement</th>
+                      </>
+                    ) : activeTab === 'landing-2' ? (
+                      <>
+                        <th className="px-3 py-2 whitespace-nowrap">Company</th>
+                        <th className="px-3 py-2 whitespace-nowrap">Industry</th>
                       </>
                     ) : (
                       <>
@@ -308,6 +355,8 @@ function FormsAdminInner() {
                     try {
                       if (sub.message && sub.message.startsWith('{')) {
                         parsed = JSON.parse(sub.message);
+                      } else if (sub.message && sub.message.startsWith('Industry:')) {
+                        parsed.industry = sub.message.replace('Industry:', '').trim();
                       }
                     } catch (e) {}
 
@@ -316,6 +365,11 @@ function FormsAdminInner() {
                         <td className="px-3 py-3.5 whitespace-nowrap text-[11px] text-slate-500">
                           {new Date(sub.createdAt).toLocaleDateString()}
                         </td>
+                        {activeTab === 'landing-1' || activeTab === 'landing-2' ? (
+                          <td className="px-3 py-3.5 text-[11px] text-[#4B2A63] font-semibold whitespace-nowrap">
+                            {formatPageName(sub.pageName)}
+                          </td>
+                        ) : null}
                         <td className="px-3 py-3.5 text-xs font-semibold text-slate-900 whitespace-nowrap">
                           {sub.name}
                         </td>
@@ -328,35 +382,31 @@ function FormsAdminInner() {
                         <td className="px-3 py-3.5 text-[11px] text-slate-500 whitespace-nowrap">
                           {sub.phone || '-'}
                         </td>
-                        {(activeTab === 'contact' || activeTab === 'landing-page') && (
+                        {activeTab === 'landing-1' || activeTab === 'contact' ? (
                           <td className="px-3 py-3.5 text-[11px] text-slate-650 whitespace-nowrap">
                             {sub.company || '-'}
                           </td>
-                        )}
-                        {activeTab === 'landing-page' ? (
-                          <td className="px-3 py-3.5 text-[11px] text-[#4B2A63] font-semibold whitespace-nowrap">
-                            {formatPageName(sub.pageName)}
-                          </td>
-                        ) : (
-                          <td className="px-3 py-3.5 text-[11px] text-slate-650 whitespace-nowrap">
-                            {sub.country || '-'}
-                          </td>
-                        )}
+                        ) : null}
                         {activeTab === 'contact' ? (
-                          <td className="px-3 py-3.5">
-                            <div className="relative group cursor-pointer">
-                              <p className="text-slate-600 line-clamp-2 text-[11px] leading-relaxed max-w-[250px]">
-                                {sub.message || '-'}
-                              </p>
-                              {sub.message && sub.message.length > 50 && (
-                                <div className="absolute right-0 top-full mt-2 hidden group-hover:block w-[400px] max-w-[90vw] p-3 bg-slate-900 text-white text-xs rounded-lg shadow-2xl z-[999] whitespace-normal break-words">
-                                  <div className="absolute bottom-full right-8 -mb-1 border-4 border-transparent border-b-slate-900"></div>
-                                  {sub.message}
-                                </div>
-                              )}
-                            </div>
-                          </td>
-                        ) : activeTab === 'landing-page' ? (
+                          <>
+                            <td className="px-3 py-3.5 text-[11px] text-slate-650 whitespace-nowrap">
+                              {sub.country || '-'}
+                            </td>
+                            <td className="px-3 py-3.5">
+                              <div className="relative group cursor-pointer">
+                                <p className="text-slate-600 line-clamp-2 text-[11px] leading-relaxed max-w-[250px]">
+                                  {sub.message || '-'}
+                                </p>
+                                {sub.message && sub.message.length > 50 && (
+                                  <div className="absolute right-0 top-full mt-2 hidden group-hover:block w-[400px] max-w-[90vw] p-3 bg-slate-900 text-white text-xs rounded-lg shadow-2xl z-[999] whitespace-normal break-words">
+                                    <div className="absolute bottom-full right-8 -mb-1 border-4 border-transparent border-b-slate-900"></div>
+                                    {sub.message}
+                                  </div>
+                                )}
+                              </div>
+                            </td>
+                          </>
+                        ) : activeTab === 'landing-1' ? (
                           <>
                             <td className="px-3 py-3.5 text-[11px] text-slate-650 whitespace-nowrap">
                               {parsed.industry || '-'}
@@ -369,6 +419,15 @@ function FormsAdminInner() {
                             </td>
                             <td className="px-3 py-3.5 text-[11px] text-slate-650 whitespace-nowrap">
                               {parsed.requirement || '-'}
+                            </td>
+                          </>
+                        ) : activeTab === 'landing-2' ? (
+                          <>
+                            <td className="px-3 py-3.5 text-[11px] text-slate-650 whitespace-nowrap">
+                              {sub.company || '-'}
+                            </td>
+                            <td className="px-3 py-3.5 text-[11px] text-slate-650 whitespace-nowrap">
+                              {parsed.industry || '-'}
                             </td>
                           </>
                         ) : (
@@ -425,8 +484,8 @@ function FormsAdminInner() {
                   >
                     <ChevronLeft className="w-3 h-3 mr-1" /> Previous
                   </Button>
-                  <span className="text-[11px] font-semibold text-slate-700 px-1.5">
-                    Page {currentPage} of {totalPages || 1}
+                  <span className="text-[11px] text-slate-600 font-medium px-2">
+                    {currentPage} / {totalPages || 1}
                   </span>
                   <Button
                     variant="outline"
@@ -456,8 +515,12 @@ function FormsAdminInner() {
                   <p className="font-bold text-slate-900 uppercase">{(selectedSub.formType || 'contact')}</p>
                 </div>
                 <div>
-                  <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Name</p>
-                  <p className="font-bold text-slate-900">{selectedSub.name}</p>
+                  <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Page Name</p>
+                  <p className="font-bold text-slate-900">{formatPageName(selectedSub.pageName)}</p>
+                </div>
+                <div>
+                  <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Name / Company</p>
+                  <p className="font-bold text-slate-900">{selectedSub.name || selectedSub.company || 'N/A'}</p>
                 </div>
                 <div>
                   <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Date</p>
@@ -473,62 +536,72 @@ function FormsAdminInner() {
                   <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Phone</p>
                   <p className="font-bold text-slate-900">{selectedSub.phone || 'N/A'}</p>
                 </div>
-                {((selectedSub.formType || 'contact') === 'contact' || selectedSub.formType === 'landing-page') && (
+                {selectedSub.company && (
                   <div>
                     <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Company</p>
-                    <p className="font-bold text-slate-900">{selectedSub.company || 'N/A'}</p>
+                    <p className="font-bold text-slate-900">{selectedSub.company}</p>
                   </div>
                 )}
-                 {selectedSub.formType === 'landing-page' ? (
-                   <div>
-                     <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Page Name</p>
-                     <p className="font-bold text-slate-900">{formatPageName(selectedSub.pageName)}</p>
-                   </div>
-                 ) : (
-                   <div>
-                     <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Country</p>
-                     <p className="font-bold text-slate-900">{selectedSub.country || 'N/A'}</p>
-                   </div>
-                 )}
+                {selectedSub.country && (
+                  <div>
+                    <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Country</p>
+                    <p className="font-bold text-slate-900">{selectedSub.country}</p>
+                  </div>
+                )}
               </div>
               
-              {selectedSub.formType === 'landing-page' && (() => {
+              {(() => {
                 let parsed = { industry: '', employees: '', currentErp: '', requirement: '' };
                 try {
                   if (selectedSub.message && selectedSub.message.startsWith('{')) {
                     parsed = JSON.parse(selectedSub.message);
+                  } else if (selectedSub.message && selectedSub.message.startsWith('Industry:')) {
+                    parsed.industry = selectedSub.message.replace('Industry:', '').trim();
                   }
                 } catch (e) {}
+
+                if (!parsed.industry && !parsed.employees && !parsed.currentErp && !parsed.requirement) {
+                  return null;
+                }
+
                 return (
                   <div className="space-y-4 border-t border-slate-100 pt-4">
-                    <h5 className="font-bold text-slate-900 text-sm">Demo Requirements</h5>
+                    <h5 className="font-bold text-slate-900 text-sm">Lead Details & Requirements</h5>
                     <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div>
-                        <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Industry</p>
-                        <p className="font-bold text-slate-800">{parsed.industry || 'N/A'}</p>
-                      </div>
-                      <div>
-                        <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Employees</p>
-                        <p className="font-bold text-slate-800">{parsed.employees || 'N/A'}</p>
-                      </div>
-                      <div>
-                        <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Current ERP</p>
-                        <p className="font-bold text-slate-800">{parsed.currentErp || 'N/A'}</p>
-                      </div>
-                      <div>
-                        <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Business Requirement</p>
-                        <p className="font-bold text-slate-800">{parsed.requirement || 'N/A'}</p>
-                      </div>
+                      {parsed.industry && (
+                        <div>
+                          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Industry</p>
+                          <p className="font-bold text-slate-800">{parsed.industry}</p>
+                        </div>
+                      )}
+                      {parsed.employees && (
+                        <div>
+                          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Employees</p>
+                          <p className="font-bold text-slate-800">{parsed.employees}</p>
+                        </div>
+                      )}
+                      {parsed.currentErp && (
+                        <div>
+                          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Current ERP</p>
+                          <p className="font-bold text-slate-800">{parsed.currentErp}</p>
+                        </div>
+                      )}
+                      {parsed.requirement && (
+                        <div>
+                          <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Business Requirement</p>
+                          <p className="font-bold text-slate-800">{parsed.requirement}</p>
+                        </div>
+                      )}
                     </div>
                   </div>
                 );
               })()}
 
-              {selectedSub.formType === 'contact' && (
+              {selectedSub.formType === 'contact' && selectedSub.message && !selectedSub.message.startsWith('{') && (
                 <div>
                   <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1">Message</p>
                   <div className="bg-slate-50 p-4 rounded-xl text-slate-700 whitespace-pre-wrap border border-slate-100 text-sm">
-                    {selectedSub.message || 'No message provided.'}
+                    {selectedSub.message}
                   </div>
                 </div>
               )}

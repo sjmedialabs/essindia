@@ -3,11 +3,14 @@
 import React from 'react';
 import Link from 'next/link';
 import { IndianRupee, ShieldCheck, Shuffle, TrendingUp, UserCheck, Clock } from 'lucide-react';
+import { useCtaAction, type CtaFormType } from '@/hooks/useCtaAction';
 
 export interface WhyEssFeatureItem {
   title: string;
   description: string;
   iconType?: string;
+  icon?: string;
+  image?: string;
 }
 
 export interface Landing2WhyEssContent {
@@ -16,6 +19,8 @@ export interface Landing2WhyEssContent {
   features?: WhyEssFeatureItem[];
   ctaText?: string;
   ctaUrl?: string;
+  ctaFormType?: string;
+  ctaPdfUrl?: string;
 }
 
 const DEFAULT_FEATURES: WhyEssFeatureItem[] = [
@@ -59,9 +64,28 @@ const DEFAULT_CONTENT: Landing2WhyEssContent = {
   ctaUrl: '/contact-us',
 };
 
-function renderFeatureIcon(iconType?: string) {
+function renderFeatureIcon(feat: WhyEssFeatureItem) {
+  const iconSrc = feat.icon || feat.image || feat.iconType;
+
+  if (
+    iconSrc &&
+    (iconSrc.startsWith('/') ||
+      iconSrc.startsWith('http://') ||
+      iconSrc.startsWith('https://') ||
+      iconSrc.startsWith('data:') ||
+      /\.(png|jpg|jpeg|svg|webp|gif)$/i.test(iconSrc))
+  ) {
+    return (
+      <img
+        src={iconSrc}
+        alt={feat.title || 'Feature Icon'}
+        className="w-7 h-7 object-contain"
+      />
+    );
+  }
+
   const iconProps = { className: 'w-7 h-7 text-[#562ca0] stroke-[2]' };
-  switch (iconType) {
+  switch (iconSrc) {
     case 'security':
       return <ShieldCheck {...iconProps} />;
     case 'flexibility':
@@ -81,6 +105,13 @@ function renderFeatureIcon(iconType?: string) {
 export function Landing2WhyEss({ content }: { content?: Landing2WhyEssContent }) {
   const data = { ...DEFAULT_CONTENT, ...content };
   const items = data.features && data.features.length > 0 ? data.features : DEFAULT_FEATURES;
+
+  const ctaFormType = (data.ctaFormType || '') as CtaFormType;
+  const { handleClick, modalNode } = useCtaAction(
+    data.ctaUrl || '/contact-us',
+    ctaFormType,
+    data.ctaPdfUrl
+  );
 
   return (
     <section className="py-14 bg-white font-sans select-none px-6">
@@ -108,7 +139,7 @@ export function Landing2WhyEss({ content }: { content?: Landing2WhyEssContent })
             >
               {/* Soft Purple Light Circle Background for Icon */}
               <div className="w-16 h-16 rounded-full bg-[#f3efff] flex items-center justify-center mb-6 group-hover:scale-110 group-hover:bg-[#ebf] transition-all duration-300">
-                {renderFeatureIcon(feat.iconType)}
+                {renderFeatureIcon(feat)}
               </div>
 
               {/* Feature Title */}
@@ -127,15 +158,17 @@ export function Landing2WhyEss({ content }: { content?: Landing2WhyEssContent })
         {/* Solid Purple Bottom CTA Button */}
         {data.ctaText && (
           <div>
-            <Link
+            <a
               href={data.ctaUrl || '/contact-us'}
+              onClick={ctaFormType ? (e) => { e.preventDefault(); handleClick(); } : undefined}
               className="inline-flex items-center justify-center bg-[#462294] hover:bg-[#381a79] text-white px-10 py-4 rounded-md font-bold text-xs md:text-sm tracking-wider uppercase transition-all shadow-md hover:shadow-lg cursor-pointer"
             >
               {data.ctaText}
-            </Link>
+            </a>
           </div>
         )}
       </div>
+      {modalNode}
     </section>
   );
 }

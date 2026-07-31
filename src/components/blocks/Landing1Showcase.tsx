@@ -2,7 +2,8 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import Link from 'next/link';
+import { Play, X } from 'lucide-react';
+import { useCtaAction, type CtaFormType } from '@/hooks/useCtaAction';
 
 export interface TabItem {
   name: string;
@@ -11,8 +12,12 @@ export interface TabItem {
   image: string;
   primaryCtaText?: string;
   primaryCtaUrl?: string;
+  primaryCtaFormType?: string;
+  primaryCtaPdfUrl?: string;
   secondaryCtaText?: string;
   secondaryCtaUrl?: string;
+  secondaryCtaFormType?: string;
+  secondaryCtaPdfUrl?: string;
 }
 
 export interface Landing1ShowcaseContent {
@@ -32,29 +37,9 @@ const DEFAULT_TABS: TabItem[] = [
     secondaryCtaUrl: '/contact',
   },
   {
-    name: 'CRM',
-    title: 'Customer Relationship Management',
-    desc: 'Manage leads, pipeline opportunities, and client communication metrics natively connected with sales order booking workflows.',
-    image: '/Landing page1/assets/Frame 1618872978.png',
-    primaryCtaText: 'Read More',
-    primaryCtaUrl: '#',
-    secondaryCtaText: 'Get free Demo',
-    secondaryCtaUrl: '/contact',
-  },
-  {
-    name: 'HRMS',
-    title: 'Human Resource Management System',
-    desc: 'Unify payroll, attendance tracking, appraisal evaluations, and leave management seamlessly across all operational sites.',
-    image: '/Landing page1/assets/Frame 1618872978.png',
-    primaryCtaText: 'Read More',
-    primaryCtaUrl: '#',
-    secondaryCtaText: 'Get free Demo',
-    secondaryCtaUrl: '/contact',
-  },
-  {
-    name: 'Finance Management',
-    title: 'Finance & Accounts Management',
-    desc: 'Automate accounting entries, manage cash flow metrics, run multi-company balance sheets, and handle audits with zero spreadsheet dependencies.',
+    name: 'Sales Management',
+    title: 'Sales Order & Quotation Control',
+    desc: 'Automate sales order approvals, credit limits, pricing matrices, and real-time inventory reservation.',
     image: '/Landing page1/assets/Frame 1618872978.png',
     primaryCtaText: 'Read More',
     primaryCtaUrl: '#',
@@ -63,8 +48,8 @@ const DEFAULT_TABS: TabItem[] = [
   },
   {
     name: 'Inventory Management',
-    title: 'Smart Inventory & Warehousing',
-    desc: 'Real-time multi-location stock tracking, barcode/RFID integrations, minimum-stock notifications, and automated supply orders.',
+    title: 'Batch & Serial Warehouse Tracking',
+    desc: 'Multi-location warehouse visibility, barcode scanning integration, reorder point alerts, and valuation metrics.',
     image: '/Landing page1/assets/Frame 1618872978.png',
     primaryCtaText: 'Read More',
     primaryCtaUrl: '#',
@@ -72,19 +57,9 @@ const DEFAULT_TABS: TabItem[] = [
     secondaryCtaUrl: '/contact',
   },
   {
-    name: 'Sales',
-    title: 'Sales & Dispatch Control',
-    desc: 'Manage sales orders, check credit limits, automate billing, and schedule delivery dispatches from a single clean screen.',
-    image: '/Landing page1/assets/Frame 1618872978.png',
-    primaryCtaText: 'Read More',
-    primaryCtaUrl: '#',
-    secondaryCtaText: 'Get free Demo',
-    secondaryCtaUrl: '/contact',
-  },
-  {
-    name: 'Purchase',
-    title: 'Strategic Purchase Management',
-    desc: 'Track vendor quotations, automate purchase orders, handle multi-currency conversions, and audit supplier performance lists.',
+    name: 'Financial Accounting',
+    title: 'Real-Time Financial Reporting',
+    desc: 'General ledger, AP/AR, multi-currency accounting, bank reconciliation, and audit-compliant balance sheet generation.',
     image: '/Landing page1/assets/Frame 1618872978.png',
     primaryCtaText: 'Read More',
     primaryCtaUrl: '#',
@@ -94,37 +69,65 @@ const DEFAULT_TABS: TabItem[] = [
 ];
 
 const DEFAULT_CONTENT: Landing1ShowcaseContent = {
-  title: '7 Modules One Powerful Manufacturing Software',
+  title: 'Modules Designed To Solve Real Business Challenges',
   tabs: DEFAULT_TABS,
 };
 
 export function Landing1Showcase({ content }: { content?: Landing1ShowcaseContent }) {
   const data = { ...DEFAULT_CONTENT, ...content };
   const [activeTab, setActiveTab] = useState(0);
+  const [isVideoModalOpen, setIsVideoModalOpen] = useState(false);
+
+  const activeTabData = data.tabs?.[activeTab];
+  const activeMedia = activeTabData?.image || (activeTabData as any)?.videoUrl || '';
+
+  const isVideoFile = (url: string) => {
+    return url && (url.toLowerCase().match(/\.(mp4|webm|mov|ogg)$/) || url.startsWith('/uploads/') || url.includes('video'));
+  };
+
+  const primaryFormType = (activeTabData?.primaryCtaFormType || '') as CtaFormType;
+  const secondaryFormType = (activeTabData?.secondaryCtaFormType || '') as CtaFormType;
+
+  const { handleClick: handlePrimaryClick, modalNode: primaryModal } = useCtaAction(
+    activeTabData?.primaryCtaUrl || '/contact-us',
+    primaryFormType,
+    activeTabData?.primaryCtaPdfUrl
+  );
+
+  const { handleClick: handleSecondaryClick, modalNode: secondaryModal } = useCtaAction(
+    activeTabData?.secondaryCtaUrl || '/contact-us',
+    secondaryFormType,
+    activeTabData?.secondaryCtaPdfUrl
+  );
 
   return (
-    <section className="py-14 bg-[#F5F7FC] font-sans select-none border-b border-slate-100">
-      <div className="container mx-auto px-6 max-w-7xl">
-        {/* Section Title */}
+    <section className="py-14 bg-[#FAF9FD] font-sans select-none border-b border-slate-100">
+      <div className="container mx-auto px-6 max-w-7xl space-y-12">
+        {/* Title */}
         {data.title && (
-          <h2 className="text-2xl md:text-4xl font-bold text-[#0D265C] text-center mb-12">
+          <h2 className="text-3xl md:text-[40px] font-bold text-center text-[#0D265C] tracking-tight leading-tight max-w-4xl mx-auto">
             {data.title}
           </h2>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-100 min-h-[580px]">
-          {/* Left Navigation Tabs */}
-          <div className="lg:col-span-3 border-r border-slate-100 flex flex-col divide-y divide-slate-100/60 bg-slate-50/20">
+        {/* Tab Card Wrapper */}
+        <div className="bg-white rounded-3xl border border-slate-100 shadow-xl overflow-hidden grid grid-cols-1 lg:grid-cols-12 min-h-[460px]">
+          {/* Left Vertical Tab Navigation */}
+          <div className="lg:col-span-3 border-r border-slate-100 flex flex-col bg-[#FAF8FC]">
             {data.tabs?.map((t, idx) => {
               const isActive = activeTab === idx;
               return (
                 <button
                   key={idx}
-                  onClick={() => setActiveTab(idx)}
-                  className={`w-full py-5 px-6 text-left font-medium text-sm transition-all relative flex items-center ${
+                  type="button"
+                  onClick={() => {
+                    setActiveTab(idx);
+                    setIsVideoModalOpen(false);
+                  }}
+                  className={`px-6 py-5 text-left text-sm font-semibold transition-all relative border-b border-slate-100 flex items-center justify-between ${
                     isActive
-                      ? 'bg-[#E3DCF5]/60 text-[#3F226D] font-semibold'
-                      : 'text-slate-700 hover:bg-slate-50'
+                      ? 'bg-white text-[#3F226D] font-bold shadow-sm'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-white/60'
                   }`}
                 >
                   <span>{t.name}</span>
@@ -151,45 +154,91 @@ export function Landing1Showcase({ content }: { content?: Landing1ShowcaseConten
                 {/* CTAs */}
                 <div className="flex flex-wrap items-center gap-3 pt-2">
                   {data.tabs[activeTab].primaryCtaText && (
-                    <Link
+                    <a
                       href={data.tabs[activeTab].primaryCtaUrl || '#'}
-                      className="px-6 py-2.5 rounded-full text-xs font-semibold text-white bg-[#3F226D] hover:bg-[#321A58] transition-colors shadow-sm"
+                      onClick={primaryFormType ? (e) => { e.preventDefault(); handlePrimaryClick(); } : undefined}
+                      className="px-6 py-2.5 rounded-full text-xs font-semibold text-white bg-[#3F226D] hover:bg-[#321A58] transition-colors shadow-sm cursor-pointer"
                     >
                       {data.tabs[activeTab].primaryCtaText}
-                    </Link>
+                    </a>
                   )}
                   {data.tabs[activeTab].secondaryCtaText && (
-                    <Link
+                    <a
                       href={data.tabs[activeTab].secondaryCtaUrl || '#'}
-                      className="px-6 py-2.5 rounded-full text-xs font-semibold text-white bg-black hover:bg-slate-900 transition-colors shadow-sm"
+                      onClick={secondaryFormType ? (e) => { e.preventDefault(); handleSecondaryClick(); } : undefined}
+                      className="px-6 py-2.5 rounded-full text-xs font-semibold text-white bg-black hover:bg-slate-900 transition-colors shadow-sm cursor-pointer"
                     >
                       {data.tabs[activeTab].secondaryCtaText}
-                    </Link>
+                    </a>
                   )}
                 </div>
               </div>
 
-              {/* Graphic Mockup with Play Overlay */}
-              <div className="relative w-full aspect-[16/8] mt-6 rounded-xl overflow-hidden shadow-md border border-slate-100 group cursor-pointer bg-slate-50">
-                <Image
-                  src={data.tabs[activeTab].image}
-                  alt={data.tabs[activeTab].title}
-                  fill
-                  className="object-cover object-top"
-                />
-                {/* Play Button Overlay */}
-                <div className="absolute inset-0 flex items-center justify-center bg-black/5 hover:bg-black/10 transition-colors">
-                  <div className="w-16 h-16 rounded-full bg-red-600 flex items-center justify-center shadow-lg transition-transform group-hover:scale-110 duration-200">
-                    <svg className="w-7 h-7 text-white fill-current ml-1" viewBox="0 0 24 24">
-                      <path d="M8 5v14l11-7z" />
-                    </svg>
+              {/* Graphic / Video Player Box */}
+              <div className="relative w-full aspect-[16/8] mt-6 rounded-xl overflow-hidden shadow-md border border-slate-100 bg-slate-900 group">
+                {isVideoFile(activeMedia) ? (
+                  <video
+                    src={activeMedia}
+                    controls
+                    autoPlay
+                    muted
+                    loop
+                    playsInline
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div
+                    onClick={() => activeMedia && setIsVideoModalOpen(true)}
+                    className="relative w-full h-full cursor-pointer"
+                  >
+                    <Image
+                      src={activeMedia || '/Landing page1/assets/Frame 1618872978.png'}
+                      alt={data.tabs[activeTab].title}
+                      fill
+                      className="object-cover object-top"
+                    />
+                    {/* Play Button Overlay */}
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/20 hover:bg-black/30 transition-colors">
+                      <div className="w-16 h-16 rounded-full bg-red-600 flex items-center justify-center shadow-lg transition-transform group-hover:scale-110 duration-200">
+                        <Play className="w-7 h-7 text-white fill-current ml-1" />
+                      </div>
+                    </div>
                   </div>
-                </div>
+                )}
               </div>
             </div>
           )}
         </div>
       </div>
+
+      {/* Fullscreen Video Popup Modal */}
+      {isVideoModalOpen && activeMedia && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4">
+          <div className="relative w-full max-w-4xl bg-black rounded-2xl overflow-hidden aspect-video shadow-2xl border border-white/20">
+            <button
+              type="button"
+              onClick={() => setIsVideoModalOpen(false)}
+              className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-black transition-colors cursor-pointer"
+            >
+              <X className="w-6 h-6" />
+            </button>
+            {activeMedia.includes('youtube') || activeMedia.includes('vimeo') ? (
+              <iframe
+                src={activeMedia}
+                title="Video Preview"
+                className="w-full h-full border-0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
+            ) : (
+              <video src={activeMedia} controls autoPlay className="w-full h-full object-contain" />
+            )}
+          </div>
+        </div>
+      )}
+
+      {primaryModal}
+      {secondaryModal}
     </section>
   );
 }

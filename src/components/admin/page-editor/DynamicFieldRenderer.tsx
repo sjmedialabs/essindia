@@ -220,6 +220,16 @@ export function DynamicFieldRenderer({
         />
       );
 
+    case 'ratingSelect':
+      return (
+        <RatingSelectField
+          fieldKey={fieldKey}
+          label={fieldLabel}
+          value={Number(value ?? 5)}
+          onChange={(v) => onChange(keyPath, v)}
+        />
+      );
+
     default:
       return null;
   }
@@ -396,6 +406,43 @@ function FormSelectField({
             </button>
           );
         })}
+      </div>
+    </div>
+  );
+}
+
+function RatingSelectField({
+  fieldKey,
+  label,
+  value,
+  onChange,
+}: {
+  fieldKey: string;
+  label?: string;
+  value: number;
+  onChange: (value: number) => void;
+}) {
+  const currentVal = Number(value) || 5;
+  return (
+    <div className="space-y-1.5 flex-1 min-w-[180px]">
+      <label className="admin-label">{label || humanLabel(fieldKey)}</label>
+      <div className="flex items-center gap-1.5 bg-slate-50 p-2 rounded-xl border border-slate-200">
+        {[1, 2, 3, 4, 5].map((num) => (
+          <button
+            key={num}
+            type="button"
+            onClick={() => onChange(num)}
+            className={cn(
+              'px-3 py-1.5 text-xs font-bold rounded-lg transition-all flex items-center gap-1 cursor-pointer',
+              currentVal === num
+                ? 'bg-amber-400 text-slate-950 shadow-sm font-extrabold scale-105 ring-1 ring-amber-500/30'
+                : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+            )}
+          >
+            <span className="text-amber-500">★</span>
+            <span>{num}</span>
+          </button>
+        ))}
       </div>
     </div>
   );
@@ -670,6 +717,8 @@ function ArrayField({
             let testimonialOrder = ['topic', 'industry', 'companyName', 'quote', 'authorAvatar', 'authorName', 'authorTitle'];
             if (sectionType === 'landing1-testimonials') {
               testimonialOrder = ['avatar', 'name', 'rating', 'quote'];
+            } else if (sectionType === 'landing2-testimonials') {
+              testimonialOrder = ['quote', 'author', 'role', 'image', 'videoUrl'];
             }
             sortedKeys = testimonialOrder.filter(k => k in objItem);
           } else if (fieldKey === 'cards') {
@@ -733,13 +782,25 @@ function ArrayField({
             const processOrder = ['icon', 'title', 'description'];
             sortedKeys = processOrder.filter(k => k in objItem);
           } else if (fieldKey === 'features') {
-            let featureOrder = ['icon', 'image', 'title', 'desc', 'desc2', 'description'];
+            let featureOrder = ['icon', 'iconType', 'image', 'title', 'desc', 'desc2', 'description'];
             if (sectionType === 'hospital-features') {
               featureOrder = ['label'];
             } else if (sectionType === 'erp-features') {
               featureOrder = ['id', 'image', 'title', 'desc', 'desc2'];
+            } else if (sectionType === 'landing2-why-ess') {
+              featureOrder = ['icon', 'iconType', 'title', 'description'];
             }
             sortedKeys = featureOrder.filter(k => k in objItem);
+            if (sectionType === 'landing2-why-ess') {
+              for (const k of ['icon', 'title', 'description']) {
+                if (!sortedKeys.includes(k) && !(k === 'icon' && 'iconType' in objItem)) {
+                  sortedKeys.unshift(k);
+                }
+                if (!(k in objItem) && !(k === 'icon' && 'iconType' in objItem)) {
+                  objItem[k] = '';
+                }
+              }
+            }
           } else if (fieldKey === 'tabs') {
             let tabOrder = ['tabName', 'heading', 'subheading', 'questions', 'image'];
             if (sectionType === 'bi-tabs') {
@@ -755,11 +816,27 @@ function ArrayField({
             } else if (sectionType === 'uganda-insights') {
               tabOrder = ['tabName', 'contentTitle', 'body1', 'body2', 'points', 'subsections', 'image'];
             } else if (sectionType === 'landing1-showcase') {
-              tabOrder = ['name', 'title', 'desc', 'image', 'primaryCtaText', 'primaryCtaUrl', 'secondaryCtaText', 'secondaryCtaUrl'];
+              tabOrder = ['name', 'title', 'desc', 'image', 'primaryCtaText', 'primaryCtaUrl', 'primaryCtaFormType', 'secondaryCtaText', 'secondaryCtaUrl', 'secondaryCtaFormType'];
+              sortedKeys = tabOrder.filter(k => k in objItem);
+              for (const k of ['name', 'title', 'desc', 'image', 'primaryCtaText', 'primaryCtaUrl', 'secondaryCtaText', 'secondaryCtaUrl']) {
+                if (!sortedKeys.includes(k)) sortedKeys.push(k);
+                if (!(k in objItem)) objItem[k] = '';
+              }
             } else if (sectionType === 'mfg-icons') {
               tabOrder = ['label', 'iconImage', 'sections'];
+            } else if (sectionType === 'landing2-capabilities') {
+              if ('tabName' in objItem && !('name' in objItem)) {
+                objItem.name = objItem.tabName;
+              }
+              tabOrder = ['name', 'image'];
             }
             sortedKeys = tabOrder.filter(k => k in objItem);
+            if (sectionType === 'landing2-capabilities') {
+              for (const k of ['name', 'image']) {
+                if (!sortedKeys.includes(k)) sortedKeys.push(k);
+                if (!(k in objItem)) objItem[k] = '';
+              }
+            }
           } else if (fieldKey === 'stats' || fieldKey === 'statistics') {
             let statOrder = ['number', 'value', 'label'];
             if (sectionType === 'landing1-stats') {
@@ -772,22 +849,52 @@ function ArrayField({
             sortedKeys = statOrder.filter(k => k in objItem);
           } else if (fieldKey === 'slides') {
             let slideOrder = ['image', 'logo', 'title', 'stats', 'ctaText', 'ctaUrl'];
-            sortedKeys = slideOrder.filter(k => k in objItem);
+            if (sectionType === 'landing2-carousel') {
+              sortedKeys = ['badge', 'title', 'description', 'mediaUrl', 'videoUrl'];
+              for (const k of sortedKeys) {
+                if (!(k in objItem)) {
+                  objItem[k] = '';
+                }
+              }
+            } else {
+              sortedKeys = slideOrder.filter(k => k in objItem);
+            }
           } else if (fieldKey === 'solutions') {
             const solutionOrder = ['title', 'description'];
             sortedKeys = solutionOrder.filter(k => k in objItem);
           } else if (fieldKey === 'benefits') {
             const benefitOrder = ['image', 'title'];
             sortedKeys = benefitOrder.filter(k => k in objItem);
+          } else if (fieldKey === 'challenges') {
+            let challengeOrder = ['icon', 'iconType', 'title', 'desc', 'solution'];
+            sortedKeys = challengeOrder.filter(k => k in objItem);
+            if (sectionType === 'landing1-challenges') {
+              for (const k of ['icon', 'title', 'desc', 'solution']) {
+                if (!sortedKeys.includes(k) && !(k === 'icon' && 'iconType' in objItem)) {
+                  sortedKeys.unshift(k);
+                }
+                if (!(k in objItem) && !(k === 'icon' && 'iconType' in objItem)) {
+                  objItem[k] = '';
+                }
+              }
+            }
           } else if (fieldKey === 'points') {
             let pointsOrder = ['title', 'description'];
             if (sectionType === 'hospital-regulatory') {
               pointsOrder = ['label'];
             }
             sortedKeys = pointsOrder.filter(k => k in objItem);
-          } else if (fieldKey === 'industries' && sectionType === 'rpa-industries') {
-            const industryOrder = ['icon', 'title', 'description'];
-            sortedKeys = industryOrder.filter(k => k in objItem);
+          } else if (fieldKey === 'industries') {
+            if (sectionType === 'landing2-industries') {
+              const industryOrder = ['name', 'title', 'image'];
+              sortedKeys = industryOrder.filter(k => k in objItem);
+              if (sortedKeys.length === 0) {
+                sortedKeys = Object.keys(objItem).filter(k => k !== 'href');
+              }
+            } else if (sectionType === 'rpa-industries') {
+              const industryOrder = ['icon', 'title', 'description'];
+              sortedKeys = industryOrder.filter(k => k in objItem);
+            }
           } else {
             // Heuristic to sort common fields logically
             const priorityKeys = ['subtitle', 'iconImage', 'icon', 'image', 'title', 'tags', 'name', 'heading', 'label', 'description', 'bgImage', 'ctaText', 'ctaUrl', 'items', 'points', 'cards'];

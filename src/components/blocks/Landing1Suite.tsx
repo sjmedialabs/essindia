@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import { useCtaAction, type CtaFormType } from '@/hooks/useCtaAction';
 
 export interface SuiteModuleItem {
   name: string;
@@ -17,6 +18,8 @@ export interface Landing1SuiteContent {
   modules?: SuiteModuleItem[];
   ctaText?: string;
   ctaUrl?: string;
+  ctaFormType?: string;
+  ctaPdfUrl?: string;
 }
 
 const DEFAULT_MODULES: SuiteModuleItem[] = [
@@ -38,72 +41,70 @@ const DEFAULT_MODULES: SuiteModuleItem[] = [
   },
   {
     name: 'Manufacturing',
-    desc: 'Plan production, manage BOMs, routing, work orders, and shop-floor activities with ease. Improve efficiency through real-time production planning.',
+    desc: 'Plan production, manage BOMs, track work orders, and control shop-floor operations. Ensure optimal capacity utilization and timely delivery.',
     image: '/Landing page1/assets/Frame 1618872983.png'
-  },
-  {
-    name: 'Inventory',
-    desc: 'Track inventory across multiple warehouses with batch and serial control. Maintain accurate stock levels through real-time inventory management.',
-    image: '/Landing page1/assets/Frame 1618872984.png'
-  },
-  {
-    name: 'Business Intelligence',
-    desc: 'Turn business data into actionable insights with interactive dashboards and reports. Monitor KPIs and make faster, data-driven decisions across your organization.',
-    image: '/Landing page1/assets/Frame 1618872981.png'
   }
 ];
 
 const DEFAULT_CONTENT: Landing1SuiteContent = {
-  badge: 'INDUSTRIES',
-  title: 'Everything Your Business Runs On, In One Suite',
-  description: '13 Deeply Integrated Modules, Use What You Need Today, Switch On The Rest As You Scale-Without Ever Migrating Data.',
+  badge: 'COMPLETE BUSINESS SUITE',
+  title: 'One Platform. Infinite Possibilities.',
+  description: 'Every tool your growing enterprise needs to operate, analyze, and scale — deeply connected out of the box.',
   modules: DEFAULT_MODULES,
-  ctaText: 'Explore More',
+  ctaText: 'Explore All Modules',
   ctaUrl: '/contact'
 };
 
 export function Landing1Suite({ content }: { content?: Landing1SuiteContent }) {
   const data = { ...DEFAULT_CONTENT, ...content };
 
+  const ctaFormType = (data.ctaFormType || '') as CtaFormType;
+  const { handleClick, modalNode } = useCtaAction(
+    data.ctaUrl || '/contact-us',
+    ctaFormType,
+    data.ctaPdfUrl
+  );
+
   return (
-    <section className="py-20 bg-slate-50 text-slate-900 font-sans select-none border-b border-slate-200">
+    <section className="py-14 bg-[#FAFAFD] font-sans select-none border-b border-slate-100">
       <div className="container mx-auto px-6 max-w-7xl">
         
         {/* Header */}
-        <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
+        <div className="text-center space-y-4 max-w-3xl mx-auto mb-16">
           {data.badge && (
-            <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold tracking-wider text-indigo-600 bg-indigo-50 border border-indigo-100 uppercase">
-              <span className="w-1.5 h-1.5 rounded-full bg-indigo-600 animate-pulse" />
+            <span className="inline-flex items-center gap-1.5 px-4 py-1 rounded-full text-xs font-semibold tracking-wider text-[#5D38F0] bg-[#EFEAFE] uppercase">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#5D38F0]" />
               {data.badge}
             </span>
           )}
+
           {data.title && (
-            <h2 className="text-3xl md:text-[40px] font-extrabold tracking-tight text-slate-900 leading-tight">
+            <h2 className="text-3xl md:text-5xl font-bold text-slate-900 tracking-tight leading-tight">
               {data.title}
             </h2>
           )}
+
           {data.description && (
-            <p className="text-slate-500 text-sm md:text-base max-w-2xl mx-auto leading-relaxed">
+            <p className="text-slate-500 text-sm md:text-base leading-relaxed">
               {data.description}
             </p>
           )}
         </div>
 
-        {/* Modules Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {/* 4 Cards Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {data.modules?.map((item, idx) => {
             return (
               <div
                 key={idx}
-                className="bg-white rounded-2xl overflow-hidden transition-all duration-300 flex flex-col h-full border border-slate-100 hover:border-slate-200 shadow-sm hover:shadow-md"
+                className="bg-white rounded-2xl border border-slate-100 overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col group"
               >
-                {/* Image Container */}
-                <div className="relative w-full aspect-[16/10] bg-slate-100/50 flex items-center justify-center overflow-hidden border-b border-slate-100">
+                {/* Image Graphic Box */}
+                <div className="h-44 w-full bg-[#F6F4FC] relative flex items-center justify-center p-6 border-b border-slate-100/60 overflow-hidden">
                   <img
                     src={item.image}
                     alt={item.name}
-                    className="w-full h-full object-cover object-center"
-                    loading="lazy"
+                    className="max-h-full max-w-full object-contain drop-shadow-md group-hover:scale-105 transition-transform duration-300"
                   />
                 </div>
                 
@@ -124,17 +125,19 @@ export function Landing1Suite({ content }: { content?: Landing1SuiteContent }) {
         {/* Bottom CTA Button */}
         {data.ctaText && (
           <div className="text-center pt-14">
-            <Link
-              href={data.ctaUrl || '#'}
-              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full text-sm font-semibold text-white bg-[#5D38F0] hover:bg-[#4B2A63] transition-all shadow-md hover:shadow-lg shadow-indigo-600/10 hover:shadow-indigo-600/20"
+            <a
+              href={data.ctaUrl || '/contact-us'}
+              onClick={ctaFormType ? (e) => { e.preventDefault(); handleClick(); } : undefined}
+              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full text-sm font-semibold text-white bg-[#5D38F0] hover:bg-[#4B2A63] transition-all shadow-md hover:shadow-lg shadow-indigo-600/10 hover:shadow-indigo-600/20 cursor-pointer"
             >
               <span>{data.ctaText}</span>
               <span>→</span>
-            </Link>
+            </a>
           </div>
         )}
 
       </div>
+      {modalNode}
     </section>
   );
 }

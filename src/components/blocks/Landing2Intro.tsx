@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import { useCtaAction, type CtaFormType } from '@/hooks/useCtaAction';
 
 export interface Landing2IntroContent {
   badgeText?: string;
@@ -9,6 +10,8 @@ export interface Landing2IntroContent {
   description?: string;
   ctaText?: string;
   ctaUrl?: string;
+  ctaFormType?: string;
+  ctaPdfUrl?: string;
 }
 
 const DEFAULT_CONTENT: Landing2IntroContent = {
@@ -21,6 +24,13 @@ const DEFAULT_CONTENT: Landing2IntroContent = {
 
 export function Landing2Intro({ content }: { content?: Landing2IntroContent }) {
   const data = { ...DEFAULT_CONTENT, ...content };
+
+  const ctaFormType = (data.ctaFormType || '') as CtaFormType;
+  const { handleClick, modalNode } = useCtaAction(
+    data.ctaUrl || '/contact-us',
+    ctaFormType,
+    data.ctaPdfUrl
+  );
 
   return (
     <section className="py-14 bg-[#f8f9fa] text-center font-sans select-none relative overflow-hidden px-6">
@@ -50,14 +60,16 @@ export function Landing2Intro({ content }: { content?: Landing2IntroContent }) {
 
         {/* Purple CTA Button */}
         {data.ctaText && (
-          <Link
+          <a
             href={data.ctaUrl || '/contact-us'}
+            onClick={ctaFormType ? (e) => { e.preventDefault(); handleClick(); } : undefined}
             className="inline-flex items-center justify-center bg-[#462294] hover:bg-[#381a79] text-white px-9 py-4 rounded-md font-bold text-xs md:text-sm tracking-wider uppercase transition-all shadow-md hover:shadow-lg cursor-pointer"
           >
             {data.ctaText}
-          </Link>
+          </a>
         )}
       </div>
+      {modalNode}
     </section>
   );
 }

@@ -4,6 +4,7 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Play } from 'lucide-react';
+import { useCtaAction, type CtaFormType } from '@/hooks/useCtaAction';
 
 import { getHeroBackgroundStyles } from '@/lib/utils';
 
@@ -15,8 +16,12 @@ export interface Landing1HeroContent {
   title?: string;
   primaryCtaText?: string;
   primaryCtaUrl?: string;
+  primaryCtaFormType?: string;
+  primaryCtaPdfUrl?: string;
   secondaryCtaText?: string;
   secondaryCtaUrl?: string;
+  secondaryCtaFormType?: string;
+  secondaryCtaPdfUrl?: string;
   image?: string;
 }
 
@@ -32,6 +37,21 @@ const DEFAULT_CONTENT: Landing1HeroContent = {
 export function Landing1Hero({ content }: { content?: Landing1HeroContent }) {
   const data = { ...DEFAULT_CONTENT, ...content };
   const heroStyles = getHeroBackgroundStyles(data, { backgroundColor: data.bgColor || '#F6F4FC' });
+
+  const primaryFormType = (data.primaryCtaFormType || '') as CtaFormType;
+  const secondaryFormType = (data.secondaryCtaFormType || '') as CtaFormType;
+
+  const { handleClick: handlePrimaryClick, modalNode: primaryModal } = useCtaAction(
+    data.primaryCtaUrl || '/contact-us',
+    primaryFormType,
+    data.primaryCtaPdfUrl
+  );
+
+  const { handleClick: handleSecondaryClick, modalNode: secondaryModal } = useCtaAction(
+    data.secondaryCtaUrl || '#',
+    secondaryFormType,
+    data.secondaryCtaPdfUrl
+  );
 
   return (
     <section
@@ -55,21 +75,23 @@ export function Landing1Hero({ content }: { content?: Landing1HeroContent }) {
         {/* Buttons */}
         <div className="flex items-center justify-center gap-4 mb-16">
           {data.primaryCtaText && (
-            <Link
+            <a
               href={data.primaryCtaUrl || '#'}
-              className="px-8 py-3 rounded-full text-xs font-semibold text-white bg-[#3F226D] hover:bg-[#321A58] transition-all shadow-sm"
+              onClick={primaryFormType ? (e) => { e.preventDefault(); handlePrimaryClick(); } : undefined}
+              className="px-8 py-3 rounded-full text-xs font-semibold text-white bg-[#3F226D] hover:bg-[#321A58] transition-all shadow-sm cursor-pointer"
             >
               {data.primaryCtaText}
-            </Link>
+            </a>
           )}
           {data.secondaryCtaText && (
-            <Link
+            <a
               href={data.secondaryCtaUrl || '#'}
-              className="px-7 py-3 rounded-full text-xs font-semibold text-slate-800 bg-white border border-slate-200/80 hover:bg-slate-50 transition-all flex items-center gap-2 shadow-sm"
+              onClick={secondaryFormType ? (e) => { e.preventDefault(); handleSecondaryClick(); } : undefined}
+              className="px-7 py-3 rounded-full text-xs font-semibold text-slate-800 bg-white border border-slate-200/80 hover:bg-slate-50 transition-all flex items-center gap-2 shadow-sm cursor-pointer"
             >
               <Play className="w-3 h-3 fill-slate-800 text-slate-800 shrink-0" />
               <span>{data.secondaryCtaText}</span>
-            </Link>
+            </a>
           )}
         </div>
 
@@ -86,6 +108,8 @@ export function Landing1Hero({ content }: { content?: Landing1HeroContent }) {
           </div>
         )}
       </div>
+      {primaryModal}
+      {secondaryModal}
     </section>
   );
 }

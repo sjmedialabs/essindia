@@ -526,14 +526,9 @@ export class PageAdminRepository {
       orderIndex: number;
     }>
   ) {
-    const section = await db.query.pageSections.findFirst({
-      where: eq(pageSections.id, sectionId),
-      with: { page: true },
-    });
-    if (!section) return null;
-
     const { content, ...rest } = data;
-    const [updated] = await db
+
+    let [updated] = await db
       .update(pageSections)
       .set({
         ...rest,
@@ -543,9 +538,34 @@ export class PageAdminRepository {
       .where(eq(pageSections.id, sectionId))
       .returning();
 
-    if (section.page) {
-      await this.saveRevision(section.pageId);
-      await this.invalidateCache(section.page.fullPath);
+    if (!updated) {
+      // Fallback: Check if it's a template section
+      const { name, ...templateRest } = rest;
+      const [templateUpdated] = await db
+        .update(templateSections)
+        .set({
+          ...templateRest,
+          ...(content !== undefined ? { contentJson: content ?? {} } : {}),
+          updatedAt: new Date(),
+        })
+        .where(eq(templateSections.id, sectionId))
+        .returning();
+
+      if (!templateUpdated) {
+        console.error(`[updateSection] Section ${sectionId} not found in pageSections or templateSections`);
+        return null;
+      }
+      return templateUpdated;
+    }
+
+    // Fetch the page for cache invalidation and revision saving.
+    const page = await db.query.pages.findFirst({
+      where: eq(pages.id, updated.pageId),
+    }).catch(() => null);
+
+    if (page) {
+      await this.saveRevision(updated.pageId).catch(() => null);
+      await this.invalidateCache(page.fullPath).catch(() => null);
     }
 
     return updated;

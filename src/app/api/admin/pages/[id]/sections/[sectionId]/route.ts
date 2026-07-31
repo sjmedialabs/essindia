@@ -11,7 +11,10 @@ export async function PATCH(
   if (!(await isAdminRequest())) return unauthorized();
 
   try {
-    const { sectionId } = await params;
+    const rawParams = await params;
+    const sectionId = rawParams?.sectionId;
+    if (!sectionId) return badRequest('Missing sectionId parameter');
+
     const body = await request.json();
     const parsed = pageSectionSchema.partial().safeParse(body);
     if (!parsed.success) {
@@ -20,9 +23,13 @@ export async function PATCH(
     }
 
     const section = await pageAdminRepository.updateSection(sectionId, parsed.data);
-    if (!section) return notFound('Section not found');
+    if (!section) {
+      console.error(`[PATCH /api/admin/pages/${rawParams.id}/sections/${sectionId}] Section not found`);
+      return notFound('Section not found');
+    }
     return NextResponse.json(section);
   } catch (error) {
+    console.error('[PATCH Section Error]', error);
     return serverError(error);
   }
 }

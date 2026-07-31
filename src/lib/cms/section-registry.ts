@@ -2049,7 +2049,7 @@ export const SECTION_REGISTRY: SectionTypeDefinition[] = [
     color: 'bg-[#4B2A63]/10 text-[#4B2A63]',
     defaultVariant: 'default',
     supportsVariants: false,
-    fieldOrder: ['gradientColor1', 'gradientColor2', 'gradientColor3', 'bgColor', 'title', 'primaryCtaText', 'primaryCtaUrl', 'secondaryCtaText', 'secondaryCtaUrl', 'image']
+    fieldOrder: ['gradientColor1', 'gradientColor2', 'gradientColor3', 'bgColor', 'title', 'primaryCtaText', 'primaryCtaUrl', 'primaryCtaFormType', 'secondaryCtaText', 'secondaryCtaUrl', 'secondaryCtaFormType', 'image']
   },
   {
     type: 'landing2-hero',
@@ -2176,7 +2176,7 @@ export const SECTION_REGISTRY: SectionTypeDefinition[] = [
     color: 'bg-[#4B2A63]/10 text-[#4B2A63]',
     defaultVariant: 'default',
     supportsVariants: false,
-    fieldOrder: ['title', 'subtitle', 'testimonials']
+    fieldOrder: ['title', 'testimonials']
   },
   {
     type: 'landing2-why-ess',
@@ -2226,7 +2226,7 @@ export const SECTION_REGISTRY: SectionTypeDefinition[] = [
     color: 'bg-[#4B2A63]/10 text-[#4B2A63]',
     defaultVariant: 'default',
     supportsVariants: false,
-    fieldOrder: ['badge', 'titlePart1', 'titlePart2', 'description', 'image', 'ctaText', 'ctaUrl', 'introModules']
+    fieldOrder: ['badge', 'titlePart1', 'titlePart2', 'description', 'image', 'ctaText', 'ctaUrl', 'ctaFormType', 'introModules']
   },
   {
     type: 'landing1-industries',
@@ -2246,7 +2246,7 @@ export const SECTION_REGISTRY: SectionTypeDefinition[] = [
     color: 'bg-[#4B2A63]/10 text-[#4B2A63]',
     defaultVariant: 'default',
     supportsVariants: false,
-    fieldOrder: ['badge', 'title', 'description', 'features', 'ctaText', 'ctaUrl']
+    fieldOrder: ['badge', 'title', 'description', 'features', 'ctaText', 'ctaUrl', 'ctaFormType']
   },
   {
     type: 'landing1-suite',
@@ -2256,7 +2256,7 @@ export const SECTION_REGISTRY: SectionTypeDefinition[] = [
     color: 'bg-[#4B2A63]/10 text-[#4B2A63]',
     defaultVariant: 'default',
     supportsVariants: false,
-    fieldOrder: ['badge', 'title', 'description', 'modules', 'ctaText', 'ctaUrl']
+    fieldOrder: ['badge', 'title', 'description', 'modules', 'ctaText', 'ctaUrl', 'ctaFormType']
   },
   {
     type: 'landing1-stats',

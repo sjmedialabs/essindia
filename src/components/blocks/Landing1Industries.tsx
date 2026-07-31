@@ -88,9 +88,9 @@ export function Landing1Industries({ content }: { content?: Landing1IndustriesCo
               {data.industries?.map((ind, idx) => (
                 <div
                   key={idx}
-                  className="bg-white py-7 px-4 rounded-[32px] shadow-[0_10px_25px_-5px_rgba(0,0,0,0.1)] hover:shadow-[0_20px_35px_-5px_rgba(0,0,0,0.15)] hover:-translate-y-1 transition-all duration-300 flex flex-col items-center justify-center text-center group cursor-pointer w-full aspect-[1.1] md:aspect-[1.15]"
+                  className="bg-white py-6 px-3 rounded-[32px] shadow-[0_10px_25px_-5px_rgba(0,0,0,0.1)] hover:shadow-[0_20px_35px_-5px_rgba(0,0,0,0.15)] hover:-translate-y-1 transition-all duration-300 flex flex-col items-center justify-center text-center group cursor-pointer w-full overflow-hidden min-w-0 aspect-[1.1] md:aspect-[1.15]"
                 >
-                  <div className="w-14 h-14 rounded-[20px] bg-gradient-to-b from-[#FAF5FF] to-[#F3E8FF] flex items-center justify-center p-3.5 mb-3.5 group-hover:from-[#F3E8FF] group-hover:to-[#E9D5FF] transition-all duration-300 shrink-0 shadow-inner">
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-[20px] bg-gradient-to-b from-[#FAF5FF] to-[#F3E8FF] flex items-center justify-center p-3 sm:p-3.5 mb-2.5 sm:mb-3.5 group-hover:from-[#F3E8FF] group-hover:to-[#E9D5FF] transition-all duration-300 shrink-0 shadow-inner">
                     <img
                       src={ind.icon}
                       alt={ind.name}
@@ -98,7 +98,7 @@ export function Landing1Industries({ content }: { content?: Landing1IndustriesCo
                       style={{ filter: 'invert(18%) sepia(82%) saturate(3015%) hue-rotate(256deg) brightness(81%) contrast(98%)' }}
                     />
                   </div>
-                  <span className="font-extrabold text-[#0F172A] text-sm tracking-wide">
+                  <span className="font-extrabold text-[#0F172A] text-xs sm:text-sm tracking-wide break-words max-w-full leading-tight block px-1">
                     {ind.name}
                   </span>
                 </div>
