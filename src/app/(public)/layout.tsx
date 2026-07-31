@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { ReactNode, Suspense } from 'react';
 import { HeaderShell } from '@/components/layout/HeaderShell';
 import { Footer } from '@/components/layout/Footer';

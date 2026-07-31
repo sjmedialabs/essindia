@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import { useCtaAction, type CtaFormType } from '@/hooks/useCtaAction';
 import {
   PieChart,
   FileText,
@@ -17,6 +18,9 @@ import {
 export interface ModuleCardItem {
   title: string;
   iconType?: string;
+  icon?: string;
+  image?: string;
+  iconUrl?: string;
   href?: string;
 }
 
@@ -25,6 +29,8 @@ export interface Landing2ModulesContent {
   modules?: ModuleCardItem[];
   ctaText?: string;
   ctaUrl?: string;
+  ctaFormType?: string;
+  ctaPdfUrl?: string;
 }
 
 const DEFAULT_MODULES: ModuleCardItem[] = [
@@ -45,9 +51,28 @@ const DEFAULT_CONTENT: Landing2ModulesContent = {
   ctaUrl: '/contact-us',
 };
 
-const renderIcon = (type?: string) => {
+const renderIcon = (mod: ModuleCardItem) => {
+  const iconSrc = mod.icon || mod.iconUrl || mod.image || mod.iconType;
+
+  if (
+    iconSrc &&
+    (iconSrc.startsWith('/') ||
+      iconSrc.startsWith('http://') ||
+      iconSrc.startsWith('https://') ||
+      iconSrc.startsWith('data:') ||
+      /\.(png|jpg|jpeg|svg|webp|gif)$/i.test(iconSrc))
+  ) {
+    return (
+      <img
+        src={iconSrc}
+        alt={mod.title || 'Module Icon'}
+        className="w-7 h-7 object-contain"
+      />
+    );
+  }
+
   const iconClass = "w-7 h-7 text-[#7c52f6] stroke-[1.75]";
-  switch (type) {
+  switch (iconSrc) {
     case 'planning':
       return <PieChart className={iconClass} />;
     case 'production':
@@ -72,6 +97,13 @@ export function Landing2Modules({ content }: { content?: Landing2ModulesContent 
   const data = { ...DEFAULT_CONTENT, ...content };
   const moduleList = data.modules && data.modules.length > 0 ? data.modules : DEFAULT_MODULES;
 
+  const ctaFormType = (data.ctaFormType || '') as CtaFormType;
+  const { handleClick, modalNode } = useCtaAction(
+    data.ctaUrl || '/contact-us',
+    ctaFormType,
+    data.ctaPdfUrl
+  );
+
   return (
     <section className="py-14 bg-[#fafafd] font-sans select-none px-6">
       <div className="container mx-auto max-w-6xl">
@@ -90,7 +122,7 @@ export function Landing2Modules({ content }: { content?: Landing2ModulesContent 
                 <div className="flex items-center gap-4">
                   {/* Light Lavender Icon Container */}
                   <div className="w-14 h-14 rounded-2xl bg-[#f4f0ff] flex items-center justify-center shrink-0 group-hover:bg-[#ebe3ff] transition-colors">
-                    {renderIcon(mod.iconType)}
+                    {renderIcon(mod)}
                   </div>
                   {/* Module Name */}
                   <span className="font-bold text-slate-800 text-sm md:text-[15px] leading-tight group-hover:text-[#462294] transition-colors">
@@ -116,15 +148,17 @@ export function Landing2Modules({ content }: { content?: Landing2ModulesContent 
         {/* Central Purple CTA Button */}
         {data.ctaText && (
           <div className="text-center">
-            <Link
+            <a
               href={data.ctaUrl || '/contact-us'}
+              onClick={ctaFormType ? (e) => { e.preventDefault(); handleClick(); } : undefined}
               className="inline-flex items-center justify-center bg-[#462294] hover:bg-[#381a79] text-white px-9 py-3.5 rounded-md font-bold text-xs md:text-sm tracking-wider uppercase transition-all shadow-md hover:shadow-lg cursor-pointer"
             >
               {data.ctaText}
-            </Link>
+            </a>
           </div>
         )}
       </div>
+      {modalNode}
     </section>
   );
 }

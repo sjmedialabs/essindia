@@ -3,6 +3,7 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useCtaAction, type CtaFormType } from '@/hooks/useCtaAction';
 
 export interface Landing2BoostingContent {
   sectionTitle?: string;
@@ -12,6 +13,8 @@ export interface Landing2BoostingContent {
   image?: string;
   ctaText?: string;
   ctaUrl?: string;
+  ctaFormType?: string;
+  ctaPdfUrl?: string;
 }
 
 const DEFAULT_CONTENT: Landing2BoostingContent = {
@@ -26,6 +29,13 @@ const DEFAULT_CONTENT: Landing2BoostingContent = {
 
 export function Landing2Boosting({ content }: { content?: Landing2BoostingContent }) {
   const data = { ...DEFAULT_CONTENT, ...content };
+
+  const ctaFormType = (data.ctaFormType || '') as CtaFormType;
+  const { handleClick, modalNode } = useCtaAction(
+    data.ctaUrl || '/contact-us',
+    ctaFormType,
+    data.ctaPdfUrl
+  );
 
   return (
     <section className="py-14 bg-[#ebe8f8] font-sans select-none px-6">
@@ -78,17 +88,19 @@ export function Landing2Boosting({ content }: { content?: Landing2BoostingConten
             {/* Solid Purple CTA Button */}
             {data.ctaText && (
               <div className="pt-2">
-                <Link
+                <a
                   href={data.ctaUrl || '/contact-us'}
+                  onClick={ctaFormType ? (e) => { e.preventDefault(); handleClick(); } : undefined}
                   className="inline-flex items-center justify-center bg-[#462294] hover:bg-[#381a79] text-white px-8 py-3.5 rounded-md font-bold text-xs md:text-sm tracking-wider transition-all shadow-md hover:shadow-lg cursor-pointer"
                 >
                   {data.ctaText}
-                </Link>
+                </a>
               </div>
             )}
           </div>
         </div>
       </div>
+      {modalNode}
     </section>
   );
 }

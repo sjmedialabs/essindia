@@ -53,6 +53,7 @@ export function ArrayFieldEditor({
 
   const duplicateItem = (index: number) => {
     if (sectionType === 'landing1-process' && fieldKey === 'process' && value.length >= 7) return;
+    if (sectionType === 'landing2-testimonials' && fieldKey === 'testimonials' && value.length >= 2) return;
     const copy = [...value];
     copy.splice(index + 1, 0, structuredClone(value[index]));
     onChange(copy);
@@ -60,6 +61,7 @@ export function ArrayFieldEditor({
 
   const addItem = () => {
     if (sectionType === 'landing1-process' && fieldKey === 'process' && value.length >= 7) return;
+    if (sectionType === 'landing2-testimonials' && fieldKey === 'testimonials' && value.length >= 2) return;
     if (value.length > 0) {
       const template = createEmptyFromTemplate(value[0]);
       onChange([...value, template]);
@@ -148,6 +150,8 @@ export function ArrayFieldEditor({
         defaultObj = { image: '', title: '', description: '' };
       } else if (lowerKey === 'intromodules') {
         defaultObj = { name: '', iconType: 'finance' };
+      } else if (lowerKey === 'slides') {
+        defaultObj = { badge: '', title: '', description: '', mediaUrl: '', videoUrl: '' };
       } else if (lowerKey === 'points') {
         if (sectionType === 'hospital-regulatory') {
           defaultObj = { label: '' };
@@ -327,7 +331,7 @@ export function ArrayFieldEditor({
                 );
               })}
 
-              {!isLocked && !(sectionType === 'portfolio' && fieldKey === 'projects') && !(sectionType === 'landing1-process' && fieldKey === 'process' && value.length >= 7) && (
+              {!isLocked && !(sectionType === 'portfolio' && fieldKey === 'projects') && !(sectionType === 'landing1-process' && fieldKey === 'process' && value.length >= 7) && !(sectionType === 'landing2-testimonials' && fieldKey === 'testimonials' && value.length >= 2) && (
                 <Button
                   variant="outline"
                   size="sm"

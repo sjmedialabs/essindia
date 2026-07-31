@@ -13,7 +13,9 @@ export interface TestimonialCardItem {
 
 export interface Landing2TestimonialsContent {
   title?: string;
+  badge?: string;
   subtitle?: string;
+  description?: string;
   testimonials?: TestimonialCardItem[];
 }
 
@@ -36,7 +38,9 @@ const DEFAULT_TESTIMONIALS: TestimonialCardItem[] = [
 
 const DEFAULT_CONTENT: Landing2TestimonialsContent = {
   title: 'See what our customers are saying',
+  badge: 'TESTIMONIALS',
   subtitle: '2,157 people have said how good we are',
+  description: '',
   testimonials: DEFAULT_TESTIMONIALS,
 };
 
@@ -56,10 +60,10 @@ export function Landing2Testimonials({ content }: { content?: Landing2Testimonia
           </h2>
         )}
 
-        {/* Subtitle */}
-        {data.subtitle && (
+        {/* Description / Subtitle */}
+        {(data.description || data.subtitle) && (
           <p className="text-slate-600 text-base md:text-lg font-medium mb-12">
-            {data.subtitle}
+            {data.description || data.subtitle}
           </p>
         )}
 

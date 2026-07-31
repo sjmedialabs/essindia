@@ -4,10 +4,12 @@ import React from 'react';
 import { Hand, Link2, BarChart3, Package, Clock, EyeOff } from 'lucide-react';
 
 export interface ChallengeItem {
-  iconType: 'manual' | 'disconnected' | 'reports' | 'inventory' | 'approval' | 'visibility';
+  iconType?: string;
+  icon?: string;
+  image?: string;
   title: string;
   desc: string;
-  solution: string;
+  solution?: string;
 }
 
 export interface Landing1ChallengesContent {
@@ -63,9 +65,28 @@ const DEFAULT_CONTENT: Landing1ChallengesContent = {
   challenges: DEFAULT_CHALLENGES,
 };
 
-const renderIcon = (type: string) => {
+const renderIcon = (item: ChallengeItem) => {
+  const iconSrc = item.icon || item.image || item.iconType;
+
+  if (
+    iconSrc &&
+    (iconSrc.startsWith('/') ||
+      iconSrc.startsWith('http://') ||
+      iconSrc.startsWith('https://') ||
+      iconSrc.startsWith('data:') ||
+      /\.(png|jpg|jpeg|svg|webp|gif)$/i.test(iconSrc))
+  ) {
+    return (
+      <img
+        src={iconSrc}
+        alt={item.title || 'Challenge Icon'}
+        className="w-5 h-5 object-contain"
+      />
+    );
+  }
+
   const iconClass = "w-5 h-5 text-red-500";
-  switch (type) {
+  switch (iconSrc) {
     case 'manual':
       return <Hand className={iconClass} />;
     case 'disconnected':
@@ -119,7 +140,7 @@ export function Landing1Challenges({ content }: { content?: Landing1ChallengesCo
               <div className="space-y-3">
                 {/* Icon Circle */}
                 <div className="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center shrink-0">
-                  {renderIcon(item.iconType)}
+                  {renderIcon(item)}
                 </div>
                 {/* Title */}
                 <h4 className="text-lg font-bold text-[#0D1F3D]">{item.title}</h4>

@@ -64,7 +64,16 @@ export function MediaField({ fieldKey, label, value, onChange, hint, sectionType
     if (key.includes('gif')) {
       return ['gifs'];
     }
-    if ((sectionType === 'europe-case-study-slider' || sectionType === 'landing1-showcase') && (key === 'image' || key.includes('image'))) {
+    if (sectionType === 'landing1-showcase') {
+      return ['videos'];
+    }
+    if (key === 'videourl' || key.includes('video')) {
+      return ['videos'];
+    }
+    if (key === 'mediaurl' || key.includes('media') || key.includes('image')) {
+      return ['images'];
+    }
+    if (sectionType === 'europe-case-study-slider') {
       return ['images', 'videos'];
     }
     // Default fallback to images only
@@ -82,7 +91,7 @@ export function MediaField({ fieldKey, label, value, onChange, hint, sectionType
 
   return (
     <div className="space-y-2">
-      <label className="text-xs font-semibold text-slate-500">{label || humanLabel(fieldKey)}</label>
+      <label className="text-xs font-semibold text-slate-500">{label || humanLabel(fieldKey, { sectionType })}</label>
       <div className="flex items-start gap-3">
         {value && showPreview ? (
           <div className="relative group shrink-0">

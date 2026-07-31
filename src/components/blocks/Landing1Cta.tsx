@@ -71,7 +71,7 @@ export function Landing1Cta({ content }: { content?: Landing1CtaContent }) {
           email,
           phone,
           company,
-          formType: 'landing-page',
+          formType: 'landing-1',
           message: messagePayload,
           pageName: pathname || ''
         })

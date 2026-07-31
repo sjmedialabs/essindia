@@ -3,6 +3,7 @@
 import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useCtaAction, type CtaFormType } from '@/hooks/useCtaAction';
 
 export interface NavLinkItem {
   label: string;
@@ -20,6 +21,8 @@ export interface Landing2FooterBannerContent {
   socialLinks?: SocialLinkItem[];
   ctaText?: string;
   ctaUrl?: string;
+  ctaFormType?: string;
+  ctaPdfUrl?: string;
 }
 
 const DEFAULT_NAV_LINKS: NavLinkItem[] = [
@@ -52,6 +55,13 @@ export function Landing2FooterBanner({ content }: { content?: Landing2FooterBann
   const data = { ...DEFAULT_CONTENT, ...content };
   const navs = data.navLinks && data.navLinks.length > 0 ? data.navLinks : DEFAULT_NAV_LINKS;
   const socials = data.socialLinks && data.socialLinks.length > 0 ? data.socialLinks : DEFAULT_SOCIAL_LINKS;
+
+  const ctaFormType = (data.ctaFormType || '') as CtaFormType;
+  const { handleClick, modalNode } = useCtaAction(
+    data.ctaUrl || '/contact-us',
+    ctaFormType,
+    data.ctaPdfUrl
+  );
 
   return (
     <section className="py-14 bg-[#462294] font-sans select-none px-6 text-white text-center">
@@ -103,8 +113,9 @@ export function Landing2FooterBanner({ content }: { content?: Landing2FooterBann
         {/* Rounded White Pill CTA Button */}
         {data.ctaText && (
           <div>
-            <Link
+            <a
               href={data.ctaUrl || '/contact-us'}
+              onClick={ctaFormType ? (e) => { e.preventDefault(); handleClick(); } : undefined}
               className="inline-flex items-center justify-center bg-white hover:bg-slate-100 text-[#462294] px-8 py-3.5 rounded-full font-bold text-sm md:text-base tracking-tight transition-all shadow-lg hover:shadow-xl group cursor-pointer"
             >
               <span>{data.ctaText}</span>
@@ -114,10 +125,11 @@ export function Landing2FooterBanner({ content }: { content?: Landing2FooterBann
               >
                 <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
               </svg>
-            </Link>
+            </a>
           </div>
         )}
       </div>
+      {modalNode}
     </section>
   );
 }

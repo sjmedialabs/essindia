@@ -112,24 +112,24 @@ export function Landing2Carousel({ content }: { content?: Landing2CarouselConten
           </div>
 
           {/* Right Side: Yellow Content Box */}
-          <div className="md:col-span-5 bg-[#ffcc29] p-7 sm:p-9 rounded-2xl md:rounded-l-2xl flex flex-col justify-center text-slate-900 shadow-lg my-2 mr-2 md:my-3 md:mr-3">
+          <div className="md:col-span-5 bg-[#ffcc29] p-6 sm:p-8 rounded-2xl md:rounded-l-2xl flex flex-col justify-center text-slate-900 shadow-lg my-2 mr-2 md:my-3 md:mr-3 overflow-hidden min-w-0">
             {/* Small Badge */}
             {activeSlide.badge && (
-              <span className="text-[11px] sm:text-xs font-black uppercase tracking-wider text-slate-900/90 mb-3 block">
+              <span className="text-[11px] sm:text-xs font-black uppercase tracking-wider text-slate-900/90 mb-3 block break-words">
                 {activeSlide.badge}
               </span>
             )}
 
             {/* Big Title */}
             {activeSlide.title && (
-              <h3 className="text-3xl sm:text-4xl font-extrabold text-white leading-[1.05] mb-5 tracking-tight whitespace-pre-line drop-shadow-[0_2px_4px_rgba(0,0,0,0.15)]">
+              <h3 className="text-2xl sm:text-3xl lg:text-4xl font-extrabold text-white leading-[1.1] mb-4 tracking-tight whitespace-pre-line break-words drop-shadow-[0_2px_4px_rgba(0,0,0,0.15)]">
                 {activeSlide.title}
               </h3>
             )}
 
             {/* Subtitle / Description */}
             {activeSlide.description && (
-              <p className="text-slate-900 font-semibold text-xs sm:text-[13px] leading-relaxed opacity-95">
+              <p className="text-slate-900 font-semibold text-xs sm:text-[13px] leading-relaxed opacity-95 break-words">
                 {activeSlide.description}
               </p>
             )}
