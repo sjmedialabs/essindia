@@ -226,11 +226,28 @@ export function Header({
 
 function DesktopNav({ items = [] }: { items: NavItem[] }) {
   const [value, setValue] = React.useState<string>("");
+  const [mounted, setMounted] = React.useState(false);
   const pathname = usePathname();
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
 
   React.useEffect(() => {
     setValue("");
   }, [pathname]);
+
+  if (!mounted) {
+    return (
+      <div className="flex items-center gap-6">
+        {items.map((item) => (
+          <span key={item.id} className="text-[13px] text-slate-700 font-medium opacity-80">
+            {item.label}
+          </span>
+        ))}
+      </div>
+    );
+  }
 
   return (
     <NavigationMenu align="center" value={value} onValueChange={setValue}>

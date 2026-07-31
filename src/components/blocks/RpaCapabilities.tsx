@@ -13,12 +13,17 @@ interface CapabilityItem {
 interface RpaCapabilitiesContent {
   title?: string;
   description?: string;
+  hubSubtitle?: string;
+  hubTitle?: string;
   items?: CapabilityItem[];
 }
 
 export function RpaCapabilities({ content }: { content?: RpaCapabilitiesContent }) {
   const title = content?.title || 'ESS RPA Offerings / Capabilities';
   const description = content?.description || 'From consulting and design to bot deployment and maintenance, we offer end-to-end RPA capabilities.';
+
+  const hubSubtitle = content?.hubSubtitle !== undefined ? content.hubSubtitle : 'ESS INDIA';
+  const hubTitle = content?.hubTitle !== undefined ? content.hubTitle : 'RPA Core Offerings';
 
   const defaultItems: CapabilityItem[] = [
     { title: 'RPA Advisory', description: 'Identify and analyze workflows to construct a feasibility roadmap for robotic automation.', icon: '/RPA-Robotic Process Automation (RPA)/problem-process-solution_svgrepo.com.png' },
@@ -62,56 +67,60 @@ export function RpaCapabilities({ content }: { content?: RpaCapabilitiesContent 
         </div>
 
         {/* Desktop View: Hub and Spoke Wheel Layout */}
-        <div className="hidden lg:flex justify-center items-center h-[540px] relative w-full max-w-[850px] mx-auto select-none">
+        <div className="hidden lg:flex justify-center items-center h-[650px] relative w-full max-w-[900px] mx-auto select-none">
           {/* Central Hub Core */}
           <div className="absolute z-20 w-44 h-44 rounded-full bg-white shadow-xl border border-slate-100 flex flex-col items-center justify-center p-6 text-center">
-            <span className="text-[10px] uppercase font-bold tracking-widest text-slate-400">
-              ESS INDIA
-            </span>
-            <span className="text-lg font-black text-[#27256b] leading-tight mt-1">
-              RPA Core Offerings
-            </span>
+            {hubSubtitle && (
+              <span className="text-[10px] uppercase font-bold tracking-widest text-slate-400">
+                {hubSubtitle}
+              </span>
+            )}
+            {hubTitle && (
+              <span className="text-lg font-black text-[#27256b] leading-tight mt-1">
+                {hubTitle}
+              </span>
+            )}
           </div>
 
           {/* Spokes (Connecting lines) */}
           <div className="absolute inset-0 pointer-events-none z-0">
-            <svg className="w-full h-full" viewBox="0 0 850 540" fill="none" stroke="#cbd5e1" strokeWidth="1.5" strokeDasharray="5 5">
-              <line x1="425" y1="270" x2="425" y2="70" />
-              <line x1="425" y1="270" x2="425" y2="470" />
-              <line x1="425" y1="270" x2="160" y2="170" />
-              <line x1="425" y1="270" x2="690" y2="170" />
-              <line x1="425" y1="270" x2="160" y2="370" />
-              <line x1="425" y1="270" x2="690" y2="370" />
+            <svg className="w-full h-full" viewBox="0 0 900 650" fill="none" stroke="#cbd5e1" strokeWidth="1.5" strokeDasharray="5 5">
+              <line x1="450" y1="325" x2="450" y2="70" />
+              <line x1="450" y1="325" x2="450" y2="580" />
+              <line x1="450" y1="325" x2="135" y2="180" />
+              <line x1="450" y1="325" x2="765" y2="180" />
+              <line x1="450" y1="325" x2="135" y2="470" />
+              <line x1="450" y1="325" x2="765" y2="470" />
             </svg>
           </div>
 
           {/* Node 1: Top Center */}
-          <div className="absolute top-[10px] left-[50%] -translate-x-[50%] z-10 w-[240px]">
+          <div className="absolute top-[0px] left-[50%] -translate-x-[50%] z-10 w-[250px]">
             <CapabilityNode item={items[0]} index={1} alignment="center" />
           </div>
 
           {/* Node 2: Top Right */}
-          <div className="absolute top-[110px] right-[40px] z-10 w-[240px]">
+          <div className="absolute top-[120px] right-[10px] z-10 w-[250px]">
             <CapabilityNode item={items[1]} index={2} alignment="right" />
           </div>
 
           {/* Node 3: Bottom Right */}
-          <div className="absolute bottom-[110px] right-[40px] z-10 w-[240px]">
+          <div className="absolute bottom-[120px] right-[10px] z-10 w-[250px]">
             <CapabilityNode item={items[2]} index={3} alignment="right" />
           </div>
 
           {/* Node 4: Bottom Center */}
-          <div className="absolute bottom-[10px] left-[50%] -translate-x-[50%] z-10 w-[240px]">
+          <div className="absolute bottom-[0px] left-[50%] -translate-x-[50%] z-10 w-[250px]">
             <CapabilityNode item={items[3]} index={4} alignment="center" />
           </div>
 
           {/* Node 5: Bottom Left */}
-          <div className="absolute bottom-[110px] left-[40px] z-10 w-[240px]">
+          <div className="absolute bottom-[120px] left-[10px] z-10 w-[250px]">
             <CapabilityNode item={items[4]} index={5} alignment="left" />
           </div>
 
           {/* Node 6: Top Left */}
-          <div className="absolute top-[110px] left-[40px] z-10 w-[240px]">
+          <div className="absolute top-[120px] left-[10px] z-10 w-[250px]">
             <CapabilityNode item={items[5]} index={6} alignment="left" />
           </div>
         </div>

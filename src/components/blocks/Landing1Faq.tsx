@@ -1,0 +1,122 @@
+'use client';
+
+import React, { useState } from 'react';
+import { ChevronRight } from 'lucide-react';
+
+export interface FaqItem {
+  question: string;
+  answer: string;
+}
+
+export interface Landing1FaqContent {
+  badge?: string;
+  title?: string;
+  description?: string;
+  faqs?: FaqItem[];
+}
+
+const DEFAULT_FAQS: FaqItem[] = [
+  {
+    question: 'How long does an ESS ERP implementation take?',
+    answer: "Most mid-market deployments go live in 6–12 weeks. The exact timeline depends on the number of modules, data migration volume and custom workflows. Our 7-step methodology includes a parallel-run safety net so there's zero disruption at cutover."
+  },
+  {
+    question: 'Is ESS ERP cloud-based or on-premise',
+    answer: 'Both options are available. We offer secure cloud hosting on AWS/Azure, as well as on-premise deployments for enterprises with strict compliance or local network requirements.'
+  },
+  {
+    question: 'Which industries does ESS ERP support?',
+    answer: 'We support Manufacturing, Retail, Chemicals, Automotive, Cosmetics, Pharmaceuticals, Steel, Logistics, Food & Beverage, and more with pre-built configurations.'
+  },
+  {
+    question: 'How does the AI Copilot actually work?',
+    answer: 'The AI Copilot integrates with your data to automate routine data entry, generate instant compliance reports, predict inventory shortages, and answer business queries using natural language.'
+  },
+  {
+    question: 'Can ESS ERP integrate with our existing tools?',
+    answer: 'Yes! We offer rich REST APIs and pre-built connectors for popular tools like Salesforce, HubSpot, QuickBooks, Tally, Gmail, Slack, and various logistics APIs.'
+  },
+  {
+    question: 'Can we start with a few modules and add more later?',
+    answer: 'Absolutely. You can start with core modules like Inventory and CRM, and easily scale up to Production Planning, HRMS, and advanced analytics as your business grows.'
+  },
+  {
+    question: 'Do you provide training and support?',
+    answer: 'Yes, we provide comprehensive role-based training (on-site and remote), 24x7 support coverage, regular system updates, and a dedicated account manager.'
+  }
+];
+
+const DEFAULT_CONTENT: Landing1FaqContent = {
+  badge: "FAQ'S",
+  title: 'Frequently Asked Questions',
+  description: 'Get the information you need with our frequently asked questions.',
+  faqs: DEFAULT_FAQS
+};
+
+export function Landing1Faq({ content }: { content?: Landing1FaqContent }) {
+  const data = { ...DEFAULT_CONTENT, ...content };
+  const [openIdx, setOpenIdx] = useState<number | null>(null);
+
+  const toggle = (idx: number) => {
+    setOpenIdx(openIdx === idx ? null : idx);
+  };
+
+  return (
+    <section className="py-20 bg-slate-50/50 text-slate-900 font-sans select-none border-b border-slate-200">
+      <div className="container mx-auto px-6 max-w-4xl">
+        
+        {/* Header */}
+        <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
+          {data.badge && (
+            <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold tracking-wider text-indigo-600 bg-indigo-50 border border-indigo-100 uppercase">
+              <span className="w-1.5 h-1.5 rounded-full bg-indigo-600 animate-pulse" />
+              {data.badge}
+            </span>
+          )}
+          {data.title && (
+            <h2 className="text-3xl md:text-[40px] font-extrabold tracking-tight text-slate-900 leading-tight">
+              {data.title}
+            </h2>
+          )}
+          {data.description && (
+            <p className="text-slate-500 text-sm md:text-base max-w-2xl mx-auto leading-relaxed">
+              {data.description}
+            </p>
+          )}
+        </div>
+
+        {/* Faqs List */}
+        <div className="space-y-4">
+          {data.faqs?.map((faq, idx) => {
+            const isOpen = openIdx === idx;
+            return (
+              <div
+                key={idx}
+                className="bg-white rounded-[20px] border border-slate-100/80 shadow-[0_4px_20px_rgba(0,0,0,0.01)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.02)] transition-all duration-300 overflow-hidden"
+              >
+                <button
+                  onClick={() => toggle(idx)}
+                  className="w-full flex items-center justify-between p-6 text-left group cursor-pointer"
+                >
+                  <span className="font-extrabold text-[#0F172A] text-sm md:text-base leading-snug pr-4">
+                    {faq.question || (faq as any).quotation}
+                  </span>
+                  <div className={`w-8 h-8 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 group-hover:text-indigo-600 group-hover:border-indigo-600 transition-all duration-300 shrink-0 ${isOpen ? 'rotate-90 text-indigo-600 border-indigo-600 bg-indigo-50/50' : ''}`}>
+                    <ChevronRight className="w-4 h-4" />
+                  </div>
+                </button>
+                
+                {isOpen && faq.answer && (
+                  <div className="px-6 pb-6 text-sm text-slate-500 leading-relaxed font-medium border-t border-slate-50 pt-4">
+                    {faq.answer}
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
+
+      </div>
+    </section>
+  );
+}

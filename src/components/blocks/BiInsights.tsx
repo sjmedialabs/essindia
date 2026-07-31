@@ -126,9 +126,12 @@ export function BiInsights({ content }: { content?: BiInsightsContent }) {
                       <IconComponent className="w-5 h-5" />
                     </div>
 
-                    {/* Item Text */}
                     <p className="text-[15px] sm:text-base text-slate-600 font-light leading-relaxed pt-1">
-                      {item.text}
+                      {typeof item.text === 'string' && (item.text.includes('<p>') || item.text.includes('<')) ? (
+                        <span dangerouslySetInnerHTML={{ __html: item.text }} />
+                      ) : (
+                        item.text
+                      )}
                     </p>
                   </motion.div>
                 );

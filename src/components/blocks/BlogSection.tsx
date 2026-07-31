@@ -67,6 +67,7 @@ export function BlogSection({ content }: BlogSectionProps) {
     async function fetchBlogs() {
       try {
         const res = await fetch('/api/blogs');
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
         const data = await res.json();
         if (Array.isArray(data) && data.length > 0) {
           const formatted = data.slice(0, 3).map((b: any) => ({

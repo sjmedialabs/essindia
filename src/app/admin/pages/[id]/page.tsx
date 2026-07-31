@@ -26,6 +26,8 @@ import {
   Search,
   ChevronDown,
   Check,
+  Monitor,
+  Smartphone,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -1553,6 +1555,11 @@ export default function PageEditor() {
   });
   const [savedSeoSnapshot, setSavedSeoSnapshot] = React.useState('');
   const [dirtySections, setDirtySections] = React.useState<Set<string>>(new Set());
+  const [showExamplePreview, setShowExamplePreview] = React.useState(false);
+
+  const isLandingPage = React.useMemo(() => {
+    return page?.template?.name?.toLowerCase().includes('landing page') || page?.pageType === 'landing-page' || false;
+  }, [page]);
 
   const isBlogsListingPage = React.useMemo(() => {
     return page?.sections.some((s) => s.type === 'blog-list-block') || false;
@@ -1680,19 +1687,28 @@ export default function PageEditor() {
   // ---- Publish / Unpublish ----
   const handlePublish = async () => {
     if (!page) return;
-    if (isDirty) {
-      toast.error('Save your changes before publishing');
-      return;
-    }
     setIsPublishing(true);
     try {
+      // 1. Save all section draft changes to DB first
+      const sectionPromises = page.sections.map((s) =>
+        fetch(`/api/admin/pages/${pageId}/sections/${s.id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ content: s.content }),
+        })
+      );
+      const results = await Promise.all(sectionPromises);
+      const failed = results.filter((r) => !r.ok);
+      if (failed.length > 0) throw new Error(`${failed.length} section(s) failed to save`);
+
+      // 2. Execute publish action
       const res = await fetch(`/api/admin/pages/${pageId}/actions`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ action: 'publish' }),
       });
       if (!res.ok) throw new Error('Failed to publish');
-      toast.success('Page published successfully');
+      toast.success('Page published successfully to live website');
       await fetchPage();
     } catch (e) {
       toast.error(e instanceof Error ? e.message : 'Publish failed');
@@ -1722,20 +1738,37 @@ export default function PageEditor() {
 
   // ---- Section operations ----
   const handleSaveSection = async (section: PageSection) => {
-    const res = await fetch(`/api/admin/pages/${pageId}/sections/${section.id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ content: section.content }),
+    toast.success('Section saved to draft preview');
+    setDirtySections((prev) => {
+      const next = new Set(prev);
+      next.delete(section.id);
+      return next;
     });
-    if (res.ok) {
-      toast.success('Section saved');
-      setDirtySections((prev) => {
-        const next = new Set(prev);
-        next.delete(section.id);
-        return next;
-      });
-    } else {
-      toast.error('Failed to save section');
+  };
+
+  const handleDiscardSection = async (sectionId: string) => {
+    try {
+      const res = await fetch(`/api/admin/pages/${pageId}`);
+      const data = await res.json();
+      if (!res.ok) throw new Error('Failed to reload section');
+      const savedSection = data.sections?.find((s: PageSection) => s.id === sectionId);
+      if (savedSection) {
+        setPage((prev) => {
+          if (!prev) return prev;
+          return {
+            ...prev,
+            sections: prev.sections.map((s) => (s.id === sectionId ? savedSection : s)),
+          };
+        });
+        setDirtySections((prev) => {
+          const next = new Set(prev);
+          next.delete(sectionId);
+          return next;
+        });
+        toast.info('Section changes discarded');
+      }
+    } catch {
+      toast.error('Failed to discard changes');
     }
   };
 
@@ -1890,6 +1923,15 @@ export default function PageEditor() {
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
+            <Button
+              variant="outline"
+              type="button"
+              onClick={() => setShowExamplePreview(true)}
+              className="rounded-full gap-2 h-10 border-[#4B2A63]/30 text-[#4B2A63] hover:bg-[#4B2A63]/5 font-medium"
+            >
+              <Monitor className="w-4 h-4 text-[#4B2A63]" />
+              <span>Example Preview</span>
+            </Button>
             <Link href={page.fullPath} target="_blank">
               <Button variant="outline" className="rounded-full gap-2 h-10">
                 <Eye className="w-4 h-4" />
@@ -1973,14 +2015,16 @@ export default function PageEditor() {
                   Collapse All
                 </Button>
               )}
-              <Button
-                onClick={() => setShowAddSection(!showAddSection)}
-                variant="outline"
-                className="rounded-full gap-2"
-              >
-                <Plus className="w-4 h-4" />
-                Add Section
-              </Button>
+              {!isLandingPage && (
+                <Button
+                  onClick={() => setShowAddSection(!showAddSection)}
+                  variant="outline"
+                  className="rounded-full gap-2"
+                >
+                  <Plus className="w-4 h-4" />
+                  Add Section
+                </Button>
+              )}
             </div>
           </div>
 
@@ -2072,11 +2116,11 @@ export default function PageEditor() {
             <Reorder.Group
               axis="y"
               values={page.sections}
-              onReorder={reorderSections}
+              onReorder={isLandingPage ? () => {} : reorderSections}
               className="space-y-3"
             >
               {page.sections.map((section, index) => (
-                <Reorder.Item key={section.id} value={section}>
+                <Reorder.Item key={section.id} value={section} drag={!isLandingPage ? "y" : false}>
                   <SectionEditorCard
                     section={section}
                     schema={findSchemaForSection(section, templateSchemas)}
@@ -2086,9 +2130,11 @@ export default function PageEditor() {
                     onToggleExpand={() => toggleSectionExpand(section.id)}
                     onContentChange={handleSectionContentChange}
                     onSave={handleSaveSection}
+                    onDiscard={handleDiscardSection}
                     onDelete={deleteSection}
                     onMove={moveSection}
                     isSectionDirty={dirtySections.has(section.id)}
+                    disableStructureChanges={isLandingPage}
                   />
                 </Reorder.Item>
               ))}
@@ -2350,6 +2396,95 @@ export default function PageEditor() {
                   <Plus className="w-4 h-4" />
                   Add to Page
                 </Button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* ===== Example Preview Modal ===== */}
+      <AnimatePresence>
+        {showExamplePreview && page && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/75 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.96 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.96 }}
+              className="bg-white rounded-2xl shadow-2xl w-full max-w-6xl h-[90vh] flex flex-col overflow-hidden border border-slate-200"
+            >
+              {/* Modal Header */}
+              <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100 bg-slate-50/80">
+                <div className="flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-xl bg-[#4B2A63]/10 text-[#4B2A63] flex items-center justify-center font-bold">
+                    <Monitor className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-slate-900 text-base leading-tight flex items-center gap-2">
+                      Example Preview
+                      <span className="text-[10px] font-bold bg-[#4B2A63]/10 text-[#4B2A63] px-2 py-0.5 rounded-full uppercase">
+                        Saved Draft
+                      </span>
+                    </h3>
+                    <p className="text-xs text-slate-400 font-mono">{page.fullPath}</p>
+                  </div>
+                </div>
+
+                {/* Close Button */}
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setShowExamplePreview(false)}
+                    className="p-2 rounded-xl text-slate-400 hover:text-slate-600 hover:bg-slate-200/60 transition-colors cursor-pointer"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Modal Body: Live Draft View Container */}
+              <div className="flex-1 bg-slate-100 overflow-y-auto flex items-center justify-center p-6">
+                <div className="bg-white shadow-xl overflow-y-auto h-full w-full rounded-xl border border-slate-200">
+                  <div className="w-full">
+                    {page.sections.map((section) => (
+                      <SectionRenderer key={section.id} section={section} />
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* Modal Footer: Confirm & Action Bar */}
+              <div className="px-6 py-4 border-t border-slate-100 bg-white flex items-center justify-between shrink-0">
+                <p className="text-xs text-slate-500">
+                  Reviewing saved sections. Unsaved section changes will not appear until saved.
+                </p>
+                <div className="flex items-center gap-3">
+                  <Button
+                    variant="outline"
+                    type="button"
+                    onClick={() => setShowExamplePreview(false)}
+                    className="rounded-full px-5 h-10 border-slate-200 text-slate-600"
+                  >
+                    Close Preview
+                  </Button>
+                  {page.status === 'draft' && (
+                    <Button
+                      type="button"
+                      disabled={isPublishing}
+                      onClick={async () => {
+                        await handlePublish();
+                        setShowExamplePreview(false);
+                      }}
+                      className="bg-emerald-600 hover:bg-emerald-700 text-white rounded-full px-6 gap-2 h-10 font-semibold shadow-sm"
+                    >
+                      {isPublishing ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Upload className="w-4 h-4" />
+                      )}
+                      Confirm & Publish Page
+                    </Button>
+                  )}
+                </div>
               </div>
             </motion.div>
           </div>

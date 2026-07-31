@@ -173,7 +173,11 @@ export function BiIndustryServices({ content }: { content?: BiIndustryServicesCo
                             </svg>
                           </div>
                           <span className="text-sm sm:text-base font-light text-white/90">
-                            {point}
+                            {typeof point === 'string' && (point.includes('<p>') || point.includes('<')) ? (
+                              <span dangerouslySetInnerHTML={{ __html: point }} />
+                            ) : (
+                              point
+                            )}
                           </span>
                         </li>
                       ))}

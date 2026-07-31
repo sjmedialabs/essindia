@@ -125,7 +125,11 @@ export function BiHero({ content }: { content?: BiHeroContent }) {
               className="text-base sm:text-lg leading-relaxed font-light mb-8 max-w-xl opacity-90"
               style={{ color: descriptionColor }}
             >
-              {description}
+              {typeof description === 'string' && (description.includes('<p>') || description.includes('<')) ? (
+                <span dangerouslySetInnerHTML={{ __html: description }} />
+              ) : (
+                description
+              )}
             </motion.p>
 
             <motion.div

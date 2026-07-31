@@ -190,15 +190,22 @@ export function BiTabs({ content }: { content?: BiTabsContent }) {
               transition={{ duration: 0.25 }}
               className="flex flex-col lg:flex-row items-center gap-12 lg:gap-16"
             >
-              {/* Left Content Column */}
-              <div className="flex-1 space-y-6 text-left w-full">
+               <div className="flex-1 space-y-6 text-left w-full">
                 <div className="space-y-1">
                   <h3 className="text-3xl sm:text-4xl font-extrabold tracking-tight leading-tight">
-                    {activeTab.heading}
+                    {typeof activeTab.heading === 'string' && (activeTab.heading.includes('<p>') || activeTab.heading.includes('<')) ? (
+                      <span dangerouslySetInnerHTML={{ __html: activeTab.heading }} />
+                    ) : (
+                      activeTab.heading
+                    )}
                   </h3>
                   {activeTab.subheading && (
                     <p className="text-white/95 text-base sm:text-lg font-light tracking-wide">
-                      {activeTab.subheading}
+                      {typeof activeTab.subheading === 'string' && (activeTab.subheading.includes('<p>') || activeTab.subheading.includes('<')) ? (
+                        <span dangerouslySetInnerHTML={{ __html: activeTab.subheading }} />
+                      ) : (
+                        activeTab.subheading
+                      )}
                     </p>
                   )}
                 </div>
@@ -214,7 +221,11 @@ export function BiTabs({ content }: { content?: BiTabsContent }) {
                         transition={{ delay: qIdx * 0.04 }}
                         className="bg-white/15 border border-white/20 hover:bg-white/25 text-white font-normal text-[15px] sm:text-base px-6 py-4 rounded-xl shadow-sm transition-all duration-300 hover:translate-x-1"
                       >
-                        {question}
+                        {typeof question === 'string' && (question.includes('<p>') || question.includes('<')) ? (
+                          <span dangerouslySetInnerHTML={{ __html: question }} />
+                        ) : (
+                          question
+                        )}
                       </motion.div>
                     ))}
                   </div>

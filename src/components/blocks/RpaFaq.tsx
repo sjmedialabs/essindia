@@ -68,7 +68,7 @@ export function RpaFaq({ content }: { content?: RpaFaqContent }) {
                   className="w-full flex items-center justify-between p-5 text-left font-bold text-slate-800 hover:text-[#27256b] transition-colors focus:outline-none"
                 >
                   <span className="text-base sm:text-lg font-bold pr-4">
-                    {faq.question}
+                    {faq.question || (faq as any).quotation}
                   </span>
                   {isOpen ? (
                     <ChevronUp className="w-5 h-5 text-[#27256b] shrink-0" />

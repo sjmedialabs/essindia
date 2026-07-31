@@ -19,7 +19,9 @@ export function getHeroBackgroundStyles(
   const c2 = content?.gradientColor2;
   const c3 = content?.gradientColor3;
 
-  const colors = [c1, c2, c3].filter((c) => c && c.trim() !== '' && c !== 'transparent');
+  const colors = [c1, c2, c3]
+    .map((c) => (c ? c.replace(/\u200B/g, '').trim() : ''))
+    .filter((c) => c !== '' && c !== 'transparent');
 
   if (colors.length === 0) {
     return defaultStyles || {};

@@ -108,7 +108,11 @@ export function BiIndustries({ content }: { content?: BiIndustriesContent }) {
                       {item.title}
                     </h4>
                     <p className="text-xs sm:text-[13px] text-slate-500 font-normal leading-relaxed">
-                      {item.description}
+                      {typeof item.description === 'string' && (item.description.includes('<p>') || item.description.includes('<')) ? (
+                        <span dangerouslySetInnerHTML={{ __html: item.description }} />
+                      ) : (
+                        item.description
+                      )}
                     </p>
                   </div>
                 </motion.div>

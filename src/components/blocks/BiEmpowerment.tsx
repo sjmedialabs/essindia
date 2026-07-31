@@ -107,7 +107,11 @@ export function BiEmpowerment({ content }: { content?: BiEmpowermentContent }) {
                 {card.title}
               </h3>
               <p className="text-[14px] sm:text-[15px] text-[#ccd0f5] font-light leading-relaxed">
-                {card.description}
+                {typeof card.description === 'string' && (card.description.includes('<p>') || card.description.includes('<')) ? (
+                  <span dangerouslySetInnerHTML={{ __html: card.description }} />
+                ) : (
+                  card.description
+                )}
               </p>
             </motion.div>
           ))}

@@ -173,7 +173,11 @@ export function BiBusinessImpact({ content }: { content?: BiBusinessImpactConten
                           {step.title}
                         </h4>
                         <p className="text-sm sm:text-base text-slate-500 font-light leading-snug">
-                          {step.description}
+                          {typeof step.description === 'string' && (step.description.includes('<p>') || step.description.includes('<')) ? (
+                            <span dangerouslySetInnerHTML={{ __html: step.description }} />
+                          ) : (
+                            step.description
+                          )}
                         </p>
                       </div>
                     </div>

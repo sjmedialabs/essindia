@@ -151,6 +151,7 @@ export function DynamicFieldRenderer({
           label={fieldLabel}
           value={value as string}
           onChange={(v) => onChange(keyPath, v)}
+          maxLength={sectionType === 'rpa-capabilities' && keyPath.includes('items') && fieldKey === 'description' ? 120 : undefined}
         />
       );
 
@@ -460,7 +461,7 @@ function ObjectField({
   }
 
   const keys = Object.keys(mergedValue);
-  
+
   // Sort keys so formType is directly under the url/href field, and pdfUrl directly under formType
   const orderedKeys: string[] = [];
   keys.forEach(k => {
@@ -663,19 +664,14 @@ function ArrayField({
               );
             }
           }
-          
+
           let sortedKeys = Object.keys(objItem);
           if (fieldKey === 'testimonials') {
-            const testimonialOrder = ['topic', 'industry', 'companyName', 'quote', 'authorAvatar', 'authorName', 'authorTitle'];
-            sortedKeys = sortedKeys.filter(k => k !== 'logoUrl');
-            sortedKeys.sort((a, b) => {
-              const indexA = testimonialOrder.indexOf(a);
-              const indexB = testimonialOrder.indexOf(b);
-              if (indexA !== -1 && indexB !== -1) return indexA - indexB;
-              if (indexA !== -1) return -1;
-              if (indexB !== -1) return 1;
-              return 0;
-            });
+            let testimonialOrder = ['topic', 'industry', 'companyName', 'quote', 'authorAvatar', 'authorName', 'authorTitle'];
+            if (sectionType === 'landing1-testimonials') {
+              testimonialOrder = ['avatar', 'name', 'rating', 'quote'];
+            }
+            sortedKeys = testimonialOrder.filter(k => k in objItem);
           } else if (fieldKey === 'cards') {
             let cardOrder = ['badge', 'icon', 'image', 'title', 'description', 'contact', 'badgeBorderColor', 'badgeTextColor', 'badgeBgColor'];
             if (sectionType === 'europe-feature-cards') {
@@ -726,13 +722,23 @@ function ArrayField({
             let itemOrder = ['icon', 'text', 'title', 'description', 'image', 'ctaText', 'ctaUrl'];
             if (sectionType === 'oracle-apex-approach') {
               itemOrder = ['image', 'title'];
+            } else if (sectionType === 'staffing-technologies') {
+              itemOrder = ['label'];
             }
             sortedKeys = itemOrder.filter(k => k in objItem);
           } else if (fieldKey === 'steps') {
             const stepOrder = ['icon', 'image', 'title', 'description'];
             sortedKeys = stepOrder.filter(k => k in objItem);
+          } else if (fieldKey === 'process') {
+            const processOrder = ['icon', 'title', 'description'];
+            sortedKeys = processOrder.filter(k => k in objItem);
           } else if (fieldKey === 'features') {
-            const featureOrder = ['icon', 'title', 'description'];
+            let featureOrder = ['icon', 'image', 'title', 'desc', 'desc2', 'description'];
+            if (sectionType === 'hospital-features') {
+              featureOrder = ['label'];
+            } else if (sectionType === 'erp-features') {
+              featureOrder = ['id', 'image', 'title', 'desc', 'desc2'];
+            }
             sortedKeys = featureOrder.filter(k => k in objItem);
           } else if (fieldKey === 'tabs') {
             let tabOrder = ['tabName', 'heading', 'subheading', 'questions', 'image'];
@@ -748,13 +754,17 @@ function ArrayField({
               tabOrder = ['tabName', 'items'];
             } else if (sectionType === 'uganda-insights') {
               tabOrder = ['tabName', 'contentTitle', 'body1', 'body2', 'points', 'subsections', 'image'];
+            } else if (sectionType === 'landing1-showcase') {
+              tabOrder = ['name', 'title', 'desc', 'image', 'primaryCtaText', 'primaryCtaUrl', 'secondaryCtaText', 'secondaryCtaUrl'];
             } else if (sectionType === 'mfg-icons') {
               tabOrder = ['label', 'iconImage', 'sections'];
             }
             sortedKeys = tabOrder.filter(k => k in objItem);
           } else if (fieldKey === 'stats' || fieldKey === 'statistics') {
             let statOrder = ['number', 'value', 'label'];
-            if (sectionType === 'uganda-presence') {
+            if (sectionType === 'landing1-stats') {
+              statOrder = ['icon', 'value', 'title'];
+            } else if (sectionType === 'uganda-presence') {
               statOrder = ['title', 'description'];
             } else if (sectionType === 'europe-case-study-slider') {
               statOrder = ['value', 'title'];
@@ -770,7 +780,10 @@ function ArrayField({
             const benefitOrder = ['image', 'title'];
             sortedKeys = benefitOrder.filter(k => k in objItem);
           } else if (fieldKey === 'points') {
-            const pointsOrder = ['title', 'description'];
+            let pointsOrder = ['title', 'description'];
+            if (sectionType === 'hospital-regulatory') {
+              pointsOrder = ['label'];
+            }
             sortedKeys = pointsOrder.filter(k => k in objItem);
           } else if (fieldKey === 'industries' && sectionType === 'rpa-industries') {
             const industryOrder = ['icon', 'title', 'description'];
@@ -980,25 +993,25 @@ function SelectedPagesField({
     newArr.splice(index, 1);
     onChange(keyPath, newArr);
   };
-    const replaceItem = (index: number, page: any) => {
-      const newArr = [...selectedItems];
-      newArr[index] = {
-        ...newArr[index],
-        title: page.title || '',
-        description: page.heroDescription || page.seoDescription || '',
-        ctaUrl: page.routePath || ''
-      };
-      onChange(keyPath, newArr);
+  const replaceItem = (index: number, page: any) => {
+    const newArr = [...selectedItems];
+    newArr[index] = {
+      ...newArr[index],
+      title: page.title || '',
+      description: page.heroDescription || page.seoDescription || '',
+      ctaUrl: page.routePath || ''
     };
+    onChange(keyPath, newArr);
+  };
 
-    const updateItemField = (index: number, field: string, val: string) => {
-      const newArr = [...selectedItems];
-      newArr[index] = { ...newArr[index], [field]: val };
-      onChange(keyPath, newArr);
-    };
+  const updateItemField = (index: number, field: string, val: string) => {
+    const newArr = [...selectedItems];
+    newArr[index] = { ...newArr[index], [field]: val };
+    onChange(keyPath, newArr);
+  };
 
-    const megaMenuPages = pages.filter(p => p.categoryLabel || p.subCategoryLabel || p.subSubCategoryLabel);
-    const availablePages = megaMenuPages.filter(p => !selectedItems.some(si => si.ctaUrl === p.routePath));
+  const megaMenuPages = pages.filter(p => p.categoryLabel || p.subCategoryLabel || p.subSubCategoryLabel);
+  const availablePages = megaMenuPages.filter(p => !selectedItems.some(si => si.ctaUrl === p.routePath));
 
   return (
     <div className="space-y-4 border border-slate-200 rounded-xl p-4 bg-slate-50">
@@ -1015,53 +1028,53 @@ function SelectedPagesField({
             >
               <Trash2 className="w-4 h-4" />
             </button>
-              <div className="grid grid-cols-2 gap-4 mt-4">
-                  <div className="col-span-2">
-                    <label className="admin-label mb-1 block">Change Page</label>
-                    <select
-                      value={item.ctaUrl || ''}
-                      onChange={(e) => {
-                        const selectedPath = e.target.value;
-                        const selectedPage = megaMenuPages.find(p => p.routePath === selectedPath);
-                        if (selectedPage) replaceItem(idx, selectedPage);
-                      }}
-                      className="admin-input"
-                    >
-                      <option value="" disabled>-- Select a Page --</option>
-                      {megaMenuPages.filter(p => p.routePath === item.ctaUrl || !selectedItems.some(si => si.ctaUrl === p.routePath)).map(p => (
-                        <option key={p.id} value={p.routePath}>{p.title} ({p.routePath})</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="col-span-2 bg-slate-50 p-3 rounded-lg border border-slate-100">
-                    <div className="font-semibold text-slate-800">{item.title}</div>
-                    <div className="text-xs text-slate-500 mt-1">{item.ctaUrl}</div>
-                    {item.description && <div className="text-sm text-slate-600 mt-2 line-clamp-2">{item.description}</div>}
-                  </div>
-                </div>
+            <div className="grid grid-cols-2 gap-4 mt-4">
+              <div className="col-span-2">
+                <label className="admin-label mb-1 block">Change Page</label>
+                <select
+                  value={item.ctaUrl || ''}
+                  onChange={(e) => {
+                    const selectedPath = e.target.value;
+                    const selectedPage = megaMenuPages.find(p => p.routePath === selectedPath);
+                    if (selectedPage) replaceItem(idx, selectedPage);
+                  }}
+                  className="admin-input"
+                >
+                  <option value="" disabled>-- Select a Page --</option>
+                  {megaMenuPages.filter(p => p.routePath === item.ctaUrl || !selectedItems.some(si => si.ctaUrl === p.routePath)).map(p => (
+                    <option key={p.id} value={p.routePath}>{p.title} ({p.routePath})</option>
+                  ))}
+                </select>
+              </div>
+              <div className="col-span-2 bg-slate-50 p-3 rounded-lg border border-slate-100">
+                <div className="font-semibold text-slate-800">{item.title}</div>
+                <div className="text-xs text-slate-500 mt-1">{item.ctaUrl}</div>
+                {item.description && <div className="text-sm text-slate-600 mt-2 line-clamp-2">{item.description}</div>}
+              </div>
+            </div>
           </div>
         ))}
       </div>
 
-        {selectedItems.length < 6 && (
-          <div className="mt-4">
-            <label className="admin-label block mb-2">Add New Page</label>
-            <select
-              value=""
-              onChange={(e) => {
-                const selectedPath = e.target.value;
-                const selectedPage = megaMenuPages.find(p => p.routePath === selectedPath);
-                if (selectedPage) handleSelect(selectedPage);
-              }}
-              className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#4B2A63]/20"
-            >
-              <option value="" disabled>-- Select a Page to Add --</option>
-              {availablePages.map(p => (
-                <option key={p.id} value={p.routePath}>{p.title} ({p.routePath})</option>
-              ))}
-            </select>
-          </div>
-        )}
+      {selectedItems.length < 6 && (
+        <div className="mt-4">
+          <label className="admin-label block mb-2">Add New Page</label>
+          <select
+            value=""
+            onChange={(e) => {
+              const selectedPath = e.target.value;
+              const selectedPage = megaMenuPages.find(p => p.routePath === selectedPath);
+              if (selectedPage) handleSelect(selectedPage);
+            }}
+            className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#4B2A63]/20"
+          >
+            <option value="" disabled>-- Select a Page to Add --</option>
+            {availablePages.map(p => (
+              <option key={p.id} value={p.routePath}>{p.title} ({p.routePath})</option>
+            ))}
+          </select>
+        </div>
+      )}
     </div>
   );
 }

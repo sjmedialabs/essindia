@@ -33,9 +33,17 @@ export function buildPageMetadata(seo: PageSeoInput): Metadata {
   const description = seo.description || undefined;
   const ogImage = toAbsoluteImage(seo.ogImage);
   const twitterImage = toAbsoluteImage(seo.twitterImage) || ogImage;
-  const canonical =
-    seo.canonicalUrl ||
-    (seo.fullPath ? absoluteUrl(seo.fullPath === '/' ? '/' : seo.fullPath) : undefined);
+  let canonical: string | undefined = undefined;
+  if (seo.canonicalUrl && seo.canonicalUrl.trim() !== '') {
+    const trimmed = seo.canonicalUrl.trim();
+    if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+      canonical = trimmed;
+    } else {
+      canonical = absoluteUrl(trimmed.startsWith('/') ? trimmed : `/${trimmed}`);
+    }
+  } else if (seo.fullPath) {
+    canonical = absoluteUrl(seo.fullPath === '/' ? '/' : seo.fullPath);
+  }
 
   const ogTitle = seo.ogTitle || title;
   const ogDescription = seo.ogDescription || description;

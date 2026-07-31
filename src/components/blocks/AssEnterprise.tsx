@@ -60,9 +60,13 @@ export function AssEnterprise({ content }: { content?: AssEnterpriseContent }) {
         {/* Headings */}
         <div className="text-center mb-2">
           {description && (
-            <span className="text-lg font-extrabold text-[#0a1128] tracking-wider mb-2 block">
-              {description}
-            </span>
+            <div className="text-lg font-extrabold text-[#0a1128] tracking-wider mb-2 block">
+              {typeof description === 'string' && (description.includes('<p>') || description.includes('<')) ? (
+                <div dangerouslySetInnerHTML={{ __html: description }} />
+              ) : (
+                description
+              )}
+            </div>
           )}
           <h2 className="text-3xl md:text-4xl font-bold text-[#171C76] leading-tight whitespace-pre-line">
             {title}

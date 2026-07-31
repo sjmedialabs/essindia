@@ -131,7 +131,7 @@ export function ErpFeaturesTab({ content }: ErpFeaturesTabProps) {
                   className=""
                 >
                   <div className="mb-6">
-                    <img src={activeTab?.image || 'ErpOverview/featureTav1.png'} alt={activeTab.title} />
+                    <img src={activeTab?.image || 'ErpOverview/featureTav1.png'} alt={activeTab.title} className="w-12 h-12 object-contain" />
                   </div>
                   {/* text and paragraphs */}
                   <div className="">

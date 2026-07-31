@@ -119,6 +119,9 @@ import { BiIndustries } from '@/components/blocks/BiIndustries';
 import { BiIndustryServices } from '@/components/blocks/BiIndustryServices';
 import { RpaHero } from '@/components/blocks/RpaHero';
 import { RpaOverview } from '@/components/blocks/RpaOverview';
+import { RpaOverviewIntro } from '@/components/blocks/RpaOverviewIntro';
+import { RpaOverviewMetrics } from '@/components/blocks/RpaOverviewMetrics';
+import { RpaOverviewLogos } from '@/components/blocks/RpaOverviewLogos';
 import { RpaIndustries } from '@/components/blocks/RpaIndustries';
 import { RpaSolutions } from '@/components/blocks/RpaSolutions';
 import { RpaBenefits } from '@/components/blocks/RpaBenefits';
@@ -150,6 +153,35 @@ import { UgandaIndustries } from '@/components/blocks/uganda/UgandaIndustries';
 import { UgandaInsights } from '@/components/blocks/uganda/UgandaInsights';
 import { NotFoundHero } from '@/components/blocks/NotFoundHero';
 import { NotFoundLinks } from '@/components/blocks/NotFoundLinks';
+import { Landing1Hero } from '@/components/blocks/Landing1Hero';
+import { Landing2Hero } from '@/components/blocks/Landing2Hero';
+import { Landing2Intro } from '@/components/blocks/Landing2Intro';
+import { Landing2Modules } from '@/components/blocks/Landing2Modules';
+import { Landing2Carousel } from '@/components/blocks/Landing2Carousel';
+import { Landing2Boosting } from '@/components/blocks/Landing2Boosting';
+import { Landing2Accounting } from '@/components/blocks/Landing2Accounting';
+import { Landing2Brands } from '@/components/blocks/Landing2Brands';
+import { Landing2Capabilities } from '@/components/blocks/Landing2Capabilities';
+import { Landing2Industries } from '@/components/blocks/Landing2Industries';
+import { Landing2Integrations } from '@/components/blocks/Landing2Integrations';
+import { Landing2Testimonials } from '@/components/blocks/Landing2Testimonials';
+import { Landing2WhyEss } from '@/components/blocks/Landing2WhyEss';
+import { Landing2FooterBanner } from '@/components/blocks/Landing2FooterBanner';
+import { Landing1Brands } from '@/components/blocks/Landing1Brands';
+import { Landing1Intro } from '@/components/blocks/Landing1Intro';
+import { Landing1Industries } from '@/components/blocks/Landing1Industries';
+import { Landing1Features } from '@/components/blocks/Landing1Features';
+import { Landing1Suite } from '@/components/blocks/Landing1Suite';
+import { Landing1Stats } from '@/components/blocks/Landing1Stats';
+import { Landing1Integration } from '@/components/blocks/Landing1Integration';
+import { Landing1Process } from '@/components/blocks/Landing1Process';
+import { Landing1Works } from '@/components/blocks/Landing1Works';
+import { Landing1Showcase } from '@/components/blocks/Landing1Showcase';
+import { Landing1Testimonials } from '@/components/blocks/Landing1Testimonials';
+import { Landing1Faq } from '@/components/blocks/Landing1Faq';
+import { Landing1Cta } from '@/components/blocks/Landing1Cta';
+import { Landing1Challenges } from '@/components/blocks/Landing1Challenges';
+import { Landing1Value } from '@/components/blocks/Landing1Value';
 import { ThankYouHero } from '@/components/blocks/ThankYouHero';
 
 
@@ -416,6 +448,12 @@ export function SectionRenderer({ section }: SectionRendererProps) {
       return <RpaHero content={section.content} />;
     case 'rpa-overview':
       return <RpaOverview content={section.content} />;
+    case 'rpa-overview-intro':
+      return <RpaOverviewIntro content={section.content} />;
+    case 'rpa-overview-metrics':
+      return <RpaOverviewMetrics content={section.content} />;
+    case 'rpa-overview-logos':
+      return <RpaOverviewLogos content={section.content} />;
     case 'rpa-industries':
       return <RpaIndustries content={section.content} />;
     case 'rpa-solutions':
@@ -480,6 +518,64 @@ export function SectionRenderer({ section }: SectionRendererProps) {
       return <NotFoundLinks content={section.content} />;
     case 'thank-you-hero':
       return <ThankYouHero content={section.content} />;
+    case 'landing1-hero':
+      return <Landing1Hero content={section.content} />;
+    case 'landing2-hero':
+      return <Landing2Hero content={section.content} />;
+    case 'landing2-intro':
+      return <Landing2Intro content={section.content} />;
+    case 'landing2-modules':
+      return <Landing2Modules content={section.content} />;
+    case 'landing2-carousel':
+      return <Landing2Carousel content={section.content} />;
+    case 'landing2-boosting':
+      return <Landing2Boosting content={section.content} />;
+    case 'landing2-accounting':
+      return <Landing2Accounting content={section.content} />;
+    case 'landing2-brands':
+      return <Landing2Brands content={section.content} />;
+    case 'landing2-capabilities':
+      return <Landing2Capabilities content={section.content} />;
+    case 'landing2-industries':
+      return <Landing2Industries content={section.content} />;
+    case 'landing2-integrations':
+      return <Landing2Integrations content={section.content} />;
+    case 'landing2-testimonials':
+      return <Landing2Testimonials content={section.content} />;
+    case 'landing2-why-ess':
+      return <Landing2WhyEss content={section.content} />;
+    case 'landing2-footer-banner':
+      return <Landing2FooterBanner content={section.content} />;
+    case 'landing1-brands':
+      return <Landing1Brands content={section.content} />;
+    case 'landing1-intro':
+      return <Landing1Intro content={section.content} />;
+    case 'landing1-industries':
+      return <Landing1Industries content={section.content} />;
+    case 'landing1-features':
+      return <Landing1Features content={section.content} />;
+    case 'landing1-suite':
+      return <Landing1Suite content={section.content} />;
+    case 'landing1-stats':
+      return <Landing1Stats content={section.content} />;
+    case 'landing1-integration':
+      return <Landing1Integration content={section.content} />;
+    case 'landing1-process':
+      return <Landing1Process content={section.content} />;
+    case 'landing1-works':
+      return <Landing1Works content={section.content} />;
+    case 'landing1-showcase':
+      return <Landing1Showcase content={section.content} />;
+    case 'landing1-testimonials':
+      return <Landing1Testimonials content={section.content} />;
+    case 'landing1-faq':
+      return <Landing1Faq content={section.content} />;
+    case 'landing1-cta':
+      return <Landing1Cta content={section.content} />;
+    case 'landing1-challenges':
+      return <Landing1Challenges content={section.content} />;
+    case 'landing1-value':
+      return <Landing1Value content={section.content} />;
 
     default:
       if (process.env.NODE_ENV === 'development') {
