@@ -2144,6 +2144,48 @@ export default function PageEditor() {
 
         {/* ===== Sidebar ===== */}
         <div className="space-y-4">
+          {/* ===== Page General Settings ===== */}
+          <div className="bg-white rounded-2xl border border-slate-100 p-6 space-y-4 shadow-sm">
+            <div className="flex items-center gap-2 text-[#4B2A63]">
+              <Layers className="w-5 h-5" />
+              <h2 className="font-bold">Page Settings</h2>
+            </div>
+
+            <div className="space-y-1.5">
+              <label className="admin-label">Page Title</label>
+              <input
+                type="text"
+                placeholder="Page Title"
+                value={page.title}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setPage((prev) => (prev ? { ...prev, title: val } : prev));
+                }}
+                className="w-full bg-slate-50 rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-[#4B2A63]/10 border border-transparent focus:border-[#4B2A63]/20 font-semibold text-slate-900"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <label className="admin-label">URL Slug</label>
+                <span className="text-[10px] text-slate-400 font-mono">Live: {page.fullPath}</span>
+              </div>
+              <input
+                type="text"
+                placeholder="page-slug"
+                value={page.slug}
+                onChange={(e) => {
+                  const val = e.target.value.toLowerCase().replace(/[^a-z0-9-/]+/g, '');
+                  setPage((prev) => (prev ? { ...prev, slug: val } : prev));
+                }}
+                className="w-full bg-slate-50 rounded-xl px-4 py-3 text-sm font-mono outline-none focus:ring-2 focus:ring-[#4B2A63]/10 border border-transparent focus:border-[#4B2A63]/20 text-slate-700"
+              />
+              <p className="text-[10px] text-amber-600 font-medium">
+                Note: Changing the URL slug will automatically create a 301 redirect from the old URL to the new URL.
+              </p>
+            </div>
+          </div>
+
           <div className="bg-white rounded-2xl border border-slate-100 p-6 space-y-4 sticky top-36 shadow-sm">
             <div className="flex items-center gap-2 text-[#4B2A63]">
               <Globe className="w-5 h-5" />

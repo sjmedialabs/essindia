@@ -23,6 +23,7 @@ import {
 import { templateRepository } from './template.repository';
 import { sectionLibraryRepository } from './section-library.repository';
 import { pageRegistryRepository } from './page-registry.repository';
+import { redirectRepository } from './redirect.repository';
 import {
   assertNoCircularParent,
   computeDepthFromMegaMenuSelection,
@@ -432,7 +433,37 @@ export class PageAdminRepository {
     });
     await this.invalidateNavigationCache();
     await this.invalidateCache(current.fullPath);
-    if (fullPath !== current.fullPath) await this.invalidateCache(fullPath);
+
+    if (fullPath !== current.fullPath) {
+      await this.invalidateCache(fullPath);
+
+      // Auto-create 301 redirect from old path to new path if old path was valid
+      if (current.fullPath && current.fullPath !== '/' && current.fullPath !== fullPath) {
+        try {
+          await redirectRepository.create({
+            fromPath: current.fullPath,
+            toPath: fullPath,
+            statusCode: 301,
+            notes: `Auto-created on page slug change from ${current.fullPath} to ${fullPath}`,
+          });
+        } catch {
+          // Ignore if redirect for this path already exists
+        }
+      }
+
+      // Cascade path update to child pages
+      try {
+        const childPages = await db.query.pages.findMany({
+          where: eq(pages.parentId, id),
+          columns: { id: true, slug: true },
+        });
+        for (const child of childPages) {
+          await this.update(child.id, { slug: child.slug });
+        }
+      } catch (err) {
+        console.error('Failed to cascade child page path updates:', err);
+      }
+    }
 
     return this.getById(updated.id);
   }

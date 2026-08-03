@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Layout, Eye, Plus, ImageIcon, Search } from 'lucide-react';
+import { Layout, Eye, Plus, Search } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
@@ -104,28 +104,14 @@ export default function LandingPagesModule() {
                 key={template.id}
                 className="grid grid-cols-8 gap-2 items-center px-4 py-2 hover:bg-slate-50/80 transition-colors"
               >
-                <div className="col-span-3 flex items-center gap-2.5 min-w-0">
-                  <div className="w-8 h-8 rounded-md bg-slate-100 flex items-center justify-center shrink-0 overflow-hidden">
-                    {template.previewThumbnail ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={template.previewThumbnail}
-                        alt=""
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <ImageIcon className="w-4 h-4 text-slate-300" />
-                    )}
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-xs font-semibold text-slate-900 truncate">{template.name}</p>
-                    <p
-                      className="text-[11px] text-slate-400 truncate"
-                      title={template.description || 'No description'}
-                    >
-                      {template.description || 'No description'}
-                    </p>
-                  </div>
+                <div className="col-span-3 min-w-0">
+                  <p className="text-xs font-semibold text-slate-900 truncate">{template.name}</p>
+                  <p
+                    className="text-[11px] text-slate-400 truncate"
+                    title={template.description || 'No description'}
+                  >
+                    {template.description || 'No description'}
+                  </p>
                 </div>
                 <div className="col-span-1 text-center text-[11px] font-semibold text-slate-600">
                   {template.templateSections?.length ?? 0}
