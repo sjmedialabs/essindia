@@ -13,7 +13,7 @@ import {
   templates,
   templateSections,
 } from '@/lib/db/schema';
-import { asc, desc, eq, or, and, isNull } from 'drizzle-orm';
+import { asc, desc, eq, ne, or, and, isNull, ilike } from 'drizzle-orm';
 import { buildFullPath, buildPageTree, slugify } from '@/lib/cms/utils';
 import {
   buildPagePathFromNavAndCategorySlugs,
@@ -94,23 +94,6 @@ export class PageAdminRepository {
     megaMenuSubCategoryId?: string | null;
     megaMenuSubSubCategoryId?: string | null;
   }) {
-    if (data.megaMenuSubSubCategoryId) {
-      const child = await db.query.megaMenuSubSubCategories.findFirst({
-        where: eq(megaMenuSubSubCategories.id, data.megaMenuSubSubCategoryId)
-      });
-      if (child) data.title = child.name;
-    } else if (data.megaMenuSubCategoryId) {
-      const sub = await db.query.megaMenuSubCategories.findFirst({
-        where: eq(megaMenuSubCategories.id, data.megaMenuSubCategoryId)
-      });
-      if (sub) data.title = sub.name;
-    } else if (data.megaMenuCategoryId) {
-      const cat = await db.query.megaMenuCategories.findFirst({
-        where: eq(megaMenuCategories.id, data.megaMenuCategoryId)
-      });
-      if (cat) data.title = cat.name;
-    }
-
     const pageSlug = resolvePageSlug(data.title, data.slug);
     const placement = await this.resolveNavigationPlacement(data);
     let fullPath: string;
@@ -180,6 +163,14 @@ export class PageAdminRepository {
       if (existing) throw new Error('A page with this route already exists');
     } else {
       fullPath = buildFullPath(null, pageSlug);
+    }
+
+    // Check if a page with the exact same title already exists
+    const existingTitlePage = await db.query.pages.findFirst({
+      where: ilike(pages.title, data.title.trim()),
+    });
+    if (existingTitlePage) {
+      throw new Error(`The page title "${data.title.trim()}" is already allocated to another page. Please change the page title.`);
     }
 
     const duplicate = await db.query.pages.findFirst({ where: eq(pages.fullPath, fullPath) });
@@ -278,6 +269,7 @@ export class PageAdminRepository {
     data: Partial<{
       title: string;
       slug: string;
+      fullPath: string;
       parentId: string | null;
       categoryId: string | null;
       status: string;
@@ -322,6 +314,7 @@ export class PageAdminRepository {
     if (
       data.slug !== undefined ||
       data.title !== undefined ||
+      data.fullPath !== undefined ||
       data.parentId !== undefined ||
       data.navigationItemId !== undefined ||
       data.categoryId !== undefined ||
@@ -394,6 +387,29 @@ export class PageAdminRepository {
         }
       } else {
         fullPath = buildFullPath(null, pageSlug);
+      }
+
+      // Explicit fullPath override takes precedence if supplied
+      if (data.fullPath !== undefined && data.fullPath.trim()) {
+        let rawPath = data.fullPath.trim();
+        if (!rawPath.startsWith('/')) rawPath = `/${rawPath}`;
+        if (rawPath.length > 1 && rawPath.endsWith('/')) rawPath = rawPath.slice(0, -1);
+        rawPath = rawPath.replace(/\/+/g, '/');
+        fullPath = rawPath;
+
+        const parts = rawPath.split('/').filter(Boolean);
+        if (parts.length > 0) {
+          data.slug = parts[parts.length - 1];
+        }
+      }
+
+      if (fullPath !== current.fullPath) {
+        const duplicate = await db.query.pages.findFirst({
+          where: and(eq(pages.fullPath, fullPath), ne(pages.id, id)),
+        });
+        if (duplicate) {
+          throw new Error(`The route "${fullPath}" is already used by another page ("${duplicate.title}")`);
+        }
       }
     }
 
@@ -643,26 +659,43 @@ export class PageAdminRepository {
     const page = await this.getById(id);
     if (!page) return null;
 
-    const slug = `${page.slug}-copy`;
-    const fullPath = `${page.fullPath.replace(/\/$/, '')}-copy`;
+    const baseSlug = page.slug;
+    const basePath = page.fullPath.replace(/\/$/, '');
+    const baseTitle = page.title;
 
-    const [seo] = await db.insert(seoMetadata).values({ title: `${page.title} (Copy)` }).returning();
+    let candidateSlug = `${baseSlug}-copy`;
+    let candidateFullPath = `${basePath}-copy`;
+    let candidateTitle = `${baseTitle} (Copy)`;
+    let counter = 1;
+
+    while (true) {
+      const existing = await db.query.pages.findFirst({ where: eq(pages.fullPath, candidateFullPath) });
+      if (!existing) break;
+
+      candidateSlug = `${baseSlug}-copy-${counter}`;
+      candidateFullPath = `${basePath}-copy-${counter}`;
+      candidateTitle = `${baseTitle} (Copy ${counter})`;
+      counter++;
+    }
+
+    const [seo] = await db.insert(seoMetadata).values({ title: candidateTitle }).returning();
 
     const [copy] = await db
       .insert(pages)
       .values({
-        title: `${page.title} (Copy)`,
-        slug,
-        fullPath,
+        title: candidateTitle,
+        slug: candidateSlug,
+        fullPath: candidateFullPath,
         parentId: page.parentId,
         categoryId: page.categoryId,
         templateId: page.templateId,
-        navigationItemId: page.navigationItemId,
+        // Clear navigation placement so the copy doesn't hijack the original's menu slot
+        navigationItemId: null,
         depthLevel: page.depthLevel,
         sortOrder: page.sortOrder,
-        megaMenuCategoryId: page.megaMenuCategoryId,
-        megaMenuSubCategoryId: page.megaMenuSubCategoryId,
-        megaMenuSubSubCategoryId: page.megaMenuSubSubCategoryId,
+        megaMenuCategoryId: null,
+        megaMenuSubCategoryId: null,
+        megaMenuSubSubCategoryId: null,
         pageType: page.pageType,
         status: 'draft',
         seoId: seo.id,

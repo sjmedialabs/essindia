@@ -10,6 +10,7 @@ export default function PublicLayout({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-screen flex-col">
       <GlobalScripts position="header" />
+      <GlobalScripts position="body" />
       <Suspense fallback={<HeaderSkeleton />}>
         <HeaderShell />
       </Suspense>

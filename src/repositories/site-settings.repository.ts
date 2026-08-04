@@ -5,6 +5,7 @@ import { withCache, safeRedisDel } from '@/lib/redis';
 
 export interface SeoGlobals {
   headerScripts: string;
+  bodyScripts: string;
   footerScripts: string;
   robotsExtraDisallow: string[];
   preferWww: boolean;
@@ -22,6 +23,7 @@ export interface FormSettings {
 
 const DEFAULT_SEO_GLOBALS: SeoGlobals = {
   headerScripts: '',
+  bodyScripts: '',
   footerScripts: '',
   robotsExtraDisallow: [],
   preferWww: false,

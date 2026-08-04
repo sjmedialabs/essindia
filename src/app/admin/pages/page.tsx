@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { Plus, Search, FileText, Eye, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -15,6 +16,7 @@ function PagesModuleContent() {
   const searchParams = useSearchParams();
   const [pages, setPages] = React.useState<PageRegistryRow[]>([]);
   const [isSyncing, setIsSyncing] = React.useState(false);
+  const [reusingId, setReusingId] = React.useState<string | null>(null);
   const [templates, setTemplates] = React.useState<
     Array<{ id: string; name: string; templateSections?: unknown[] }>
   >([]);
@@ -129,6 +131,29 @@ function PagesModuleContent() {
     }
   };
 
+  const handleReuse = async (pageId: string) => {
+    setReusingId(pageId);
+    try {
+      const res = await fetch(`/api/admin/pages/${pageId}/actions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'duplicate' }),
+      });
+      const data = await res.json().catch(() => ({}));
+      if (res.status === 409) {
+        toast.warning(data.error || 'This slug is already used. Please edit the slug when saving.');
+        return;
+      }
+      if (!res.ok) throw new Error(data.error || 'Failed to duplicate page');
+      toast.success('Page duplicated as draft! Redirecting to edit...');
+      router.push(`/admin/pages/${data.id}`);
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : 'Failed to duplicate page');
+    } finally {
+      setReusingId(null);
+    }
+  };
+
   return (
     <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
@@ -182,6 +207,8 @@ function PagesModuleContent() {
                   page={page}
                   onDelete={handleDelete}
                   onAction={handlePageAction}
+                  onReuse={handleReuse}
+                  isReusing={reusingId === page.pageId}
                 />
               ))}
 
@@ -221,10 +248,14 @@ function RegistryPageRow({
   page,
   onDelete,
   onAction,
+  onReuse,
+  isReusing,
 }: {
   page: PageRegistryRow;
   onDelete: (id: string) => void;
   onAction: (pageId: string, action: string) => void;
+  onReuse: (pageId: string) => void;
+  isReusing?: boolean;
 }) {
   if (!page.pageId) return null;
 
@@ -252,6 +283,20 @@ function RegistryPageRow({
       <div className="col-span-1 text-center text-[11px] text-slate-400">{new Date(page.updatedAt).toLocaleDateString()}</div>
       <div className="col-span-2 flex justify-end gap-1">
         <Link href={page.routePath} target="_blank"><Button variant="ghost" size="icon-xs"><Eye /></Button></Link>
+        <button
+          title="Reuse (Duplicate) page"
+          disabled={isReusing}
+          onClick={() => onReuse(page.pageId!)}
+          className="w-6 h-6 flex items-center justify-center rounded hover:bg-slate-100 transition-colors disabled:opacity-40"
+        >
+          <Image
+            src="/icons8-process-90.png"
+            alt="Reuse"
+            width={16}
+            height={16}
+            className={cn('object-contain', isReusing && 'animate-spin')}
+          />
+        </button>
         <Link href={`/admin/pages/${page.pageId}`}><Button size="xs">Edit</Button></Link>
         <Button
           variant="outline"

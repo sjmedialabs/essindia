@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import { getHeroBackgroundStyles } from '@/lib/utils';
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
@@ -118,7 +117,7 @@ export function BiHero({ content }: { content?: BiHeroContent }) {
               {title}
             </motion.h1>
 
-            <motion.p
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.4, duration: 0.6 }}
@@ -130,7 +129,7 @@ export function BiHero({ content }: { content?: BiHeroContent }) {
               ) : (
                 description
               )}
-            </motion.p>
+            </motion.div>
 
             <motion.div
               initial={{ opacity: 0, y: 15 }}
@@ -159,12 +158,13 @@ export function BiHero({ content }: { content?: BiHeroContent }) {
                   )}
                 </motion.div>
               )}
+
               {button2Text && (
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.98 }}>
                   {button2FormType ? (
                     <button
                       onClick={handleBtn2Click}
-                      className="inline-block px-6 py-3 rounded-full text-sm font-bold border shadow-sm hover:shadow-md transition-all text-center min-w-[140px] cursor-pointer"
+                      className="inline-block px-6 py-3 rounded-full text-sm font-bold shadow-md hover:shadow-lg transition-all border text-center min-w-[140px] cursor-pointer"
                       style={{ backgroundColor: button2BgColor, borderColor: button2BorderColor, color: button2TextColor }}
                     >
                       {button2Text}
@@ -172,7 +172,7 @@ export function BiHero({ content }: { content?: BiHeroContent }) {
                   ) : (
                     <Link
                       href={button2Url}
-                      className="inline-block px-6 py-3 rounded-full text-sm font-bold border shadow-sm hover:shadow-md transition-all border text-center min-w-[140px]"
+                      className="inline-block px-6 py-3 rounded-full text-sm font-bold shadow-md hover:shadow-lg transition-all border text-center min-w-[140px]"
                       style={{ backgroundColor: button2BgColor, borderColor: button2BorderColor, color: button2TextColor }}
                     >
                       {button2Text}
@@ -186,25 +186,20 @@ export function BiHero({ content }: { content?: BiHeroContent }) {
           {/* Right Image Column */}
           {rightImage && (
             <motion.div
-              initial={{ opacity: 0, scale: 0.95, x: 20 }}
-              animate={{ opacity: 1, scale: 1, x: 0 }}
-              transition={{ delay: 0.4, duration: 0.7, ease: 'easeOut' }}
-              className="flex-1 w-full max-w-[500px] flex justify-center items-center"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.7, delay: 0.2 }}
+              className="flex-1 w-full max-w-lg lg:max-w-xl relative flex justify-center"
             >
-              <motion.div
-                animate={{ y: [0, -8, 0] }}
-                transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
-                className="w-full h-full relative aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl border border-white/10"
-              >
+              <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl border border-white/40">
                 <Image
                   src={rightImage}
-                  alt={title}
+                  alt={title || 'Power BI Consulting'}
                   fill
-                  className="object-contain"
+                  className="object-contain p-2"
                   priority
-                  unoptimized
                 />
-              </motion.div>
+              </div>
             </motion.div>
           )}
 

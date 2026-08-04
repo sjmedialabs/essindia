@@ -255,11 +255,14 @@ function DesktopNav({ items = [] }: { items: NavItem[] }) {
         {items.map((item) => {
           const isDropdown = item.megaMenuConfig?.displayType === 'dropdown';
           const simpleLinks = item.megaMenuConfig?.links || [];
+          const hasSubCategories = item.megaMenu?.categories.some(
+            (c) => c.subCategories && c.subCategories.length > 0
+          );
 
           return (
             <NavigationMenuItem key={item.id} value={item.id}>
               {hasRenderableMegaMenu(item.megaMenu) ? (
-                isDropdown ? (
+                isDropdown || !hasSubCategories ? (
                   <>
                     <NavigationMenuTrigger className="bg-transparent hover:bg-slate-50 text-[13px] text-slate-700 font-medium cursor-pointer">
                       {item.label}

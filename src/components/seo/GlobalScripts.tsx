@@ -5,10 +5,15 @@ import { siteSettingsRepository } from '@/repositories/site-settings.repository'
  * Injects CMS-configured global header/footer scripts.
  * Empty by default — no visual change until admins add scripts.
  */
-export async function GlobalScripts({ position }: { position: 'header' | 'footer' }) {
+export async function GlobalScripts({ position }: { position: 'header' | 'body' | 'footer' }) {
   try {
     const settings = await siteSettingsRepository.getSeoGlobals();
-    const raw = position === 'header' ? settings.headerScripts : settings.footerScripts;
+    const raw =
+      position === 'header'
+        ? settings.headerScripts
+        : position === 'body'
+          ? settings.bodyScripts
+          : settings.footerScripts;
     if (!raw?.trim()) return null;
 
     return (

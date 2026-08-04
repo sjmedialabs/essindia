@@ -47,13 +47,13 @@ export function RetailWhyErp({ content }: { content: RetailWhyErpContent }) {
             <h2 className="text-3xl md:text-4xl font-bold text-indigo-900 mb-6 tracking-tight">
               {title}
             </h2>
-            <p className="text-lg text-slate-600 leading-relaxed text-justify md:text-left">
+            <div className="text-lg text-slate-600 leading-relaxed text-justify md:text-left">
               {typeof paragraph === 'string' && (paragraph.includes('<p>') || paragraph.includes('<')) ? (
                 <span dangerouslySetInnerHTML={{ __html: paragraph }} />
               ) : (
                 paragraph
               )}
-            </p>
+            </div>
           </motion.div>
           
         </div>

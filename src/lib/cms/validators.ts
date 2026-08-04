@@ -52,6 +52,7 @@ export const createPageSchema = z.object({
 export const updatePageSchema = z.object({
   title: z.string().min(1).max(255).optional(),
   slug: z.string().min(1).max(255).optional(),
+  fullPath: z.string().min(1).max(500).optional(),
   parentId: z.string().uuid().nullable().optional(),
   categoryId: z.string().uuid().nullable().optional(),
   status: z.enum(['draft', 'published', 'scheduled', 'archived']).optional(),

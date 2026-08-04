@@ -183,6 +183,7 @@ import { Landing1Cta } from '@/components/blocks/Landing1Cta';
 import { Landing1Challenges } from '@/components/blocks/Landing1Challenges';
 import { Landing1Value } from '@/components/blocks/Landing1Value';
 import { ThankYouHero } from '@/components/blocks/ThankYouHero';
+import { BiTitle } from '@/components/blocks/BiTitle';
 
 
 
@@ -430,6 +431,8 @@ export function SectionRenderer({ section }: SectionRendererProps) {
       return <BiIntro content={section.content} />;
     case 'bi-insights':
       return <BiInsights content={section.content} />;
+    case 'bi-title':
+      return <BiTitle content={section.content} />;
     case 'bi-tabs':
       return <BiTabs content={section.content} />;
     case 'bi-highlight-strip':

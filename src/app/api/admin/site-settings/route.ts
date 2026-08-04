@@ -6,6 +6,7 @@ import { z } from 'zod';
 
 const globalsSchema = z.object({
   headerScripts: z.string().optional(),
+  bodyScripts: z.string().optional(),
   footerScripts: z.string().optional(),
   robotsExtraDisallow: z.array(z.string()).optional(),
   preferWww: z.boolean().optional(),

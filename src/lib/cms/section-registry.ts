@@ -1491,6 +1491,16 @@ export const SECTION_REGISTRY: SectionTypeDefinition[] = [
     fieldOrder: ['title', 'items', 'rightImage'],
   },
   {
+    type: 'bi-title',
+    label: 'BI Title Section',
+    description: 'Simple title/heading section with customizable background color, title text, and text color',
+    icon: Layout,
+    color: 'bg-purple-50 text-purple-600',
+    defaultVariant: 'default',
+    supportsVariants: false,
+    fieldOrder: ['title', 'titleColor', 'bgColor'],
+  },
+  {
     type: 'bi-tabs',
     label: 'BI Persona Tabs',
     description: 'Interactive persona tab switcher with questions and dashboard screenshot for BI page',
@@ -1518,7 +1528,7 @@ export const SECTION_REGISTRY: SectionTypeDefinition[] = [
     color: 'bg-indigo-50 text-indigo-600',
     defaultVariant: 'default',
     supportsVariants: false,
-    fieldOrder: ['title', 'subtitle', 'description', 'steps']
+    fieldOrder: ['title', 'subtitle', 'description', 'optionLabel', 'steps']
   },
   {
     type: 'bi-architecture',

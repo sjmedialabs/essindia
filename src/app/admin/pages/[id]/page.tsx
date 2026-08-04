@@ -1653,7 +1653,7 @@ export default function PageEditor() {
       const metaRes = await fetch(`/api/admin/pages/${pageId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: page.title, slug: page.slug }),
+        body: JSON.stringify({ title: page.title, slug: page.slug, fullPath: page.fullPath }),
       });
       if (!metaRes.ok) throw new Error('Failed to save page settings');
 
@@ -1664,16 +1664,14 @@ export default function PageEditor() {
       });
       if (!seoRes.ok) throw new Error('Failed to save SEO');
 
-      const sectionPromises = page.sections.map((s) =>
-        fetch(`/api/admin/pages/${pageId}/sections/${s.id}`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ content: s.content }),
-        })
-      );
-      const results = await Promise.all(sectionPromises);
-      const failed = results.filter((r) => !r.ok);
-      if (failed.length > 0) throw new Error(`${failed.length} section(s) failed to save`);
+      const secRes = await fetch(`/api/admin/pages/${pageId}/sections`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sections: page.sections.map((s) => ({ id: s.id, content: s.content })),
+        }),
+      });
+      if (!secRes.ok) throw new Error('Failed to save page sections');
 
       toast.success('All changes saved');
       await fetchPage();
@@ -1690,16 +1688,14 @@ export default function PageEditor() {
     setIsPublishing(true);
     try {
       // 1. Save all section draft changes to DB first
-      const sectionPromises = page.sections.map((s) =>
-        fetch(`/api/admin/pages/${pageId}/sections/${s.id}`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ content: s.content }),
-        })
-      );
-      const results = await Promise.all(sectionPromises);
-      const failed = results.filter((r) => !r.ok);
-      if (failed.length > 0) throw new Error(`${failed.length} section(s) failed to save`);
+      const secRes = await fetch(`/api/admin/pages/${pageId}/sections`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sections: page.sections.map((s) => ({ id: s.id, content: s.content })),
+        }),
+      });
+      if (!secRes.ok) throw new Error('Failed to save page sections');
 
       // 2. Execute publish action
       const res = await fetch(`/api/admin/pages/${pageId}/actions`, {
@@ -2165,25 +2161,56 @@ export default function PageEditor() {
               />
             </div>
 
-            <div className="space-y-1.5">
-              <div className="flex items-center justify-between">
-                <label className="admin-label">URL Slug</label>
-                <span className="text-[10px] text-slate-400 font-mono">Live: {page.fullPath}</span>
-              </div>
-              <input
-                type="text"
-                placeholder="page-slug"
-                value={page.slug}
-                onChange={(e) => {
-                  const val = e.target.value.toLowerCase().replace(/[^a-z0-9-/]+/g, '');
-                  setPage((prev) => (prev ? { ...prev, slug: val } : prev));
-                }}
-                className="w-full bg-slate-50 rounded-xl px-4 py-3 text-sm font-mono outline-none focus:ring-2 focus:ring-[#4B2A63]/10 border border-transparent focus:border-[#4B2A63]/20 text-slate-700"
-              />
-              <p className="text-[10px] text-amber-600 font-medium">
-                Note: Changing the URL slug will automatically create a 301 redirect from the old URL to the new URL.
-              </p>
-            </div>
+            {/* Single Dynamic URL/Slug Field */}
+            {(() => {
+              const isNested = Boolean(
+                page.fullPath && page.fullPath.split('/').filter(Boolean).length > 1
+              );
+
+              return (
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <label className="admin-label">
+                      {isNested ? 'Full URL Path' : 'URL Slug'}
+                    </label>
+                    <span className="text-[10px] text-slate-400 font-mono">
+                      {isNested ? 'Category Route' : 'Individual Page'}
+                    </span>
+                  </div>
+                  {isNested ? (
+                    <input
+                      type="text"
+                      placeholder="/solutions/example/page"
+                      value={page.fullPath}
+                      onChange={(e) => {
+                        let val = e.target.value.toLowerCase().replace(/[^a-z0-9-/]+/g, '');
+                        if (val && !val.startsWith('/')) val = `/${val}`;
+                        const parts = val.split('/').filter(Boolean);
+                        const lastSegment = parts.length > 0 ? parts[parts.length - 1] : page.slug;
+                        setPage((prev) => (prev ? { ...prev, fullPath: val, slug: lastSegment } : prev));
+                      }}
+                      className="w-full bg-slate-50 rounded-xl px-4 py-3 text-sm font-mono outline-none focus:ring-2 focus:ring-[#4B2A63]/10 border border-transparent focus:border-[#4B2A63]/20 text-slate-800 font-medium"
+                    />
+                  ) : (
+                    <input
+                      type="text"
+                      placeholder="page-slug"
+                      value={page.slug}
+                      onChange={(e) => {
+                        const val = e.target.value.toLowerCase().replace(/[^a-z0-9-]+/g, '');
+                        setPage((prev) =>
+                          prev ? { ...prev, slug: val, fullPath: `/${val}` } : prev
+                        );
+                      }}
+                      className="w-full bg-slate-50 rounded-xl px-4 py-3 text-sm font-mono outline-none focus:ring-2 focus:ring-[#4B2A63]/10 border border-transparent focus:border-[#4B2A63]/20 text-slate-800 font-medium"
+                    />
+                  )}
+                  <p className="text-[10px] text-amber-600 font-medium leading-relaxed">
+                    Note: Changing the URL will automatically create a 301 Permanent Redirect from the old URL to the new URL so existing links don&apos;t break.
+                  </p>
+                </div>
+              );
+            })()}
           </div>
 
           <div className="bg-white rounded-2xl border border-slate-100 p-6 space-y-4 sticky top-36 shadow-sm">
