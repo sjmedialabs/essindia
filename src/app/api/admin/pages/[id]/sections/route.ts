@@ -48,3 +48,33 @@ export async function POST(
     return serverError(error);
   }
 }
+
+export async function PUT(
+  request: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  if (!(await isAdminRequest())) return unauthorized();
+
+  try {
+    const { id: pageId } = await params;
+    const body = await request.json();
+    const { sections } = body;
+    if (!Array.isArray(sections)) return badRequest('sections must be an array');
+
+    const updatedSections = [];
+    for (const s of sections) {
+      if (!s.id) continue;
+      const updated = await pageAdminRepository.updateSection(s.id, {
+        ...(s.content !== undefined ? { content: s.content } : {}),
+        ...(s.name !== undefined ? { name: s.name } : {}),
+        ...(s.variant !== undefined ? { variant: s.variant } : {}),
+        ...(s.isActive !== undefined ? { isActive: s.isActive } : {}),
+      });
+      if (updated) updatedSections.push(updated);
+    }
+
+    return NextResponse.json({ success: true, count: updatedSections.length, pageId });
+  } catch (error) {
+    return serverError(error);
+  }
+}

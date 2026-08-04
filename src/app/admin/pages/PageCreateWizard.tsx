@@ -337,8 +337,7 @@ export function PageCreateWizard({ open, onClose, templates, onSubmit, fullPage 
                       placeholder="Page title"
                       value={form.title}
                       onChange={(e) => setForm({ ...form, title: e.target.value })}
-                      disabled={!!form.megaMenuCategoryId}
-                      className="w-full bg-slate-50 border border-slate-200 focus:border-[#4B2A63]/30 rounded-2xl px-6 py-4 font-bold outline-none focus:ring-4 focus:ring-[#4B2A63]/10 disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="w-full bg-slate-50 border border-slate-200 focus:border-[#4B2A63]/30 rounded-2xl px-6 py-4 font-bold outline-none focus:ring-4 focus:ring-[#4B2A63]/10"
                     />
                   </div>
                   <div>
@@ -564,9 +563,8 @@ export function PageCreateWizard({ open, onClose, templates, onSubmit, fullPage 
                         placeholder="Page title"
                         value={form.title}
                         onChange={(e) => setForm({ ...form, title: e.target.value })}
-                        disabled={!!form.megaMenuCategoryId}
                         onMouseDown={(e) => e.stopPropagation()}
-                        className="w-full bg-slate-50 border border-slate-200 focus:border-[#4B2A63]/30 rounded-2xl px-6 py-4 font-bold outline-none focus:ring-4 focus:ring-[#4B2A63]/10 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full bg-slate-50 border border-slate-200 focus:border-[#4B2A63]/30 rounded-2xl px-6 py-4 font-bold outline-none focus:ring-4 focus:ring-[#4B2A63]/10"
                       />
                     </div>
                     <div>

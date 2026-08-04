@@ -1000,6 +1000,12 @@ const DEFAULT_BI_INSIGHTS_CONTENT: Record<string, any> = {
   rightImage: '/Business intilligence/image 44.png'
 };
 
+const DEFAULT_BI_TITLE_CONTENT: Record<string, any> = {
+  title: 'Business Intelligence',
+  titleColor: '#1a1a1a',
+  bgColor: '#ffffff',
+};
+
 const DEFAULT_BI_TABS_CONTENT: Record<string, any> = {
   tabs: [
     {
@@ -2085,6 +2091,8 @@ export function SectionEditorCard({
         baseSchema = DEFAULT_BI_INTRO_CONTENT as Record<string, JsonValue>;
       } else if (section.type === 'bi-insights') {
         baseSchema = DEFAULT_BI_INSIGHTS_CONTENT as Record<string, JsonValue>;
+      } else if (section.type === 'bi-title') {
+        baseSchema = DEFAULT_BI_TITLE_CONTENT as Record<string, JsonValue>;
       } else if (section.type === 'bi-tabs') {
         baseSchema = DEFAULT_BI_TABS_CONTENT as Record<string, JsonValue>;
       } else if (section.type === 'bi-highlight-strip') {

@@ -19,6 +19,7 @@ interface BiBusinessImpactContent {
   title?: string;
   subtitle?: string;
   description?: string;
+  optionLabel?: string;
   steps?: StepItem[];
 }
 
@@ -26,6 +27,7 @@ export function BiBusinessImpact({ content }: { content?: BiBusinessImpactConten
   const title = content?.title || 'Business Impact';
   const subtitle = content?.subtitle || "We don't build dashboards first. We start with business problems.";
   const description = content?.description || 'From identifying business challenges to measuring measurable outcomes, our AI-driven approach transforms raw data into meaningful business decisions. We focus on solving real business problems first – delivering actionable insights, smarter decisions, and measurable financial impact.';
+  const optionLabel = content?.optionLabel ?? 'Option';
 
   const defaultSteps: StepItem[] = [
     {
@@ -134,7 +136,7 @@ export function BiBusinessImpact({ content }: { content?: BiBusinessImpactConten
                       {/* Option Text - Sitting on top of the horizontal line, centered horizontally */}
                       <div className="absolute left-[19px] w-20 bottom-[50%] mb-[2px] flex flex-col items-center justify-end leading-none z-10">
                         <span className="text-[9px] uppercase font-bold tracking-widest text-slate-400">
-                          Option
+                          {optionLabel}
                         </span>
                         <span className="text-xl font-black text-slate-900 mt-0.5">
                           {step.number}
@@ -167,7 +169,7 @@ export function BiBusinessImpact({ content }: { content?: BiBusinessImpactConten
                       {/* Card Content Text */}
                       <div className="text-left space-y-0.5">
                         <span className="text-[9px] uppercase font-bold tracking-wider text-slate-400 md:hidden block">
-                          Option {step.number}
+                          {optionLabel} {step.number}
                         </span>
                         <h4 className="text-lg sm:text-xl font-bold text-slate-900 leading-snug">
                           {step.title}

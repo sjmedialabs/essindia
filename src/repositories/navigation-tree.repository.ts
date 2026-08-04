@@ -553,15 +553,7 @@ export class NavigationTreeRepository {
         }))
         .filter((cat) => mode === 'admin' || cat.subCategories.length > 0 || cat.pageId);
 
-      const navPages = pagesByNavItem.get(item.id) ?? [];
-      const unassignedNavPages = navPages.filter(p => !pageIds.has(p.id));
-
-      const pageCategories = pagesToNavigationTreeCategories(
-        unassignedNavPages,
-        navSlug,
-        mode
-      );
-      const treeCategories = mergeNavigationCategories(pageCategories, tableCategories);
+      const treeCategories = tableCategories;
 
       result.push({
         id: item.id,
@@ -572,7 +564,7 @@ export class NavigationTreeRepository {
         megaMenuConfig: item.megaMenuConfig,
         orderIndex: item.orderIndex,
         categories: treeCategories.filter(
-          (cat) => mode === 'admin' || cat.subCategories.length > 0 || cat.pageId || cat.href
+          (cat) => mode === 'admin' || cat.subCategories.length > 0 || !!cat.pageId
         ),
       });
       } catch (itemError) {

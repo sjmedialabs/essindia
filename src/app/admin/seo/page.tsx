@@ -32,6 +32,7 @@ export default function SeoManagerPage() {
   });
   const [globals, setGlobals] = React.useState({
     headerScripts: '',
+    bodyScripts: '',
     footerScripts: '',
     robotsExtraDisallow: '' as string,
   });
@@ -51,6 +52,7 @@ export default function SeoManagerPage() {
         if (data) {
           setGlobals({
             headerScripts: data.headerScripts || '',
+            bodyScripts: data.bodyScripts || '',
             footerScripts: data.footerScripts || '',
             robotsExtraDisallow: Array.isArray(data.robotsExtraDisallow)
               ? data.robotsExtraDisallow.join('\n')
@@ -96,6 +98,7 @@ export default function SeoManagerPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           headerScripts: globals.headerScripts,
+          bodyScripts: globals.bodyScripts,
           footerScripts: globals.footerScripts,
           robotsExtraDisallow: globals.robotsExtraDisallow
             .split('\n')
@@ -191,31 +194,49 @@ export default function SeoManagerPage() {
           <div>
             <p className="text-xs font-semibold text-slate-700">Global Scripts & Robots</p>
             <p className="text-[11px] text-slate-400">
-              Apply site-wide header/footer scripts and extra robots.txt disallow paths.
+              Apply site-wide header/body/footer scripts and extra robots.txt disallow paths.
             </p>
           </div>
           <Button size="xs" onClick={saveGlobals} disabled={savingGlobals}>
             <Save className="w-3.5 h-3.5" /> {savingGlobals ? 'Saving…' : 'Save Globals'}
           </Button>
         </div>
-        <textarea
-          className="w-full bg-slate-50 rounded-md px-2.5 py-2 text-xs font-mono border border-slate-200 outline-none min-h-[72px]"
-          placeholder="Global header scripts"
-          value={globals.headerScripts}
-          onChange={(e) => setGlobals({ ...globals, headerScripts: e.target.value })}
-        />
-        <textarea
-          className="w-full bg-slate-50 rounded-md px-2.5 py-2 text-xs font-mono border border-slate-200 outline-none min-h-[72px]"
-          placeholder="Global footer scripts"
-          value={globals.footerScripts}
-          onChange={(e) => setGlobals({ ...globals, footerScripts: e.target.value })}
-        />
-        <textarea
-          className="w-full bg-slate-50 rounded-md px-2.5 py-2 text-xs font-mono border border-slate-200 outline-none min-h-[56px]"
-          placeholder="Extra robots disallow paths (one per line), e.g. /private/"
-          value={globals.robotsExtraDisallow}
-          onChange={(e) => setGlobals({ ...globals, robotsExtraDisallow: e.target.value })}
-        />
+        <div>
+          <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Global Header Scripts (&lt;head&gt;)</label>
+          <textarea
+            className="w-full bg-slate-50 rounded-md px-2.5 py-2 text-xs font-mono border border-slate-200 outline-none min-h-[64px]"
+            placeholder="Global header scripts (e.g. GTM head script)"
+            value={globals.headerScripts}
+            onChange={(e) => setGlobals({ ...globals, headerScripts: e.target.value })}
+          />
+        </div>
+        <div>
+          <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Global Body Scripts (&lt;body&gt;)</label>
+          <textarea
+            className="w-full bg-slate-50 rounded-md px-2.5 py-2 text-xs font-mono border border-slate-200 outline-none min-h-[64px]"
+            placeholder="Global body scripts (e.g. GTM noscript body tag)"
+            value={globals.bodyScripts}
+            onChange={(e) => setGlobals({ ...globals, bodyScripts: e.target.value })}
+          />
+        </div>
+        <div>
+          <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Global Footer Scripts</label>
+          <textarea
+            className="w-full bg-slate-50 rounded-md px-2.5 py-2 text-xs font-mono border border-slate-200 outline-none min-h-[64px]"
+            placeholder="Global footer scripts (e.g. Chat widgets, Analytics)"
+            value={globals.footerScripts}
+            onChange={(e) => setGlobals({ ...globals, footerScripts: e.target.value })}
+          />
+        </div>
+        <div>
+          <label className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block mb-1">Extra Robots.txt Disallow Paths</label>
+          <textarea
+            className="w-full bg-slate-50 rounded-md px-2.5 py-2 text-xs font-mono border border-slate-200 outline-none min-h-[56px]"
+            placeholder="Extra robots disallow paths (one per line), e.g. /private/"
+            value={globals.robotsExtraDisallow}
+            onChange={(e) => setGlobals({ ...globals, robotsExtraDisallow: e.target.value })}
+          />
+        </div>
       </div>
     </motion.div>
   );

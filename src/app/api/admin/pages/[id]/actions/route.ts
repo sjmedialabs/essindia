@@ -28,9 +28,16 @@ export async function POST(
     }
 
     if (action === 'duplicate') {
-      const page = await pageAdminRepository.duplicate(id);
-      if (!page) return notFound('Page not found');
-      return NextResponse.json(page, { status: 201 });
+      try {
+        const page = await pageAdminRepository.duplicate(id);
+        if (!page) return notFound('Page not found');
+        return NextResponse.json(page, { status: 201 });
+      } catch (err: any) {
+        if (err?.message?.startsWith('SLUG_CONFLICT:')) {
+          return NextResponse.json({ error: err.message.replace('SLUG_CONFLICT: ', '') }, { status: 409 });
+        }
+        throw err;
+      }
     }
 
     if (action === 'convert-template') {
