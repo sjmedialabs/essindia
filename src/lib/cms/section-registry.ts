@@ -23,7 +23,7 @@ export interface SectionTypeDefinition {
   fieldOrder?: string[];
 }
 
-export const SECTION_REGISTRY: SectionTypeDefinition[] = [
+const RAW_SECTION_REGISTRY: SectionTypeDefinition[] = [
   {
     type: 'sticky-card',
     label: 'Sticky Floating Card',
@@ -2417,10 +2417,12 @@ export const SECTION_REGISTRY: SectionTypeDefinition[] = [
     color: 'bg-[#4B2A63]/10 text-[#4B2A63]',
     defaultVariant: 'default',
     supportsVariants: false,
-    fieldOrder: ['badge', 'title', 'description', 'challenges']
   },
 ];
 
+export const SECTION_REGISTRY: SectionTypeDefinition[] = RAW_SECTION_REGISTRY.filter(
+  (sec, index, self) => index === self.findIndex((t) => t.type === sec.type)
+);
 
 export function getSectionDefinition(type: string): SectionTypeDefinition | undefined {
   return SECTION_REGISTRY.find((s) => s.type === type);

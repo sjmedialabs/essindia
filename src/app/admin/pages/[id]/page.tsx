@@ -2514,8 +2514,8 @@ export default function PageEditor() {
               <div className="flex-1 bg-slate-100 overflow-y-auto flex items-center justify-center p-6">
                 <div className="bg-white shadow-xl overflow-y-auto h-full w-full rounded-xl border border-slate-200">
                   <div className="w-full">
-                    {page.sections.map((section) => (
-                      <SectionRenderer key={section.id} section={section} />
+                    {page.sections.map((section, idx) => (
+                      <SectionRenderer key={section.id ? `${section.id}-${idx}` : `${section.type}-${idx}`} section={section} />
                     ))}
                   </div>
                 </div>

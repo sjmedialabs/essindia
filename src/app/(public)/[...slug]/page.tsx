@@ -91,8 +91,8 @@ export default async function DynamicPage({ params }: PageProps) {
           headerScripts={seo?.headerScripts}
           footerScripts={seo?.footerScripts}
         />
-        {page.sections.map((section: any) => (
-          <SectionRenderer key={section.id} section={section} />
+        {page.sections.map((section: any, idx: number) => (
+          <SectionRenderer key={section.id ? `${section.id}-${idx}` : `${section.type}-${idx}`} section={section} />
         ))}
       </div>
     );
