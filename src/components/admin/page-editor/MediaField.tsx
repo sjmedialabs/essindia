@@ -53,12 +53,25 @@ export function MediaField({ fieldKey, label, value, onChange, hint, sectionType
   };
 
   const isVideo = value && (value.toLowerCase().match(/\.(mp4|webm|ogg|mov)$/) || value.includes('video'));
-  const isPdfField = fieldKey.toLowerCase().includes('pdf');
-  const isPdfFile = value && value.toLowerCase().endsWith('.pdf');
+  const isPdfField = fieldKey.toLowerCase().includes('pdf') || fieldKey.toLowerCase().includes('document');
+  const isPdfFile = value && (
+    value.toLowerCase().endsWith('.pdf') ||
+    value.toLowerCase().endsWith('.doc') ||
+    value.toLowerCase().endsWith('.docx') ||
+    value.toLowerCase().endsWith('.xls') ||
+    value.toLowerCase().endsWith('.xlsx') ||
+    value.toLowerCase().endsWith('.ppt') ||
+    value.toLowerCase().endsWith('.pptx') ||
+    value.toLowerCase().endsWith('.txt') ||
+    isPdfField
+  );
 
   const allowedTabs = React.useMemo((): TabType[] => {
     const key = fieldKey.toLowerCase();
-    if (key.includes('pdf')) {
+    if (key === 'image' || key.includes('image') || key.includes('media') || key === 'mediaurl') {
+      return ['images'];
+    }
+    if (key.includes('pdf') || key.includes('document')) {
       return ['pdfs'];
     }
     if (key.includes('gif')) {
@@ -70,9 +83,6 @@ export function MediaField({ fieldKey, label, value, onChange, hint, sectionType
     if (key === 'videourl' || key.includes('video')) {
       return ['videos'];
     }
-    if (key === 'mediaurl' || key.includes('media') || key.includes('image')) {
-      return ['images'];
-    }
     if (sectionType === 'europe-case-study-slider') {
       return ['images', 'videos'];
     }
@@ -81,7 +91,7 @@ export function MediaField({ fieldKey, label, value, onChange, hint, sectionType
   }, [fieldKey, sectionType]);
 
   const acceptString = React.useMemo(() => {
-    if (allowedTabs.includes('pdfs')) return 'application/pdf';
+    if (allowedTabs.includes('pdfs')) return '.pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,application/pdf';
     const parts: string[] = [];
     if (allowedTabs.includes('images')) parts.push('image/*');
     if (allowedTabs.includes('gifs')) parts.push('image/gif');

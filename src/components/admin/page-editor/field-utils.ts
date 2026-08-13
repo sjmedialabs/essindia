@@ -185,7 +185,17 @@ function baseHumanLabel(key: string): string {
   if (key === 'mediaUrl') return 'Thumbnail Upload';
   if (key === 'videoUrl') return 'Media Upload';
   if (key === 'buttonBgColor') return 'Button Background Color';
-  if (key === 'buttonTextColor') return 'Button Text Color';
+  if (key === 'badge') return 'Badge';
+  if (key === 'primaryTitleColor' || key === 'titlePrimaryColor') return 'Title Primary Color';
+  if (key === 'secondaryTitleColor' || key === 'titleSecondaryColor') return 'Secondary Title Color';
+  if (key === 'visionIcon') return 'Vision Icon Upload';
+  if (key === 'visionTitle') return 'Vision Title';
+  if (key === 'visionDescription') return 'Vision Description';
+  if (key === 'visionPoints') return 'Vision Points';
+  if (key === 'missionIcon') return 'Mission Icon Upload';
+  if (key === 'missionTitle') return 'Mission Title';
+  if (key === 'missionDescription') return 'Mission Description';
+  if (key === 'missionPoints') return 'Mission Points';
   if (key === 'tabs') return 'Category Tabs List';
   if (key === 'label') return 'Title';
   if (key === 'number') return 'Value';
@@ -193,8 +203,10 @@ function baseHumanLabel(key: string): string {
   if (key === 'contentDescription') return 'Detail Description';
   if (key === 'contentImage') return 'Detail Mockup Image';
   if (key === 'benefits') return 'Benefits Tags (Array)';
-  if (key === 'buttonText') return 'CTA Text';
+  if (key === 'buttonText') return 'Button Text';
   if (key === 'buttonUrl') return 'CTA URL';
+  if (key === 'documentUrl') return 'Document Upload';
+  if (key === 'redirectUrl') return 'Redirection Link';
   if (key === 'buttonFormType') return 'Button Form Action';
   if (key === 'button1FormType') return 'Button 1 Form Action';
   if (key === 'button2FormType') return 'Button 2 Form Action';
@@ -220,13 +232,19 @@ function baseHumanLabel(key: string): string {
     .replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-/**
- * Human-readable field label. Appends fixed heading tag when applicable, e.g. "Title (H1)".
- */
 export function humanLabel(
   key: string,
   options?: { sectionType?: string; keyPath?: string }
 ): string {
+  if (options?.sectionType === 'sticky-card') {
+    if (key === 'image') return 'Image Upload';
+    if (key === 'title') return 'Title';
+    if (key === 'description') return 'Description';
+    if (key === 'buttonText') return 'Button Text';
+    if (key === 'documentUrl') return 'Document Upload';
+    if (key === 'redirectUrl') return 'Redirection Link';
+  }
+
   if (options?.sectionType === 'landing1-challenges' && options?.keyPath?.includes('challenges.')) {
     if (key === 'title') return 'Challenge Title';
     if (key === 'desc') return 'Challenge Description';
@@ -289,6 +307,14 @@ export function humanLabel(
     if (key === 'logo') return 'Company Logo Upload';
     if (key === 'navLinks') return 'Navigation Links Array';
     if (key === 'socialLinks') return 'Social Icons Array';
+  }
+
+  if (options?.sectionType === 'erp-features' && options?.keyPath?.includes('features.')) {
+    if (key === 'title') return 'Tab Title';
+    if (key === 'icon') return 'Tab Icon Upload';
+    if (key === 'image') return 'Illustration / Mockup Image Upload';
+    if (key === 'desc') return 'Description Line 1';
+    if (key === 'desc2') return 'Description Line 2';
   }
 
   const base = baseHumanLabel(key);

@@ -1,0 +1,61 @@
+﻿
+        <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
+        <head>
+          <title>Job Description Template</title>
+          <style>
+            body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
+            h1 { color: #4B2A63; border-bottom: 2px solid #4B2A63; padding-bottom: 5px; }
+            h2 { color: #4B2A63; margin-top: 20px; }
+            .field { margin-bottom: 10px; }
+            .label { font-weight: bold; color: #64748b; text-transform: uppercase; font-size: 11px; }
+            .value { font-size: 14px; color: #1e293b; }
+            ul { margin-top: 5px; margin-bottom: 5px; }
+          </style>
+        </head>
+        <body>
+          <h1>JOB DESCRIPTION TEMPLATE</h1>
+          
+          <div class="field"><span class="label">Job Title:</span> <span class="value">[e.g. Senior React Developer]</span></div>
+          <div class="field"><span class="label">Department:</span> <span class="value">[e.g. Engineering]</span></div>
+          <div class="field"><span class="label">Locations:</span> <span class="value">[e.g. Noida, Delhi NCR (comma-separated if multiple)]</span></div>
+          <div class="field"><span class="label">Job Type:</span> <span class="value">[e.g. Full-Time, Part-Time, Contract]</span></div>
+          <div class="field"><span class="label">Experience Level:</span> <span class="value">[e.g. 5+ Years]</span></div>
+          <div class="field"><span class="label">Budget Range:</span> <span class="value">[e.g. 12L - 18L]</span></div>
+          
+          <h2>Short Card Description:</h2>
+          <p>Provide a brief 1-2 sentence overview of the role to be shown on the search page card.</p>
+          <p>Example: We are looking for a Senior React Developer to join our team and build next-gen enterprise UI.</p>
+          
+          <h2>Full "About the Role":</h2>
+          <p>Provide a comprehensive description of the role, team environment, and project scope.</p>
+          <p>Example: As a Senior Developer, you will collaborate with cross-functional teams to design and implement scalable web applications, mentor junior engineers, and champion coding best practices.</p>
+          
+          <h2>Role Requirements:</h2>
+          <ul>
+            <li>Requirement 1: Strong experience in React, TypeScript, and modern state management.</li>
+            <li>Requirement 2: Solid understanding of REST APIs, Tailwind CSS, and web performance optimization.</li>
+            <li>Requirement 3: Excellent communication and teamwork skills.</li>
+          </ul>
+          
+          <h2>Key Responsibilities:</h2>
+          <ul>
+            <li>Responsibility 1: Develop clean, well-tested, and performant user interface components.</li>
+            <li>Responsibility 2: Lead frontend architectural discussions and conduct code reviews.</li>
+            <li>Responsibility 3: Collaborate with backend team members to integrate APIs.</li>
+          </ul>
+          
+          <h2>Nice to Have (Optional):</h2>
+          <ul>
+            <li>Nice to Have 1: Familiarity with Next.js, Turbopack, or Docker containerization.</li>
+            <li>Nice to Have 2: Contributions to open-source libraries.</li>
+          </ul>
+          
+          <h2>What We Offer:</h2>
+          <ul>
+            <li>Offer 1: Competitive salary and comprehensive health benefits.</li>
+            <li>Offer 2: Flexible work-from-home policy and learning allowances.</li>
+            <li>Offer 3: Collaborative workspace with regular team building events.</li>
+          </ul>
+        </body>
+        </html>
+      

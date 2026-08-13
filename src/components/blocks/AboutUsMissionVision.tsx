@@ -1,116 +1,211 @@
 'use client';
 
-import Image from 'next/image';
-import { CheckCircle2 } from 'lucide-react';
-import { MotionSection } from '@/components/animations/MotionSection';
+import React from 'react';
+import { Target, Rocket, CheckCircle2 } from 'lucide-react';
+import { motion } from 'framer-motion';
 
-interface MissionVisionItem {
+export interface MissionVisionItem {
   title?: string;
   description?: string;
   image?: string;
   subItems?: string[];
 }
 
-interface AboutUsMissionVisionContent {
+export interface AboutUsMissionVisionContent {
+  badge?: string;
+  title?: string;
+  titlePrimaryColor?: string;
+  titleSecondaryColor?: string;
+
+  // Explicit vision CMS fields
+  visionIcon?: string;
+  visionTitle?: string;
+  visionDescription?: string;
+  visionPoints?: string[];
+
+  // Explicit mission CMS fields
+  missionIcon?: string;
+  missionTitle?: string;
+  missionDescription?: string;
+  missionPoints?: string[];
+
+  // Legacy/Array fallback
   items?: MissionVisionItem[];
 }
 
-interface AboutUsMissionVisionProps {
+export interface AboutUsMissionVisionProps {
   content?: AboutUsMissionVisionContent;
 }
 
-const defaultItems: MissionVisionItem[] = [
-  {
-    title: 'Our Mission',
+export function AboutUsMissionVision({ content }: AboutUsMissionVisionProps) {
+  const badge = content?.badge || 'OUR PURPOSE';
+  const title = content?.title || 'Building technology that transforms businesses.';
+  const titlePrimaryColor = content?.titlePrimaryColor || '#1E1B4B';
+  const titleSecondaryColor = content?.titleSecondaryColor || '#9333EA';
+
+  // Vision Card Resolution
+  const visionCard = {
+    title: content?.visionTitle || content?.items?.[0]?.title || 'Our Vision',
     description:
-      'To provide world-class software solutions and services to our clients, enabling them to achieve their business goals. We strive to build long-term relationships with our clients based on trust, integrity, and mutual respect.',
-    image: '/about-us/mission.png',
-    subItems: [
-      'Focus on delivering measurable business value',
-      'Commitment to continuous innovation and quality',
-      'Customer-centric approach to software development',
-    ],
-  },
-  {
-    title: 'Our Vision',
-    description:
-      'To be a leading global IT solutions provider, recognized for our technical excellence, customer centricity, and commitment to quality. We aim to empower businesses with innovative technology solutions that drive growth and efficiency.',
-    image: '/about-us/vission.png',
-    subItems: [
+      content?.visionDescription ||
+      content?.items?.[0]?.description ||
+      'To be the trusted digital transformation partner enabling enterprises globally to grow through smarter, adaptive, future-ready technology solutions.',
+    icon: content?.visionIcon || content?.items?.[0]?.image,
+    points: content?.visionPoints || content?.items?.[0]?.subItems || [
       'Leadership through technological excellence',
       'Foster a culture of collaboration and continuous learning',
       'Partner with clients to drive sustainable business growth',
     ],
-  },
-];
+  };
 
-export function AboutUsMissionVision({
-  content,
-}: AboutUsMissionVisionProps) {
-  const items = content?.items || defaultItems;
+  // Mission Card Resolution
+  const missionCard = {
+    title: content?.missionTitle || content?.items?.[1]?.title || 'Our Mission',
+    description:
+      content?.missionDescription ||
+      content?.items?.[1]?.description ||
+      'We enable organizations run, scale, and transform their businesses by delivering AI-powered ERP solutions, BI, RPA, Mobility solutions on Cloud-ready technologies backed by our deep industry expertise.',
+    icon: content?.missionIcon || content?.items?.[1]?.image,
+    points: content?.missionPoints || content?.items?.[1]?.subItems || [
+      'Focus on delivering measurable business value',
+      'Commitment to continuous innovation and quality',
+      'Customer-centric approach to software development',
+    ],
+  };
+
+  const cards = [
+    { ...visionCard, isVision: true },
+    { ...missionCard, isVision: false },
+  ];
 
   return (
-    <section className="py-8 md:py-24 bg-[#EEF3F8]">
-      <div className="container mx-auto max-w-7xl px-4">
+    <section className="py-16 md:py-24 bg-gradient-to-b from-[#F3E8FF]/70 via-[#F8F3FF] to-[#FAF8FF] relative overflow-hidden font-sans border-b">
+      {/* Ambient Radial Glowing Orbs */}
+      <div className="absolute -top-20 -left-20 w-[450px] h-[450px] bg-purple-400/20 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute -bottom-20 -right-20 w-[450px] h-[450px] bg-indigo-400/20 rounded-full blur-[100px] pointer-events-none" />
 
-        <div className="space-y-10">
-          {items.map((item, index) => {
-            const imageSrc = item.image || '/about-us/mission.png';
+      {/* Decorative Dot Patterns */}
+      <div className="absolute -left-10 top-1/2 -translate-y-1/2 w-48 h-96 opacity-40 pointer-events-none bg-[radial-gradient(#a855f7_1.5px,transparent_1.5px)] [background-size:16px_16px]" />
+      <div className="absolute -right-10 top-1/2 -translate-y-1/2 w-48 h-96 opacity-40 pointer-events-none bg-[radial-gradient(#a855f7_1.5px,transparent_1.5px)] [background-size:16px_16px]" />
+
+      <div className="container mx-auto max-w-7xl px-4 sm:px-6 relative z-10">
+        
+        {/* Header Block */}
+        <div className="max-w-3xl mx-auto text-center space-y-4 mb-14 md:mb-20">
+          {badge && (
+            <div className="inline-flex items-center gap-3">
+              <span className="w-6 h-[1px] bg-purple-300" />
+              <span className="text-xs font-black uppercase tracking-widest text-purple-600">
+                {badge}
+              </span>
+              <span className="w-6 h-[1px] bg-purple-300" />
+            </div>
+          )}
+
+          {title && (
+            <motion.h2
+              initial={{ opacity: 0, y: 12 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.4 }}
+              className="text-3xl sm:text-4xl md:text-[42px] font-extrabold tracking-tight leading-tight"
+            >
+              {renderFormattedTitle(title, titlePrimaryColor, titleSecondaryColor)}
+            </motion.h2>
+          )}
+        </div>
+
+        {/* 2-Column Vision & Mission Cards Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-10 max-w-6xl mx-auto items-stretch">
+          {cards.map((card, index) => {
+            const isVision = card.isVision;
+            const customIcon = card.icon && typeof card.icon === 'string' ? card.icon.trim() : '';
 
             return (
-              <MotionSection
+              <motion.div
                 key={index}
-                variant="fadeUp"
-                delay={index * 0.1}
-                className="bg-white rounded-2xl border border-slate-200 shadow-sm"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: index * 0.1 }}
+                className="bg-white rounded-[32px] p-8 sm:p-10 border border-purple-100/70 shadow-[0_15px_40px_-10px_rgba(147,51,234,0.07)] hover:shadow-[0_25px_50px_-12px_rgba(147,51,234,0.14)] hover:-translate-y-1 transition-all duration-300 flex flex-col items-center text-center justify-between group"
               >
-                <div className="flex flex-col md:flex-row items-center py-6 md:px-0 px-6">
-                  {/* Left Image */}
-                  <div className="flex items-center basis-1/3 justify-center">
-                    <Image
-                      src={imageSrc}
-                      alt={item.title || ''}
-                      width={200}
-                      height={200}
-                      className="w-70 h-auto"
-                    />
+                <div className="w-full">
+                  {/* Top Circular Icon Box */}
+                  <div className="w-24 h-24 rounded-full bg-gradient-to-tr from-purple-100/80 via-purple-50/60 to-indigo-50 flex items-center justify-center mb-6 shadow-sm border border-purple-150/60 relative mx-auto group-hover:scale-105 transition-transform duration-300">
+                    <div className="w-16 h-16 rounded-full bg-white flex items-center justify-center shadow-inner overflow-hidden p-2">
+                      {customIcon ? (
+                        /* eslint-disable-next-line @next/next/no-img-element */
+                        <img
+                          src={encodeURI(customIcon)}
+                          alt={card.title || ''}
+                          className="w-10 h-10 object-contain"
+                        />
+                      ) : isVision ? (
+                        <Target className="w-8 h-8 text-purple-600" />
+                      ) : (
+                        <Rocket className="w-8 h-8 text-blue-600" />
+                      )}
+                    </div>
                   </div>
 
-                  {/* Right Content */}
-                  <div className='basis-2/3'>
-                    <h3 className="text-3xl font-bold text-black mb-2">
-                      {item.title}
-                    </h3>
+                  {/* Card Title & Accent Line */}
+                  <h3 className="text-2xl font-extrabold text-[#1E1B4B] mb-2">
+                    {card.title}
+                  </h3>
+                  <div className={`w-8 h-1 rounded-full mb-6 mx-auto ${isVision ? 'bg-purple-500' : 'bg-blue-500'}`} />
 
-                    <p className="text-[#71717A] leading-8 text-base">
-                      {item.description}
-                    </p>
-
-                    {item.subItems && item.subItems.length > 0 && (
-                      <div className="space-y-2 mt-2">
-                        {item.subItems.map((subItem, idx) => (
-                          <div
-                            key={idx}
-                            className="flex items-start gap-4"
-                          >
-                            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-amber-100 flex-shrink-0">
-                              <CheckCircle2 className="h-4 w-4 text-amber-600" />
-                            </div>
-
-                            <span className="text-black font-medium leading-7">
-                              {subItem}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
+                  {/* Paragraph Description */}
+                  <p className="text-slate-500 font-normal text-xs sm:text-sm leading-relaxed mb-8 max-w-md mx-auto">
+                    {card.description}
+                  </p>
                 </div>
-              </MotionSection>
+
+                {/* SubItems / Points Checklist */}
+                {card.points && card.points.length > 0 && (
+                  <div className="w-full max-w-md mx-auto space-y-3.5 pt-6 border-t border-slate-100">
+                    {card.points.map((subItem, idx) => (
+                      <div key={idx} className="flex items-start gap-3 text-left">
+                        <CheckCircle2 className={`w-5 h-5 shrink-0 mt-0.5 ${isVision ? 'text-purple-600' : 'text-blue-600'}`} />
+                        <span className="text-xs sm:text-sm font-medium text-slate-700 leading-snug">
+                          {subItem}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </motion.div>
             );
           })}
         </div>
+
       </div>
     </section>
   );
 }
+
+function renderFormattedTitle(titleText: string, primaryColor: string, secondaryColor: string) {
+  if (!titleText) return null;
+  if (titleText.toLowerCase().includes('transforms')) {
+    const regex = /(transforms)/i;
+    const parts = titleText.split(regex);
+    return (
+      <>
+        {parts.map((part, i) =>
+          part.toLowerCase() === 'transforms' ? (
+            <span key={i} style={{ color: secondaryColor }}>
+              {part}
+            </span>
+          ) : (
+            <span key={i} style={{ color: primaryColor }}>
+              {part}
+            </span>
+          )
+        )}
+      </>
+    );
+  }
+  return <span style={{ color: primaryColor }}>{titleText}</span>;
+}
+
+export default AboutUsMissionVision;

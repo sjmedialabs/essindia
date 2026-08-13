@@ -68,15 +68,13 @@ export function RpaOverviewMetrics({ content }: { content?: RpaOverviewMetricsCo
               className="bg-white rounded-2xl p-6 shadow-sm border border-blue-100 flex flex-col items-center text-center space-y-4 hover:shadow-md transition-shadow duration-300"
             >
               {card.icon && (
-                <div className="w-14 h-14 relative flex items-center justify-center bg-blue-50/50 rounded-xl">
-                  <div className="w-8 h-8 relative">
-                    <Image
-                      src={card.icon}
-                      alt={card.title || 'Metric Icon'}
-                      fill
-                      className="object-contain"
-                    />
-                  </div>
+                <div className="w-14 h-14 relative flex items-center justify-center bg-blue-50/50 rounded-xl overflow-hidden">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={encodeURI(card.icon.trim())}
+                    alt={card.title || 'Metric Icon'}
+                    className="w-8 h-8 object-contain"
+                  />
                 </div>
               )}
               <div className="space-y-1">

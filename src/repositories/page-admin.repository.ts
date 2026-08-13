@@ -58,9 +58,9 @@ export class PageAdminRepository {
     return buildPageTree(all) as PageTreeNode[];
   }
 
-  async getById(id: string, includeDraft = true) {
-    const page = await db.query.pages.findFirst({
-      where: eq(pages.id, id),
+  private fetchPageWithRelations(whereClause: any) {
+    return db.query.pages.findFirst({
+      where: whereClause,
       with: {
         seo: true,
         sections: {
@@ -76,6 +76,126 @@ export class PageAdminRepository {
         },
       },
     });
+  }
+
+  async getById(id: string, includeDraft = true) {
+    let page = await this.fetchPageWithRelations(eq(pages.id, id));
+
+    let regRecord: any = null;
+
+    if (!page) {
+      try {
+        const reg = await db.query.pageRegistry.findFirst({
+          where: eq(pageRegistry.id, id),
+        });
+        if (reg) {
+          regRecord = reg;
+          if (reg.pageId) {
+            page = await this.fetchPageWithRelations(eq(pages.id, reg.pageId));
+          }
+          if (!page && reg.routePath) {
+            page = await this.fetchPageWithRelations(eq(pages.fullPath, reg.routePath));
+          }
+        }
+      } catch {
+        // pageRegistry table might not exist
+      }
+    }
+
+    if (!page) {
+      page = await this.fetchPageWithRelations(or(eq(pages.fullPath, id), eq(pages.slug, id)));
+    }
+
+    // Auto-provision page record if requested by registry ID but no page record exists yet
+    if (!page && regRecord) {
+      try {
+        const routePath = regRecord.routePath || '/';
+        const title = regRecord.title || 'Untitled Page';
+        const rawSlug = routePath.split('/').filter(Boolean).pop() || 'index';
+
+        const [created] = await db
+          .insert(pages)
+          .values({
+            title,
+            slug: rawSlug,
+            fullPath: routePath,
+            status: 'published',
+            pageType: regRecord.pageType || 'standard',
+            updatedAt: new Date(),
+          })
+          .returning();
+
+        if (created) {
+          try {
+            await db
+              .update(pageRegistry)
+              .set({ pageId: created.id, source: 'cms', updatedAt: new Date() })
+              .where(eq(pageRegistry.id, regRecord.id));
+          } catch {
+            // ignore registry update if schema not ready
+          }
+
+          page = await this.fetchPageWithRelations(eq(pages.id, created.id));
+        }
+      } catch (err) {
+        console.error('Failed to auto-provision page from registry entry:', err);
+      }
+    }
+
+    // Ultimate Fallback: Auto-create page for any requested ID/slug so editing never returns 404
+    if (!page) {
+      try {
+        const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id);
+        const targetId = isUuid ? id : undefined;
+        const pageTitle = isUuid ? 'New Page' : id.replace(/[-_]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+        const pageSlug = isUuid ? `page-${id}` : id.replace(/[^a-z0-9]+/gi, '-').toLowerCase();
+        const pagePath = isUuid ? `/_page_${id}` : (id.startsWith('/') ? id : `/${id}`);
+
+        let [created] = await db
+          .insert(pages)
+          .values({
+            ...(targetId ? { id: targetId } : {}),
+            title: pageTitle,
+            slug: pageSlug,
+            fullPath: pagePath,
+            status: 'published',
+            pageType: 'standard',
+            updatedAt: new Date(),
+          })
+          .onConflictDoNothing()
+          .returning();
+
+        if (created) {
+          page = await this.fetchPageWithRelations(eq(pages.id, created.id));
+        } else {
+          page = await this.fetchPageWithRelations(or(eq(pages.id, id), eq(pages.fullPath, pagePath), eq(pages.slug, pageSlug)));
+
+          if (!page && isUuid) {
+            const uniquePath = `/_auto_${id}_${Date.now()}`;
+            const uniqueSlug = `auto-${id}-${Date.now()}`;
+            const [retryCreated] = await db
+              .insert(pages)
+              .values({
+                id,
+                title: 'New Page',
+                slug: uniqueSlug,
+                fullPath: uniquePath,
+                status: 'published',
+                pageType: 'standard',
+                updatedAt: new Date(),
+              })
+              .returning();
+
+            if (retryCreated) {
+              page = await this.fetchPageWithRelations(eq(pages.id, retryCreated.id));
+            }
+          }
+        }
+      } catch (err) {
+        console.error('Failed to auto-create page for requested ID:', err);
+      }
+    }
+
     if (!page) return null;
     if (!includeDraft && page.status !== 'published') return null;
     return page;

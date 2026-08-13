@@ -60,7 +60,10 @@ export function ContactInfoCards({ content }: { content?: ContactInfoCardsConten
             const IconComponent = (card.iconName && iconMap[card.iconName]) || MessageSquare;
 
             return (
-              <div key={i} className="bg-white rounded-2xl p-8 border border-[#04247D] flex flex-col h-full relative group hover:border-[#5C2B6A] transition-colors duration-300">
+              <div
+                key={i}
+                className="bg-white rounded-2xl p-8 border border-[#04247D]/30 flex flex-col h-full relative group transition-all duration-300 hover:border-[#04247D] hover:shadow-xl hover:shadow-[#04247D]/12 hover:-translate-y-1.5 cursor-pointer"
+              >
                 <div className="w-12 h-12 bg-[#f4f7ff] rounded-lg flex items-center justify-center mb-6 text-[#2A2B6E] transition-colors duration-300 p-2.5 overflow-hidden group-hover:bg-[#2A2B6E]/5">
                   {iconUrl ? (
                     <img 

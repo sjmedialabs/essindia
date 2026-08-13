@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import Image from 'next/image';
 
 interface BenefitItem {
   icon?: string;
@@ -48,40 +47,58 @@ export function AssBenefits({ content }: { content?: AssBenefitsContent }) {
           <div className="lg:w-[30%] w-full space-y-6">
             {leftItems.map((item: BenefitItem, idx: number) => {
               const color = leftColors[idx % leftColors.length];
+              const iconSrc = typeof item.icon === 'string' ? item.icon.trim() : '';
               return (
-                <div key={idx} className="flex items-center gap-4 bg-white rounded-2xl px-5 py-4 shadow-[0_4px_20px_rgba(0,0,0,0.02)] border border-slate-100 transition-all hover:shadow-md hover:border-slate-200">
-                  {item.icon && (
-                    <div className={`w-10 h-10 rounded-xl ${color} flex items-center justify-center shrink-0 shadow-sm`}>
-                      <Image src={item.icon} alt="" width={18} height={18} className="object-contain invert brightness-0" />
+                <div
+                  key={idx}
+                  className="flex items-center gap-4 bg-white rounded-2xl px-5 py-4 shadow-sm border border-slate-150/80 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/15 hover:border-blue-300 hover:-translate-y-1 group cursor-pointer"
+                >
+                  {iconSrc ? (
+                    <div className={`w-10 h-10 rounded-xl ${color} flex items-center justify-center shrink-0 shadow-sm transition-transform duration-300 group-hover:scale-110`}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={encodeURI(iconSrc)}
+                        alt=""
+                        className="w-[18px] h-[18px] object-contain invert brightness-0"
+                      />
                     </div>
-                  )}
-                  <p className="text-sm font-semibold text-slate-800 leading-relaxed">{item.text}</p>
+                  ) : null}
+                  <p className="text-sm font-semibold text-slate-800 group-hover:text-blue-950 transition-colors leading-relaxed">
+                    {item.text}
+                  </p>
                 </div>
               );
             })}
           </div>
 
           {/* Center Image with Dashed indicators */}
-          <div className="lg:w-[40%] w-full flex justify-center py-6">
+          <div className="lg:w-[40%] w-full flex justify-center py-6 group cursor-pointer">
             <div className="relative w-full max-w-[450px] aspect-square flex items-center justify-center">
               {/* Dashed outer circle */}
-              <div className="absolute inset-0 rounded-full border border-dashed border-blue-200 opacity-80" />
+              <div className="absolute inset-0 rounded-full border border-dashed border-blue-200 opacity-80 transition-colors duration-500 group-hover:border-blue-400" />
 
               {/* 8 indicators on the circle */}
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2.5 h-2.5 bg-blue-500 rounded-full shadow-sm" />
-              <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-2.5 h-2.5 bg-blue-500 rounded-full shadow-sm" />
-              <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 w-2.5 h-2.5 bg-blue-500 rounded-full shadow-sm" />
-              <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 w-2.5 h-2.5 bg-blue-500 rounded-full shadow-sm" />
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 w-2.5 h-2.5 bg-blue-500 rounded-full shadow-sm transition-transform duration-500 group-hover:scale-125" />
+              <div className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/2 w-2.5 h-2.5 bg-blue-500 rounded-full shadow-sm transition-transform duration-500 group-hover:scale-125" />
+              <div className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-1/2 w-2.5 h-2.5 bg-blue-500 rounded-full shadow-sm transition-transform duration-500 group-hover:scale-125" />
+              <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 w-2.5 h-2.5 bg-blue-500 rounded-full shadow-sm transition-transform duration-500 group-hover:scale-125" />
 
               {/* Diagonals (45 deg) */}
-              <div className="absolute top-[14.6%] left-[14.6%] -translate-x-1/2 -translate-y-1/2 w-2.5 h-2.5 bg-blue-500 rounded-full shadow-sm" />
-              <div className="absolute top-[14.6%] right-[14.6%] translate-x-1/2 -translate-y-1/2 w-2.5 h-2.5 bg-blue-500 rounded-full shadow-sm" />
-              <div className="absolute bottom-[14.6%] left-[14.6%] -translate-x-1/2 translate-y-1/2 w-2.5 h-2.5 bg-blue-500 rounded-full shadow-sm" />
-              <div className="absolute bottom-[14.6%] right-[14.6%] translate-x-1/2 translate-y-1/2 w-2.5 h-2.5 bg-blue-500 rounded-full shadow-sm" />
+              <div className="absolute top-[14.6%] left-[14.6%] -translate-x-1/2 -translate-y-1/2 w-2.5 h-2.5 bg-blue-500 rounded-full shadow-sm transition-transform duration-500 group-hover:scale-125" />
+              <div className="absolute top-[14.6%] right-[14.6%] translate-x-1/2 -translate-y-1/2 w-2.5 h-2.5 bg-blue-500 rounded-full shadow-sm transition-transform duration-500 group-hover:scale-125" />
+              <div className="absolute bottom-[14.6%] left-[14.6%] -translate-x-1/2 translate-y-1/2 w-2.5 h-2.5 bg-blue-500 rounded-full shadow-sm transition-transform duration-500 group-hover:scale-125" />
+              <div className="absolute bottom-[14.6%] right-[14.6%] translate-x-1/2 translate-y-1/2 w-2.5 h-2.5 bg-blue-500 rounded-full shadow-sm transition-transform duration-500 group-hover:scale-125" />
 
-              <div className="relative w-[80%] h-[80%]">
-                <Image src={image} alt="Benefits Mockup" fill className="object-contain z-10" />
-              </div>
+              {image ? (
+                <div className="relative w-[80%] h-[80%] flex items-center justify-center">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={encodeURI(image.trim())}
+                    alt="Benefits Mockup"
+                    className="w-full h-full object-contain z-10 transition-transform duration-500 ease-out group-hover:scale-105"
+                  />
+                </div>
+              ) : null}
             </div>
           </div>
 
@@ -89,14 +106,25 @@ export function AssBenefits({ content }: { content?: AssBenefitsContent }) {
           <div className="lg:w-[30%] w-full space-y-6">
             {rightItems.map((item: BenefitItem, idx: number) => {
               const color = rightColors[idx % rightColors.length];
+              const iconSrc = typeof item.icon === 'string' ? item.icon.trim() : '';
               return (
-                <div key={idx} className="flex items-center gap-4 bg-white rounded-2xl px-5 py-4 shadow-[0_4px_20px_rgba(0,0,0,0.02)] border border-slate-100 transition-all hover:shadow-md hover:border-slate-200">
-                  {item.icon && (
-                    <div className={`w-10 h-10 rounded-xl ${color} flex items-center justify-center shrink-0 shadow-sm`}>
-                      <Image src={item.icon} alt="" width={18} height={18} className="object-contain invert brightness-0" />
+                <div
+                  key={idx}
+                  className="flex items-center gap-4 bg-white rounded-2xl px-5 py-4 shadow-sm border border-slate-150/80 transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/15 hover:border-blue-300 hover:-translate-y-1 group cursor-pointer"
+                >
+                  {iconSrc ? (
+                    <div className={`w-10 h-10 rounded-xl ${color} flex items-center justify-center shrink-0 shadow-sm transition-transform duration-300 group-hover:scale-110`}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={encodeURI(iconSrc)}
+                        alt=""
+                        className="w-[18px] h-[18px] object-contain invert brightness-0"
+                      />
                     </div>
-                  )}
-                  <p className="text-sm font-semibold text-slate-800 leading-relaxed">{item.text}</p>
+                  ) : null}
+                  <p className="text-sm font-semibold text-slate-800 group-hover:text-blue-950 transition-colors leading-relaxed">
+                    {item.text}
+                  </p>
                 </div>
               );
             })}
@@ -107,3 +135,5 @@ export function AssBenefits({ content }: { content?: AssBenefitsContent }) {
     </section>
   );
 }
+
+export default AssBenefits;

@@ -257,7 +257,8 @@ function RegistryPageRow({
   onReuse: (pageId: string) => void;
   isReusing?: boolean;
 }) {
-  if (!page.pageId) return null;
+  const activeId = page.pageId || page.id;
+  if (!activeId) return null;
 
   return (
     <div className="group grid grid-cols-12 gap-2 items-center px-4 py-2 hover:bg-slate-50/80 transition-colors">
@@ -286,7 +287,7 @@ function RegistryPageRow({
         <button
           title="Reuse (Duplicate) page"
           disabled={isReusing}
-          onClick={() => onReuse(page.pageId!)}
+          onClick={() => onReuse(activeId)}
           className="w-6 h-6 flex items-center justify-center rounded hover:bg-slate-100 transition-colors disabled:opacity-40"
         >
           <Image
@@ -297,7 +298,7 @@ function RegistryPageRow({
             className={cn('object-contain', isReusing && 'animate-spin')}
           />
         </button>
-        <Link href={`/admin/pages/${page.pageId}`}><Button size="xs">Edit</Button></Link>
+        <Link href={`/admin/pages/${activeId}`}><Button size="xs">Edit</Button></Link>
         <Button
           variant="outline"
           size="xs"

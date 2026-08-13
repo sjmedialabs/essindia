@@ -72,9 +72,21 @@ export default async function DynamicPage({ params }: PageProps) {
 
   const seo = page.seo as any;
 
+  const isLandingPage =
+    page.pageType === 'landing' ||
+    page.pageType === 'LANDING' ||
+    fullPath.startsWith('/landing') ||
+    fullPath.includes('/landing-') ||
+    fullPath.startsWith('/lp') ||
+    (page.sections && page.sections.some((s: any) =>
+      s.type?.startsWith('landing1-') ||
+      s.type?.startsWith('landing2-') ||
+      s.type?.startsWith('landing-')
+    ));
+
   if (page.sections && page.sections.length > 0) {
     return (
-      <>
+      <div data-landing-page={isLandingPage ? 'true' : undefined}>
         <PageScripts
           headerScripts={seo?.headerScripts}
           footerScripts={seo?.footerScripts}
@@ -82,7 +94,7 @@ export default async function DynamicPage({ params }: PageProps) {
         {page.sections.map((section: any) => (
           <SectionRenderer key={section.id} section={section} />
         ))}
-      </>
+      </div>
     );
   }
 

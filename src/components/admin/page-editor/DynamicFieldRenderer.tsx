@@ -37,7 +37,7 @@ export function DynamicFieldRenderer({
   const fieldLabel = humanLabel(fieldKey, { sectionType, keyPath });
 
   let fieldType = detectFieldType(fieldKey, value, sectionType);
-  if (fieldKey.toLowerCase().includes('pdf')) {
+  if (fieldKey.toLowerCase().includes('pdf') || fieldKey.toLowerCase().includes('document')) {
     fieldType = 'image';
   }
 

@@ -5,21 +5,29 @@ import { HeaderShell } from '@/components/layout/HeaderShell';
 import { Footer } from '@/components/layout/Footer';
 import { HeaderSkeleton, FooterSkeleton } from '@/components/layout/LoadingSkeletons';
 import { GlobalScripts } from '@/components/seo/GlobalScripts';
+import { HeaderFooterGuard } from '@/components/layout/HeaderFooterGuard';
 
 export default function PublicLayout({ children }: { children: ReactNode }) {
   return (
     <div className="flex min-h-screen flex-col">
       <GlobalScripts position="header" />
       <GlobalScripts position="body" />
-      <Suspense fallback={<HeaderSkeleton />}>
-        <HeaderShell />
-      </Suspense>
-      <main className="flex-1 pt-16">
+      
+      <HeaderFooterGuard
+        header={
+          <Suspense fallback={<HeaderSkeleton />}>
+            <HeaderShell />
+          </Suspense>
+        }
+        footer={
+          <Suspense fallback={<FooterSkeleton />}>
+            <Footer />
+          </Suspense>
+        }
+      >
         {children}
-      </main>
-      <Suspense fallback={<FooterSkeleton />}>
-        <Footer />
-      </Suspense>
+      </HeaderFooterGuard>
+
       <GlobalScripts position="footer" />
     </div>
   );

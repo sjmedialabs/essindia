@@ -1,7 +1,6 @@
 'use client';
 
 import React from 'react';
-import Image from 'next/image';
 
 interface FmcgOverviewContent {
   title?: string;
@@ -20,7 +19,7 @@ export function FmcgOverview({ content }: { content?: FmcgOverviewContent }) {
   const image = content?.image || '/BI-industy solution-FMGC/image 53.png';
 
   return (
-    <section className="py-14 px-6 bg-white border-b border-slate-100">
+    <section className="py-14 px-6 bg-white border-b border-slate-100 font-sans">
       <div className="container mx-auto max-w-7xl">
         <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-16">
           
@@ -32,13 +31,13 @@ export function FmcgOverview({ content }: { content?: FmcgOverviewContent }) {
             
             <div className="space-y-4 text-slate-600 text-sm sm:text-base leading-relaxed">
               {paragraphs.map((para, index) => (
-                <p key={index}>
+                <div key={index}>
                   {typeof para === 'string' && (para.includes('<p>') || para.includes('<')) ? (
-                    <span dangerouslySetInnerHTML={{ __html: para }} />
+                    <div dangerouslySetInnerHTML={{ __html: para }} />
                   ) : (
-                    para
+                    <p>{para}</p>
                   )}
-                </p>
+                </div>
               ))}
             </div>
           </div>
@@ -47,12 +46,11 @@ export function FmcgOverview({ content }: { content?: FmcgOverviewContent }) {
           {image && (
             <div className="flex-1 w-full max-w-md lg:max-w-xl relative aspect-square lg:aspect-auto lg:h-[450px] shrink-0 flex justify-center items-center">
               <div className="w-full h-full relative">
-                <Image
-                  src={image}
-                  alt={title}
-                  fill
-                  sizes="(max-width: 1024px) 100vw, 50vw"
-                  className="object-contain"
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={encodeURI(image.trim())}
+                  alt={title || 'FMCG Overview Image'}
+                  className="w-full h-full object-contain"
                 />
               </div>
             </div>
@@ -63,3 +61,5 @@ export function FmcgOverview({ content }: { content?: FmcgOverviewContent }) {
     </section>
   );
 }
+
+export default FmcgOverview;

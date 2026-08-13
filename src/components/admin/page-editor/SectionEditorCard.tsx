@@ -1516,6 +1516,61 @@ const DEFAULT_ORACLE_APEX_DELIVERABLES_CONTENT: Record<string, any> = {
   ]
 };
 
+const DEFAULT_ABOUT_US_WHY_ESS_CONTENT: Record<string, any> = {
+  badge: 'Trusted. Proven. Preferred.',
+  title: 'Why Businesses Trust ESS',
+  primaryTitleColor: '#FFFFFF',
+  secondaryTitleColor: '#C084FC',
+  description: 'Trusted by organizations worldwide for practical expertise, enterprise technology, and a business-first approach to digital transformation.',
+  items: [
+    { title: 'Business-First Implementation', description: 'We build around your business and not the other way around. Every solution starts with understanding your processes, goals, and the way your teams actually work.', image: '' },
+    { title: 'Faster Deployment, Product-Focused', description: 'We leverage proven frameworks and pre-built accelerators to shorten implementation timelines, reduce complexity, and help you realize value sooner.', image: '' },
+    { title: 'Global Expertise with Local Support', description: 'With 20+ years of experience across industries and geographies, we combine global best practices with responsive local support at every stage.', image: '' },
+    { title: 'Designed for Securing Digital Future', description: 'With state-of-the-art security frameworks (including SOC 2 and GDPR compliance), we build trust at every layer.', image: '' },
+    { title: 'One Connected Technology Ecosystem', description: 'From ERP and AI to BI, RPA, and mobile applications, we bring your business together on a unified digital foundation.', image: '' },
+    { title: 'Proven Across Industries', description: 'Having delivered solutions across 25+ industry verticals, we understand the operational realities behind every business.', image: '' }
+  ]
+};
+
+const DEFAULT_ERP_FEATURES_CONTENT: Record<string, any> = {
+  heading: 'Why 1,500+ Enterprises Chose ebizframe.ai',
+  subheading: 'Select standard version or customizable version',
+  features: [
+    {
+      id: 'live-90-days',
+      title: 'Go Live in 90 Days Industry average 9 months.',
+      icon: '',
+      image: '/ErpOverview/featureTav1.png',
+      desc: 'Go Live in 90 Days; Industry average 9 months.',
+      desc2: "Our average: 90 days. That's an entire quarter of ROI your competitors won't see until Q3. We've done this 1,500+ times."
+    },
+    {
+      id: 'shorten-adoption',
+      title: 'Shorten Adoption. No Training Costs.',
+      icon: '',
+      image: '/ErpOverview/ERP-2.png',
+      desc: 'Shorten Adoption & Eliminate Training Costs.',
+      desc2: 'Intuitive AI-driven user experience ensures immediate user adoption without costly classroom training sessions.'
+    },
+    {
+      id: 'built-for-business',
+      title: 'Built to Your Business—not Against It',
+      icon: '',
+      image: '/ErpOverview/ERP-3.png',
+      desc: 'Built to Your Business—not Against It.',
+      desc2: 'Configurable workflows and modular architecture adapt directly to your enterprise operational flows.'
+    },
+    {
+      id: 'proven-scale',
+      title: 'Proven 1:1 Enterprise Scale',
+      icon: '',
+      image: '/ErpOverview/ERP-4.png',
+      desc: 'Proven 1:1 Enterprise Scale.',
+      desc2: 'Engineered for multi-entity conglomerates with multi-currency ledgers and high-velocity transaction volume.'
+    }
+  ]
+};
+
 const DEFAULT_ORACLE_APEX_APPROACH_CONTENT: Record<string, any> = {
   title: 'COMPREHENSIVE ORACLE FORMS MIGRATION ASSESSMENT',
   tag: 'OUR STRATEGIC MIGRATION APPROACH',
@@ -2175,6 +2230,10 @@ export function SectionEditorCard({
         baseSchema = DEFAULT_NOT_FOUND_LINKS_CONTENT as Record<string, JsonValue>;
       } else if (section.type === 'thank-you-hero') {
         baseSchema = DEFAULT_THANK_YOU_HERO_CONTENT as Record<string, JsonValue>;
+      } else if (section.type === 'about-us-why-ess') {
+        baseSchema = DEFAULT_ABOUT_US_WHY_ESS_CONTENT as Record<string, JsonValue>;
+      } else if (section.type === 'erp-features') {
+        baseSchema = DEFAULT_ERP_FEATURES_CONTENT as Record<string, JsonValue>;
       }
     }
 
@@ -2188,7 +2247,7 @@ export function SectionEditorCard({
       meta.fieldOrder.forEach((key) => {
         if (!(key in finalMerged)) {
           // Default arrays/booleans for known list fields
-          if (['items', 'processes', 'features', 'faqs', 'cards', 'values', 'modules', 'paragraphs', 'leftItems', 'rightItems', 'steps', 'logos', 'stats', 'statistics', 'slides', 'categories', 'tabs', 'benefits', 'industries', 'solutions', 'points', 'topics', 'links', 'testimonials', 'challenges', 'introModules'].includes(key)) {
+          if (['items', 'processes', 'features', 'faqs', 'cards', 'values', 'modules', 'paragraphs', 'leftItems', 'rightItems', 'steps', 'logos', 'stats', 'statistics', 'slides', 'categories', 'tabs', 'benefits', 'industries', 'solutions', 'points', 'topics', 'links', 'testimonials', 'challenges', 'introModules', 'visionPoints', 'missionPoints'].includes(key) || key.endsWith('Points')) {
             finalMerged[key] = [];
           } else if (['autoScroll', 'isActive', 'supportsVariants'].includes(key)) {
             finalMerged[key] = true;
@@ -2199,23 +2258,83 @@ export function SectionEditorCard({
       });
     }
 
-    // Automatically inject companion FormType fields for any Url fields
-    Object.keys(finalMerged).forEach((key) => {
-      if (key.endsWith('Url')) {
-        const formTypeKey = key.replace(/Url$/, 'FormType');
-        if (!(formTypeKey in finalMerged)) {
-          finalMerged[formTypeKey] = '';
-        }
+    if (section.type === 'about-us-mission-vision') {
+      const items = (section.content as any)?.items || [];
+      if (!finalMerged.badge) finalMerged.badge = (section.content as any)?.badge || 'OUR PURPOSE';
+      if (!finalMerged.title) finalMerged.title = (section.content as any)?.title || 'Building technology that transforms businesses.';
+      if (!finalMerged.titlePrimaryColor) finalMerged.titlePrimaryColor = (section.content as any)?.titlePrimaryColor || '#1E1B4B';
+      if (!finalMerged.titleSecondaryColor) finalMerged.titleSecondaryColor = (section.content as any)?.titleSecondaryColor || '#9333EA';
+
+      if (!finalMerged.visionTitle) finalMerged.visionTitle = (section.content as any)?.visionTitle || items[0]?.title || 'Our Vision';
+      if (!finalMerged.visionDescription) finalMerged.visionDescription = (section.content as any)?.visionDescription || items[0]?.description || 'To be the trusted digital transformation partner enabling enterprises globally to grow through smarter, adaptive, future-ready technology solutions.';
+      if (!finalMerged.visionIcon) finalMerged.visionIcon = (section.content as any)?.visionIcon || items[0]?.image || '';
+      if (!finalMerged.visionPoints || (Array.isArray(finalMerged.visionPoints) && finalMerged.visionPoints.length === 0)) {
+        finalMerged.visionPoints = (section.content as any)?.visionPoints || items[0]?.subItems || [
+          'Leadership through technological excellence',
+          'Foster a culture of collaboration and continuous learning',
+          'Partner with clients to drive sustainable business growth'
+        ];
       }
-    });
+
+      if (!finalMerged.missionTitle) finalMerged.missionTitle = (section.content as any)?.missionTitle || items[1]?.title || 'Our Mission';
+      if (!finalMerged.missionDescription) finalMerged.missionDescription = (section.content as any)?.missionDescription || items[1]?.description || 'We enable organizations run, scale, and transform their businesses by delivering AI-powered ERP solutions, BI, RPA, Mobility solutions on Cloud-ready technologies backed by our deep industry expertise.';
+      if (!finalMerged.missionIcon) finalMerged.missionIcon = (section.content as any)?.missionIcon || items[1]?.image || '';
+      if (!finalMerged.missionPoints || (Array.isArray(finalMerged.missionPoints) && finalMerged.missionPoints.length === 0)) {
+        finalMerged.missionPoints = (section.content as any)?.missionPoints || items[1]?.subItems || [
+          'Focus on delivering measurable business value',
+          'Commitment to continuous innovation and quality',
+          'Customer-centric approach to software development'
+        ];
+      }
+    }
+
+    if (section.type === 'about-us-why-ess') {
+      if (!finalMerged.badge) finalMerged.badge = (section.content as any)?.badge || 'Trusted. Proven. Preferred.';
+      if (!finalMerged.title) finalMerged.title = (section.content as any)?.title || 'Why Businesses Trust ESS';
+      if (!finalMerged.primaryTitleColor) finalMerged.primaryTitleColor = (section.content as any)?.primaryTitleColor || (section.content as any)?.titlePrimaryColor || '#FFFFFF';
+      if (!finalMerged.secondaryTitleColor) finalMerged.secondaryTitleColor = (section.content as any)?.secondaryTitleColor || (section.content as any)?.titleSecondaryColor || '#C084FC';
+      if (!finalMerged.description) finalMerged.description = (section.content as any)?.description || 'Trusted by organizations worldwide for practical expertise, enterprise technology, and a business-first approach to digital transformation.';
+    }
+
+    if (section.type === 'erp-features') {
+      if (Array.isArray(finalMerged.features)) {
+        finalMerged.features = finalMerged.features.map((feat: any) => ({
+          icon: '',
+          image: '',
+          title: '',
+          desc: '',
+          desc2: '',
+          ...feat,
+        }));
+      }
+    }
+
+    // Automatically inject companion FormType fields for any Url fields (except sticky-card)
+    if (section.type !== 'sticky-card') {
+      Object.keys(finalMerged).forEach((key) => {
+        if (key.endsWith('Url')) {
+          const formTypeKey = key.replace(/Url$/, 'FormType');
+          if (!(formTypeKey in finalMerged)) {
+            finalMerged[formTypeKey] = '';
+          }
+        }
+      });
+    }
 
     return finalMerged;
   }, [schema, section.content, section.type]);
 
   const contentKeys = React.useMemo(() => {
+    if (section.type === 'sticky-card') {
+      return ['image', 'title', 'description', 'buttonText', 'documentUrl', 'redirectUrl'];
+    }
+    if (section.type === 'about-us-why-ess') {
+      return ['badge', 'title', 'primaryTitleColor', 'secondaryTitleColor', 'description', 'items'];
+    }
+
     const keys = Object.keys(mergedContent);
     let finalKeys = keys;
-    if ((section.type.startsWith('landing1-') || section.type.startsWith('contact-') || section.type.startsWith('europe-') || section.type.startsWith('uganda-') || section.type === 'job-detail-hero' || section.type === 'job-detail-content' || section.type === 'bi-highlight-strip' || section.type === 'bi-industries' || section.type === 'career-positions' || section.type === 'about-us-cta' || section.type === 'career-cta' || section.type === 'blog' || section.type === 'about-us-services-overview' || section.type.startsWith('oracle-') || (section.type.startsWith('rpa-') && section.type !== 'rpa-hero') || section.type.startsWith('ass-') || section.type.startsWith('aom-') || section.type.startsWith('fmcg-') || section.type.startsWith('roi-') || section.type.startsWith('retail-')) && meta?.fieldOrder) {
+    if ((section.type.startsWith('landing1-') || section.type.startsWith('contact-') || section.type.startsWith('europe-') || section.type.startsWith('uganda-') || section.type.startsWith('about-us-') || section.type === 'job-detail-hero' || section.type === 'job-detail-content' || section.type === 'bi-highlight-strip' || section.type === 'bi-industries' || section.type === 'career-positions' || section.type === 'about-us-cta' || section.type === 'career-cta' || section.type === 'blog' || section.type === 'about-us-services-overview' || section.type.startsWith('oracle-') || (section.type.startsWith('rpa-') && section.type !== 'rpa-hero') || section.type.startsWith('ass-') || section.type.startsWith('aom-') || section.type.startsWith('fmcg-') || section.type.startsWith('roi-') || section.type.startsWith('retail-')) && meta?.fieldOrder) {
       finalKeys = meta.fieldOrder;
     } else if (meta?.fieldOrder) {
       finalKeys = keys.sort((a, b) => {
