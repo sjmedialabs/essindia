@@ -130,7 +130,7 @@ export function UgandaServices({ content }: { content?: UgandaServicesContent })
           </span>
         )}
         {title && (
-          <h2 className="text-2xl sm:text-[34px] font-bold text-[#111827] tracking-tight max-w-2xl mx-auto leading-tight">
+          <h2 className="text-2xl sm:text-[34px] font-bold text-[#111827] tracking-tight max-w-2xl mx-auto leading-tight mb-4">
             {title}
           </h2>
         )}

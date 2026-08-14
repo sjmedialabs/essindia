@@ -1,9 +1,11 @@
 'use client';
 
+import { useRef, useState, useEffect, useCallback } from 'react';
 import { motion } from 'framer-motion';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { TextReveal } from '@/components/animations/TextReveal';
-import { MotionSection, StaggerContainer } from '@/components/animations/MotionSection';
+import { MotionSection } from '@/components/animations/MotionSection';
 import { useInternalNavigate } from '@/hooks/useInternalNavigate';
 
 interface Industry {
@@ -49,11 +51,45 @@ const defaultIndustries = [
 
 export function IndustrySection({ content }: IndustrySectionProps) {
   const navigate = useInternalNavigate();
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
   const heading = content?.heading || "Choose the Industry Expert";
   const subheading = content?.subheading || "Designed for the way your industry works.";
   const description = content?.description || "From manufacturing to services, ESS understands the workflows behind real business operations. We infuse our extensive industry expertise into every solution, tailoring our approach to the specific realities of each industry rather than relying on generic software thinking.";
   const industries = content?.industries || defaultIndustries;
   const viewAllCta = content?.viewAllCta || { label: "View all INDUSTRIES", url: "/industries" };
+
+  const checkScroll = useCallback(() => {
+    if (scrollRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+      setCanScrollLeft(scrollLeft > 5);
+      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 5);
+    }
+  }, []);
+
+  useEffect(() => {
+    checkScroll();
+    const el = scrollRef.current;
+    if (el) {
+      el.addEventListener('scroll', checkScroll);
+      window.addEventListener('resize', checkScroll);
+    }
+    return () => {
+      if (el) {
+        el.removeEventListener('scroll', checkScroll);
+      }
+      window.removeEventListener('resize', checkScroll);
+    };
+  }, [checkScroll, industries]);
+
+  const scroll = (direction: 'left' | 'right') => {
+    if (scrollRef.current) {
+      const scrollAmount = direction === 'left' ? -340 : 340;
+      scrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
+  };
 
   return (
     <section className="py-14 bg-[#462885] relative z-10 overflow-hidden">
@@ -63,7 +99,7 @@ export function IndustrySection({ content }: IndustrySectionProps) {
       <div className="container mx-auto px-4 md:px-8 max-w-7xl relative z-10">
         
         {/* Text Header Content */}
-        <div className="flex flex-col items-center text-center mb-16 max-w-4xl mx-auto text-white">
+        <div className="flex flex-col items-center text-center mb-12 max-w-4xl mx-auto text-white">
           <TextReveal 
             as="h2"
             text={heading}
@@ -81,45 +117,74 @@ export function IndustrySection({ content }: IndustrySectionProps) {
           </MotionSection>
         </div>
 
-        {/* Cards Grid */}
-        <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          {industries.map((ind, index) => (
-            <motion.div
-              key={ind.name + index}
-              variants={{
-                initial: { opacity: 0, y: 30, scale: 0.95 },
-                animate: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] } }
-              }}
-              whileHover={{ y: -10, transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] } }}
-              className="bg-white rounded-[24px] overflow-hidden flex flex-col h-full shadow-[0_20px_40px_-15px_rgba(0,0,0,0.4)] hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.5)] transition-shadow duration-500 cursor-pointer group"
+        {/* Carousel Container with Left/Right Arrows */}
+        <div className="relative group/carousel">
+          {/* Scroll Left Button - Only visible if canScrollLeft */}
+          {canScrollLeft && (
+            <button
+              onClick={() => scroll('left')}
+              aria-label="Scroll Left"
+              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-3 md:-translate-x-12 lg:-translate-x-14 z-20 w-11 h-11 rounded-full bg-white/90 hover:bg-white text-[#462885] shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer border border-slate-100"
             >
-              {/* Image Container */}
-              <div className="h-[220px] relative bg-slate-100 overflow-hidden">
-                <motion.img 
-                  whileHover={{ scale: 1.1 }}
-                  transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-                  src={ind.image} 
-                  alt={ind.name} 
-                  className="w-full h-full object-cover" 
-                  onError={(e) => {
-                    (e.target as HTMLImageElement).style.display = 'none';
-                  }}
-                />
-                <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors duration-500" />
-              </div>
-              
-              {/* Text Container */}
-              <div className="p-8 flex flex-col flex-1">
-                <h4 className="text-[17px] font-bold text-slate-900 mb-3 group-hover:text-[#462885] transition-colors">
-                  {ind.name}
-                </h4>
-                <p className="text-[13px] text-slate-500 leading-relaxed line-clamp-3">
-                  {ind.description}
-                </p>
-              </div>
-            </motion.div>
-          ))}
-        </StaggerContainer>
+              <ChevronLeft className="w-6 h-6" />
+            </button>
+          )}
+
+          {/* Scroll Right Button - Only visible if canScrollRight */}
+          {canScrollRight && (
+            <button
+              onClick={() => scroll('right')}
+              aria-label="Scroll Right"
+              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-3 md:translate-x-12 lg:translate-x-14 z-20 w-11 h-11 rounded-full bg-white/90 hover:bg-white text-[#462885] shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-110 active:scale-95 cursor-pointer border border-slate-100"
+            >
+              <ChevronRight className="w-6 h-6" />
+            </button>
+          )}
+
+          {/* Cards Scroll Track */}
+          <div
+            ref={scrollRef}
+            className="flex gap-6 overflow-x-auto scroll-smooth py-4 px-1 no-scrollbar snap-x snap-mandatory"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
+            {industries.map((ind, index) => (
+              <motion.div
+                key={ind.name + index}
+                initial={{ opacity: 0, y: 30, scale: 0.95 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.5, delay: index * 0.05 }}
+                whileHover={{ y: -10, transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] } }}
+                className="bg-white rounded-[24px] overflow-hidden flex flex-col h-full shadow-[0_20px_40px_-15px_rgba(0,0,0,0.4)] hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.5)] transition-shadow duration-500 cursor-pointer group shrink-0 w-[280px] sm:w-[300px] md:w-[310px] lg:w-[calc((100%-4.5rem)/4)] snap-start"
+              >
+                {/* Image Container */}
+                <div className="h-[220px] relative bg-slate-100 overflow-hidden">
+                  <motion.img 
+                    whileHover={{ scale: 1.1 }}
+                    transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+                    src={ind.image} 
+                    alt={ind.name} 
+                    className="w-full h-full object-cover" 
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = 'none';
+                    }}
+                  />
+                  <div className="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors duration-500" />
+                </div>
+                
+                {/* Text Container */}
+                <div className="p-8 flex flex-col flex-1">
+                  <h4 className="text-[17px] font-bold text-slate-900 mb-3 group-hover:text-[#462885] transition-colors">
+                    {ind.name}
+                  </h4>
+                  <p className="text-[13px] text-slate-500 leading-relaxed line-clamp-3">
+                    {ind.description}
+                  </p>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
 
         {/* View All Button */}
         <MotionSection variant="fadeUp" delay={0.5} className="mt-16 text-center">

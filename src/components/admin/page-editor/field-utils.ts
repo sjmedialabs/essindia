@@ -20,9 +20,26 @@ export type FieldType =
   | 'null';
 
 /** Fields editors should not change — heading level is fixed in the component. */
-export function isHiddenCmsField(key: string): boolean {
+export function isHiddenCmsField(key: string, sectionType?: string): boolean {
   const lower = key.toLowerCase();
-  return lower === 'headingtag' || lower === 'titletag';
+  if (lower === 'headingtag' || lower === 'titletag') return true;
+
+  if (sectionType === 'blog-detail-block') {
+    if (
+      key === 'type' ||
+      key === 'id' ||
+      key === 'authorName' ||
+      key === 'authorAvatar' ||
+      key === 'image' ||
+      key === 'contentHtml' ||
+      key === 'description' ||
+      key === 'title'
+    ) {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 /**
@@ -185,7 +202,17 @@ function baseHumanLabel(key: string): string {
   if (key === 'mediaUrl') return 'Thumbnail Upload';
   if (key === 'videoUrl') return 'Media Upload';
   if (key === 'buttonBgColor') return 'Button Background Color';
-  if (key === 'buttonTextColor') return 'Button Text Color';
+  if (key === 'badge') return 'Badge';
+  if (key === 'primaryTitleColor' || key === 'titlePrimaryColor') return 'Title Primary Color';
+  if (key === 'secondaryTitleColor' || key === 'titleSecondaryColor') return 'Secondary Title Color';
+  if (key === 'visionIcon') return 'Vision Icon Upload';
+  if (key === 'visionTitle') return 'Vision Title';
+  if (key === 'visionDescription') return 'Vision Description';
+  if (key === 'visionPoints') return 'Vision Points';
+  if (key === 'missionIcon') return 'Mission Icon Upload';
+  if (key === 'missionTitle') return 'Mission Title';
+  if (key === 'missionDescription') return 'Mission Description';
+  if (key === 'missionPoints') return 'Mission Points';
   if (key === 'tabs') return 'Category Tabs List';
   if (key === 'label') return 'Title';
   if (key === 'number') return 'Value';
@@ -193,8 +220,10 @@ function baseHumanLabel(key: string): string {
   if (key === 'contentDescription') return 'Detail Description';
   if (key === 'contentImage') return 'Detail Mockup Image';
   if (key === 'benefits') return 'Benefits Tags (Array)';
-  if (key === 'buttonText') return 'CTA Text';
+  if (key === 'buttonText') return 'Button Text';
   if (key === 'buttonUrl') return 'CTA URL';
+  if (key === 'documentUrl') return 'Document Upload';
+  if (key === 'redirectUrl') return 'Redirection Link';
   if (key === 'buttonFormType') return 'Button Form Action';
   if (key === 'button1FormType') return 'Button 1 Form Action';
   if (key === 'button2FormType') return 'Button 2 Form Action';
@@ -220,13 +249,19 @@ function baseHumanLabel(key: string): string {
     .replace(/\b\w/g, (c) => c.toUpperCase());
 }
 
-/**
- * Human-readable field label. Appends fixed heading tag when applicable, e.g. "Title (H1)".
- */
 export function humanLabel(
   key: string,
   options?: { sectionType?: string; keyPath?: string }
 ): string {
+  if (options?.sectionType === 'sticky-card') {
+    if (key === 'image') return 'Image Upload';
+    if (key === 'title') return 'Title';
+    if (key === 'description') return 'Description';
+    if (key === 'buttonText') return 'Button Text';
+    if (key === 'documentUrl') return 'Document Upload';
+    if (key === 'redirectUrl') return 'Redirection Link';
+  }
+
   if (options?.sectionType === 'landing1-challenges' && options?.keyPath?.includes('challenges.')) {
     if (key === 'title') return 'Challenge Title';
     if (key === 'desc') return 'Challenge Description';
@@ -279,6 +314,27 @@ export function humanLabel(
     if (key === 'videoUrl') return 'Video Upload';
   }
 
+  if (options?.sectionType === 'blog-detail-block') {
+    if (key === 'category') return 'Topic';
+    if (key === 'heroBgImage') return 'Banner Image Upload';
+    if (key === 'bgColor') return 'Hero Background Color';
+    if (key === 'gradientFrom') return 'Hero BG Gradient 1';
+    if (key === 'gradientVia') return 'Hero BG Gradient 2';
+    if (key === 'gradientTo') return 'Hero BG Gradient 3';
+    if (key === 'heroTitle') return 'Blog Title';
+    if (key === 'date') return 'Published Date';
+    if (key === 'readTime') return 'Time Estimation (e.g. 3min read)';
+    if (key === 'authorCardAvatar') return 'Author Image Upload';
+    if (key === 'authorCardName') return 'Author Name';
+    if (key === 'authorCardRole') return 'Designation';
+    if (key === 'authorCardBio') return 'Author Description';
+    if (key === 'contentSegments') return 'Content Segments (Dynamic)';
+    if (key === 'conclusionParagraphs') return 'Conclusion Descriptions';
+    if (key === 'calcTitle') return 'Form Title';
+    if (key === 'calcDisclaimer') return 'Form Disclaimer';
+    if (key === 'calcPoints') return 'Form Points';
+  }
+
   if (options?.sectionType === 'landing2-why-ess') {
     if (key === 'title') return 'Feature Title';
     if (key === 'description') return 'Feature Description';
@@ -289,6 +345,14 @@ export function humanLabel(
     if (key === 'logo') return 'Company Logo Upload';
     if (key === 'navLinks') return 'Navigation Links Array';
     if (key === 'socialLinks') return 'Social Icons Array';
+  }
+
+  if (options?.sectionType === 'erp-features' && options?.keyPath?.includes('features.')) {
+    if (key === 'title') return 'Tab Title';
+    if (key === 'icon') return 'Tab Icon Upload';
+    if (key === 'image') return 'Illustration / Mockup Image Upload';
+    if (key === 'desc') return 'Description Line 1';
+    if (key === 'desc2') return 'Description Line 2';
   }
 
   const base = baseHumanLabel(key);
@@ -324,13 +388,13 @@ export function detectFieldType(
     if (sectionType?.startsWith('landing1-') && (lower === 'desc' || lower === 'description')) {
       return 'textarea';
     }
-    if (lower === 'topic') return 'topicSelect';
-    if (lower === 'industry') return 'industrySelect';
+    if (lower === 'topic' || lower === 'category') return 'topicSelect';
+    if (lower === 'industry' || lower === 'industries') return 'industrySelect';
     if (lower.endsWith('formtype')) return 'formSelect';
     if (lower === 'icon' && (sectionType === 'bi-business-impact' || sectionType === 'rpa-overview' || sectionType === 'rpa-capabilities' || sectionType === 'rpa-industries' || value.startsWith('/') || value.includes('.') || value.includes('://'))) return 'image';
     if (IMAGE_PATTERNS.some((p) => lower.includes(p)) && !lower.endsWith('alt')) return 'image';
-    if (lower === 'color' || lower.endsWith('color') || lower.startsWith('color') || lower.includes('accent')) {
-      if (COLOR_PATTERN.test(value) || value.startsWith('rgb') || value.startsWith('hsl')) return 'color';
+    if (lower === 'color' || lower.endsWith('color') || lower.startsWith('color') || lower.includes('accent') || lower.startsWith('gradient')) {
+      return 'color';
     }
     if (COLOR_PATTERN.test(value)) return 'color';
     if (URL_PATTERNS.some((p) => lower === p || lower.endsWith(p.charAt(0).toUpperCase() + p.slice(1)) || lower.endsWith('_' + p))) return 'url';

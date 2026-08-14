@@ -35,17 +35,18 @@ function FormsAdminInner() {
   const [submissions, setSubmissions] = React.useState<FormSubmission[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
   const [selectedSub, setSelectedSub] = React.useState<FormSubmission | null>(null);
-  
+
   // Filter State
   const [fromDateFilter, setFromDateFilter] = React.useState('');
   const [toDateFilter, setToDateFilter] = React.useState('');
   const [countryFilter, setCountryFilter] = React.useState('');
-  
+
   // Pagination & Tab State
   const searchParams = useSearchParams();
   const [currentPage, setCurrentPage] = React.useState(1);
-  const [activeTab, setActiveTab] = React.useState<'contact' | 'landing-1' | 'landing-2' | 'cta'>(() => {
+  const [activeTab, setActiveTab] = React.useState<'contact' | 'landing-1' | 'landing-2' | 'cta' | 'blog-lead'>(() => {
     const t = searchParams?.get('tab');
+    if (t === 'blog-lead' || t === 'blog') return 'blog-lead';
     if (t === 'cta') return 'cta';
     if (t === 'landing-2') return 'landing-2';
     if (t === 'landing-1' || t === 'landing-page') return 'landing-1';
@@ -77,11 +78,12 @@ function FormsAdminInner() {
   const filteredSubmissions = React.useMemo(() => {
     return submissions.filter(sub => {
       const type = sub.formType || 'contact';
-      
+
       // Filter by tab
       if (activeTab === 'contact' && type !== 'contact') return false;
       if (activeTab === 'cta' && type !== 'cta') return false;
-      
+      if (activeTab === 'blog-lead' && type !== 'blog-lead') return false;
+
       if (activeTab === 'landing-1') {
         const isLanding1 = type === 'landing-1' || (type === 'landing-page' && sub.message?.includes('requirement'));
         if (!isLanding1) return false;
@@ -91,24 +93,24 @@ function FormsAdminInner() {
         const isLanding2 = type === 'landing-2' || type === 'landing2-trial' || (type === 'landing-page' && !sub.message?.includes('requirement'));
         if (!isLanding2) return false;
       }
-      
+
       let dateMatch = true;
       let countryMatch = true;
-      
+
       const subDate = new Date(sub.createdAt).toISOString().split('T')[0];
-      
+
       if (fromDateFilter) {
         dateMatch = dateMatch && (subDate >= fromDateFilter);
       }
-      
+
       if (toDateFilter) {
         dateMatch = dateMatch && (subDate <= toDateFilter);
       }
-      
+
       if (countryFilter) {
         countryMatch = sub.country === countryFilter;
       }
-      
+
       return dateMatch && countryMatch;
     });
   }, [submissions, fromDateFilter, toDateFilter, countryFilter, activeTab]);
@@ -122,10 +124,12 @@ function FormsAdminInner() {
 
   const exportToCSV = () => {
     if (filteredSubmissions.length === 0) return;
-    
+
     let headers: string[] = [];
     if (activeTab === 'contact') {
       headers = ['Date', 'Name', 'Email', 'Phone', 'Company', 'Country', 'Message'];
+    } else if (activeTab === 'blog-lead') {
+      headers = ['Date', 'Name', 'Email', 'Phone No', 'Blog Title'];
     } else if (activeTab === 'landing-1') {
       headers = ['Date', 'Page Name', 'Name', 'Email', 'Phone', 'Company', 'Industry', 'Employees', 'Current ERP', 'Requirement'];
     } else if (activeTab === 'landing-2') {
@@ -133,7 +137,7 @@ function FormsAdminInner() {
     } else {
       headers = ['Date', 'Name', 'Email', 'Phone', 'Country', 'Page Name', 'PDF URL'];
     }
-      
+
     const rows = filteredSubmissions.map(sub => {
       let parsed = { industry: '', employees: '', currentErp: '', requirement: '' };
       try {
@@ -142,7 +146,7 @@ function FormsAdminInner() {
         } else if (sub.message && sub.message.startsWith('Industry:')) {
           parsed.industry = sub.message.replace('Industry:', '').trim();
         }
-      } catch (e) {}
+      } catch (e) { }
 
       if (activeTab === 'contact') {
         return [
@@ -153,6 +157,14 @@ function FormsAdminInner() {
           `"${(sub.company || '').replace(/"/g, '""')}"`,
           `"${(sub.country || '').replace(/"/g, '""')}"`,
           `"${(sub.message || '').replace(/"/g, '""').replace(/\n|\r/g, ' ')}"`
+        ];
+      } else if (activeTab === 'blog-lead') {
+        return [
+          `"${new Date(sub.createdAt).toLocaleString().replace(/"/g, '""')}"`,
+          `"${(sub.name || '').replace(/"/g, '""')}"`,
+          `"${(sub.email || '').replace(/"/g, '""')}"`,
+          `"${(sub.phone || '').replace(/"/g, '""')}"`,
+          `"${(sub.pageName || '').replace(/"/g, '""')}"`
         ];
       } else if (activeTab === 'landing-1') {
         return [
@@ -226,25 +238,30 @@ function FormsAdminInner() {
         <div className="flex items-center gap-1 bg-slate-100/80 p-0.5 rounded-lg mb-1.5 border border-slate-200/60">
           <button
             onClick={() => setActiveTab('landing-1')}
-            className={`cursor-pointer px-3 py-1 text-xs font-bold rounded-md transition-all ${
-              activeTab === 'landing-1'
+            className={`cursor-pointer px-3 py-1 text-xs font-bold rounded-md transition-all ${activeTab === 'landing-1'
                 ? 'bg-[#4B2A63] text-white shadow-sm'
                 : 'text-slate-600 hover:text-slate-900'
-            }`}
+              }`}
           >
             Landing 1 Leads
           </button>
           <button
             onClick={() => setActiveTab('landing-2')}
-            className={`cursor-pointer px-3 py-1 text-xs font-bold rounded-md transition-all ${
-              activeTab === 'landing-2'
+            className={`cursor-pointer px-3 py-1 text-xs font-bold rounded-md transition-all ${activeTab === 'landing-2'
                 ? 'bg-[#4B2A63] text-white shadow-sm'
                 : 'text-slate-600 hover:text-slate-900'
-            }`}
+              }`}
           >
             Landing 2 Leads
           </button>
         </div>
+
+        <button
+          onClick={() => setActiveTab('blog-lead')}
+          className={`cursor-pointer pb-2 px-2 font-semibold text-xs transition-colors border-b-2 ${activeTab === 'blog-lead' ? 'border-[#4B2A63] text-[#4B2A63]' : 'border-transparent text-slate-500 hover:text-slate-800'}`}
+        >
+          Blog Leads
+        </button>
 
         <button
           onClick={() => setActiveTab('cta')}
@@ -287,14 +304,14 @@ function FormsAdminInner() {
           </select>
         </div>
         <div>
-           <Button
-             variant="ghost"
-             size="sm"
-             onClick={() => { setFromDateFilter(''); setToDateFilter(''); setCountryFilter(''); }}
-             disabled={!fromDateFilter && !toDateFilter && !countryFilter}
-           >
-             Clear filters
-           </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => { setFromDateFilter(''); setToDateFilter(''); setCountryFilter(''); }}
+            disabled={!fromDateFilter && !toDateFilter && !countryFilter}
+          >
+            Clear filters
+          </Button>
         </div>
       </div>
 
@@ -311,7 +328,7 @@ function FormsAdminInner() {
           <>
             <div className="w-full overflow-x-auto flex-1">
               <table className="w-full text-left text-sm">
-                 <thead className="bg-slate-50/60 text-slate-500 font-medium border-b border-slate-200">
+                <thead className="bg-slate-50/60 text-slate-500 font-medium border-b border-slate-200">
                   <tr>
                     <th className="px-3 py-2 whitespace-nowrap">Date</th>
                     {activeTab === 'landing-1' || activeTab === 'landing-2' ? (
@@ -319,7 +336,10 @@ function FormsAdminInner() {
                     ) : null}
                     <th className="px-3 py-2 whitespace-nowrap">Name</th>
                     <th className="px-3 py-2 whitespace-nowrap">Mail</th>
-                    <th className="px-3 py-2 whitespace-nowrap">Contact</th>
+                    <th className="px-3 py-2 whitespace-nowrap">Phone No</th>
+                    {activeTab === 'blog-lead' ? (
+                      <th className="px-3 py-2 whitespace-nowrap font-bold text-slate-800">Blog Title</th>
+                    ) : null}
                     {activeTab === 'landing-1' || activeTab === 'contact' ? (
                       <th className="px-3 py-2 whitespace-nowrap">Company</th>
                     ) : null}
@@ -340,13 +360,13 @@ function FormsAdminInner() {
                         <th className="px-3 py-2 whitespace-nowrap">Company</th>
                         <th className="px-3 py-2 whitespace-nowrap">Industry</th>
                       </>
-                    ) : (
+                    ) : activeTab === 'cta' ? (
                       <>
                         <th className="px-3 py-2 whitespace-nowrap">Page Name</th>
                         <th className="px-3 py-2 whitespace-nowrap">PDF URL</th>
                       </>
-                    )}
-                    <th className="px-3 py-2 whitespace-nowrap text-right">Actions</th>
+                    ) : null}
+                    <th className="px-3 py-2 whitespace-nowrap text-right pr-6">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
@@ -358,12 +378,16 @@ function FormsAdminInner() {
                       } else if (sub.message && sub.message.startsWith('Industry:')) {
                         parsed.industry = sub.message.replace('Industry:', '').trim();
                       }
-                    } catch (e) {}
+                    } catch (e) { }
 
                     return (
                       <tr key={sub.id} className="hover:bg-slate-50/50 transition-colors">
-                        <td className="px-3 py-3.5 whitespace-nowrap text-[11px] text-slate-500">
-                          {new Date(sub.createdAt).toLocaleDateString()}
+                        <td className="px-3 py-3.5 whitespace-nowrap text-[11px] text-slate-500 font-medium">
+                          {new Date(sub.createdAt).toLocaleDateString('en-US', {
+                            month: 'short',
+                            day: 'numeric',
+                            year: 'numeric'
+                          })}
                         </td>
                         {activeTab === 'landing-1' || activeTab === 'landing-2' ? (
                           <td className="px-3 py-3.5 text-[11px] text-[#4B2A63] font-semibold whitespace-nowrap">
@@ -382,6 +406,11 @@ function FormsAdminInner() {
                         <td className="px-3 py-3.5 text-[11px] text-slate-500 whitespace-nowrap">
                           {sub.phone || '-'}
                         </td>
+                        {activeTab === 'blog-lead' ? (
+                          <td className="px-3 py-3.5 text-xs font-bold text-slate-800 whitespace-nowrap">
+                            {sub.pageName || 'Blog Article'}
+                          </td>
+                        ) : null}
                         {activeTab === 'landing-1' || activeTab === 'contact' ? (
                           <td className="px-3 py-3.5 text-[11px] text-slate-650 whitespace-nowrap">
                             {sub.company || '-'}
@@ -430,7 +459,7 @@ function FormsAdminInner() {
                               {parsed.industry || '-'}
                             </td>
                           </>
-                        ) : (
+                        ) : activeTab === 'cta' ? (
                           <>
                             <td className="px-3 py-3.5 text-[11px] text-slate-650 whitespace-nowrap">
                               {formatPageName(sub.pageName)}
@@ -443,7 +472,7 @@ function FormsAdminInner() {
                               ) : '-'}
                             </td>
                           </>
-                        )}
+                        ) : null}
                         <td className="px-3 py-3.5 text-right">
                           <div className="flex items-center justify-end gap-1">
                             <a
@@ -549,7 +578,7 @@ function FormsAdminInner() {
                   </div>
                 )}
               </div>
-              
+
               {(() => {
                 let parsed = { industry: '', employees: '', currentErp: '', requirement: '' };
                 try {
@@ -558,7 +587,7 @@ function FormsAdminInner() {
                   } else if (selectedSub.message && selectedSub.message.startsWith('Industry:')) {
                     parsed.industry = selectedSub.message.replace('Industry:', '').trim();
                   }
-                } catch (e) {}
+                } catch (e) { }
 
                 if (!parsed.industry && !parsed.employees && !parsed.currentErp && !parsed.requirement) {
                   return null;

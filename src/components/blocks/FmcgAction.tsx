@@ -123,7 +123,7 @@ export function FmcgAction({ content }: { content?: FmcgActionContent }) {
                   {/* Badge */}
                   {card.badge && (
                     <div
-                      className="w-10 h-10 rounded-lg border-2 flex items-center justify-center text-sm font-bold"
+                      className="inline-flex min-w-[2.5rem] min-h-[2.5rem] w-auto h-auto px-3 py-1.5 rounded-lg border-2 items-center justify-center text-sm font-bold w-fit"
                       style={badgeStyle}
                     >
                       {card.badge}

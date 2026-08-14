@@ -33,12 +33,19 @@ const TOPICS = [
 ];
 
 const INDUSTRIES = [
-
   'FMCG',
   'Pharma',
   'Manufacturing',
   'Retail',
-  'Electronics'
+  'Electronics',
+  'Automotive',
+  'Healthcare',
+  'Logistics & Supply Chain',
+  'Chemicals',
+  'Textiles',
+  'Construction & Real Estate',
+  'Food & Beverages',
+  'Agriculture'
 ];
 
 export function BlogListSection({ content }: BlogListSectionProps) {
@@ -73,9 +80,9 @@ export function BlogListSection({ content }: BlogListSectionProps) {
         const res = await fetch('/api/blogs');
         if (res.ok) {
           const data = await res.json();
-          if (data && data.length > 0) {
-            // Sort by date (descending) or keep database order
-            setBlogs(data);
+          const list = Array.isArray(data) ? data : data?.blogs;
+          if (list && list.length > 0) {
+            setBlogs(list);
           } else {
             setBlogs(isDefaultBlogPage ? defaultBlogs : []);
           }

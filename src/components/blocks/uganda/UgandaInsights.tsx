@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface PointItem {
   title: string;
@@ -86,14 +87,43 @@ export function UgandaInsights({ content }: { content?: UgandaInsightsContent })
   const description = content?.description || 'Looking for more information that can help you grow your business? Make sure you check out our Insights. You are also welcome to sign up for our newsletter, find the link at the bottom of the page.';
   const tabs = content?.tabs && content.tabs.length > 0 ? content.tabs : DEFAULT_TABS;
 
-  const [activeTabIdx, setActiveTabIdx] = useState(1); // Default to Finance and accounting tab
+  const [activeTabIdx, setActiveTabIdx] = useState(0); // Default to first tab
   const activeTab = tabs[activeTabIdx] || tabs[0];
+  const tabsRef = useRef<HTMLDivElement>(null);
+
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  const checkScrollState = React.useCallback(() => {
+    if (tabsRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = tabsRef.current;
+      setCanScrollLeft(scrollLeft > 5);
+      setCanScrollRight(scrollLeft + clientWidth < scrollWidth - 5);
+    }
+  }, []);
+
+  React.useEffect(() => {
+    checkScrollState();
+    const timer = setTimeout(checkScrollState, 150);
+    window.addEventListener('resize', checkScrollState);
+    return () => {
+      clearTimeout(timer);
+      window.removeEventListener('resize', checkScrollState);
+    };
+  }, [tabs, checkScrollState]);
+
+  const scrollTabs = (direction: 'left' | 'right') => {
+    if (tabsRef.current) {
+      const scrollAmount = direction === 'left' ? -280 : 280;
+      tabsRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
+  };
 
   return (
     <section className="w-full py-14 bg-white flex flex-col items-center border-b">
       <div className="container mx-auto px-4 md:px-8 max-w-7xl">
         {/* Header Block */}
-        <div className="text-center max-w-3xl mx-auto mb-12">
+        <div className="text-center max-w-3xl mx-auto mb-10">
           {tag && (
             <span className="inline-block text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-500 mb-3">
               {tag}
@@ -111,20 +141,39 @@ export function UgandaInsights({ content }: { content?: UgandaInsightsContent })
           )}
         </div>
 
-        {/* Sidebar Tabs Layout */}
-        <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 items-start mt-6">
-          {/* Left Vertical Menu */}
-          <div className="w-full lg:w-1/4 flex flex-col border-l border-slate-200 divide-y divide-slate-100 lg:divide-y-0">
+        {/* Horizontal Navigation Tabs with Left & Right Arrow Buttons */}
+        <div className="relative flex items-center gap-2 mb-10 w-full max-w-7xl mx-auto">
+          {/* Left Arrow Button */}
+          <button
+            type="button"
+            onClick={() => scrollTabs('left')}
+            disabled={!canScrollLeft}
+            className={`w-9 h-9 rounded-full border border-slate-200 bg-white hover:bg-slate-100 flex items-center justify-center shadow-sm text-slate-700 shrink-0 transition-all duration-200 ${
+              canScrollLeft ? 'opacity-100 scale-100 cursor-pointer' : 'opacity-0 pointer-events-none scale-90'
+            }`}
+            aria-label="Scroll tabs left"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </button>
+
+          {/* Horizontal Scrollable Tabs Track */}
+          <div
+            ref={tabsRef}
+            onScroll={checkScrollState}
+            className="flex-1 flex items-center justify-start sm:justify-center gap-2.5 overflow-x-auto no-scrollbar scroll-smooth py-2 px-1 border-b border-slate-200"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
             {tabs.map((tab, idx) => {
               const isActive = idx === activeTabIdx;
               return (
                 <button
                   key={idx}
+                  type="button"
                   onClick={() => setActiveTabIdx(idx)}
-                  className={`text-left px-5 py-4 text-xs sm:text-sm transition-all duration-200 border-l-2 -ml-[2px] font-medium leading-snug ${
+                  className={`px-5 py-3 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-200 whitespace-nowrap shrink-0 ${
                     isActive
-                      ? 'border-[#1d1b4b] text-[#1d1b4b] font-bold bg-[#f8fafc]/80'
-                      : 'border-transparent text-slate-500 hover:text-slate-800 hover:bg-slate-50/50'
+                      ? 'bg-[#1d1b4b] text-white shadow-md shadow-[#1d1b4b]/20 scale-100'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900'
                   }`}
                 >
                   {tab.tabName}
@@ -133,76 +182,91 @@ export function UgandaInsights({ content }: { content?: UgandaInsightsContent })
             })}
           </div>
 
-          {/* Right Active Content Panel */}
-          <div className="w-full lg:w-3/4 space-y-8">
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={activeTabIdx}
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -15 }}
-                transition={{ duration: 0.35 }}
-                className="space-y-6"
-              >
-                {/* Content Title */}
-                {activeTab.contentTitle && (
-                  <h3 className="text-xl sm:text-[28px] font-extrabold text-[#1d1b4b] leading-tight tracking-tight">
-                    {activeTab.contentTitle}
-                  </h3>
-                )}
+          {/* Right Arrow Button */}
+          <button
+            type="button"
+            onClick={() => scrollTabs('right')}
+            disabled={!canScrollRight}
+            className={`w-9 h-9 rounded-full border border-slate-200 bg-white hover:bg-slate-100 flex items-center justify-center shadow-sm text-slate-700 shrink-0 transition-all duration-200 ${
+              canScrollRight ? 'opacity-100 scale-100 cursor-pointer' : 'opacity-0 pointer-events-none scale-90'
+            }`}
+            aria-label="Scroll tabs right"
+          >
+            <ChevronRight className="w-5 h-5" />
+          </button>
+        </div>
 
-                {/* Body Paragraphs */}
-                {activeTab.body1 && (
-                  <p className="text-xs sm:text-sm text-slate-700 leading-relaxed">
-                    {activeTab.body1}
-                  </p>
-                )}
-                {activeTab.body2 && (
-                  <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-medium">
-                    {activeTab.body2}
-                  </p>
-                )}
+        {/* Full-Width Active Content Panel */}
+        <div className="w-full max-w-7xl mx-auto">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={activeTabIdx}
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -15 }}
+              transition={{ duration: 0.35 }}
+              className="space-y-6"
+            >
+              {/* Content Title */}
+              {activeTab.contentTitle && (
+                <h3 className="text-xl sm:text-[28px] font-extrabold text-[#1d1b4b] leading-tight tracking-tight">
+                  {activeTab.contentTitle}
+                </h3>
+              )}
 
-                {/* Points checklist */}
-                {activeTab.points && activeTab.points.length > 0 && (
-                  <ul className="space-y-4 pt-2">
-                    {activeTab.points.map((p, pidx) => (
-                      <li key={pidx} className="text-xs sm:text-sm text-slate-700 flex items-start gap-3">
-                        <span className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-slate-900 mt-2" />
-                        <div>
-                          <strong className="text-slate-950 font-bold">{p.title}:</strong>{' '}
-                          <span className="text-slate-600">{p.description}</span>
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                )}
+              {/* Body Paragraphs */}
+              {activeTab.body1 && (
+                <p className="text-xs sm:text-sm text-slate-700 leading-relaxed">
+                  {activeTab.body1}
+                </p>
+              )}
+              {activeTab.body2 && (
+                <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-medium">
+                  {activeTab.body2}
+                </p>
+              )}
 
-                {/* Subsections Rich text */}
-                {activeTab.subsections && (
-                  <div className="whitespace-pre-line text-xs sm:text-sm text-slate-700 leading-relaxed space-y-6 border-t border-slate-100 pt-6">
-                    {activeTab.subsections}
-                  </div>
-                )}
+              {/* Points checklist */}
+              {activeTab.points && activeTab.points.length > 0 && (
+                <ul className="space-y-4 pt-2">
+                  {activeTab.points.map((p, pidx) => (
+                    <li key={pidx} className="text-xs sm:text-sm text-slate-700 flex items-start gap-3">
+                      <span className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-slate-900 mt-2" />
+                      <div>
+                        <strong className="text-slate-950 font-bold">{p.title}:</strong>{' '}
+                        <span className="text-slate-600">{p.description}</span>
+                      </div>
+                    </li>
+                  ))}
+                </ul>
+              )}
 
-                {/* Mockup Dashboard Image */}
-                {activeTab.image && (
-                  <div className="relative w-full aspect-[16/9] max-w-4xl rounded-xl overflow-hidden border border-slate-150 shadow-sm mt-8">
-                    <Image
-                      src={activeTab.image}
-                      alt={activeTab.contentTitle || 'Dashboard detail'}
-                      fill
-                      className="object-contain"
-                      sizes="(max-width: 1024px) 100vw, 75vw"
-                      priority
-                    />
-                  </div>
-                )}
-              </motion.div>
-            </AnimatePresence>
-          </div>
+              {/* Subsections Rich text */}
+              {activeTab.subsections && (
+                <div className="whitespace-pre-line text-xs sm:text-sm text-slate-700 leading-relaxed space-y-6 border-t border-slate-100 pt-6">
+                  {activeTab.subsections}
+                </div>
+              )}
+
+              {/* Mockup Dashboard Image */}
+              {activeTab.image && (
+                <div className="relative w-full aspect-[16/9] max-w-4xl mx-auto rounded-xl overflow-hidden border border-slate-150 shadow-sm mt-8">
+                  <Image
+                    src={activeTab.image}
+                    alt={activeTab.contentTitle || 'Dashboard detail'}
+                    fill
+                    className="object-contain"
+                    sizes="(max-width: 1024px) 100vw, 75vw"
+                    priority
+                  />
+                </div>
+              )}
+            </motion.div>
+          </AnimatePresence>
         </div>
       </div>
     </section>
   );
 }
+
+export default UgandaInsights;

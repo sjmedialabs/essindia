@@ -1,4 +1,5 @@
 import React from 'react';
+import { StickyCardSection } from '@/components/blocks/StickyCardSection';
 import { HeroSection } from '@/components/blocks/HeroSection';
 import { ServicesSection } from '@/components/blocks/ServicesSection';
 import { PrivacyPolicy } from '@/components/blocks/PrivacyPolicy';
@@ -548,7 +549,7 @@ export function SectionRenderer({ section }: SectionRendererProps) {
     case 'landing2-why-ess':
       return <Landing2WhyEss content={section.content} />;
     case 'landing2-footer-banner':
-      return <Landing2FooterBanner content={section.content} />;
+      return null;
     case 'landing1-brands':
       return <Landing1Brands content={section.content} />;
     case 'landing1-intro':
@@ -579,6 +580,8 @@ export function SectionRenderer({ section }: SectionRendererProps) {
       return <Landing1Challenges content={section.content} />;
     case 'landing1-value':
       return <Landing1Value content={section.content} />;
+    case 'sticky-card':
+      return <StickyCardSection content={section.content} />;
 
     default:
       if (process.env.NODE_ENV === 'development') {

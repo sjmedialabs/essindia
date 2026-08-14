@@ -8,6 +8,7 @@ import {
   MousePointer,
   Layers,
   Users,
+  Target,
   LucideIcon,
 } from 'lucide-react';
 
@@ -22,7 +23,24 @@ export interface SectionTypeDefinition {
   fieldOrder?: string[];
 }
 
-export const SECTION_REGISTRY: SectionTypeDefinition[] = [
+const RAW_SECTION_REGISTRY: SectionTypeDefinition[] = [
+  {
+    type: 'sticky-card',
+    label: 'Sticky Floating Card',
+    description: 'Fixed bottom-right corner card with image, title, description, document download or link redirect',
+    icon: MousePointer,
+    color: 'bg-amber-50 text-amber-600',
+    defaultVariant: 'default',
+    supportsVariants: false,
+    fieldOrder: [
+      'image',
+      'title',
+      'description',
+      'buttonText',
+      'documentUrl',
+      'redirectUrl'
+    ],
+  },
   {
     type: 'hero',
     label: 'Hero Banner',
@@ -529,6 +547,28 @@ export const SECTION_REGISTRY: SectionTypeDefinition[] = [
     color: 'bg-indigo-50 text-indigo-600',
     defaultVariant: 'default',
     supportsVariants: false,
+
+    fieldOrder: [
+      'heroBgImage',
+      'category',
+      'industry',
+      'bgColor',
+      'gradientFrom',
+      'gradientVia',
+      'gradientTo',
+      'heroTitle',
+      'date',
+      'readTime',
+      'authorCardAvatar',
+      'authorCardName',
+      'authorCardRole',
+      'authorCardBio',
+      'contentSegments',
+      'conclusionParagraphs',
+      'calcTitle',
+      'calcDisclaimer',
+      'calcPoints'
+    ],
   },
   {
     type: 'quality-hero',
@@ -960,6 +1000,39 @@ export const SECTION_REGISTRY: SectionTypeDefinition[] = [
     ],
   },
   {
+    type: 'about-us-mission-vision',
+    label: 'About Us Mission & Vision',
+    description: 'Our purpose section with vision & mission cards',
+    icon: Target,
+    color: 'bg-purple-50 text-purple-600',
+    defaultVariant: 'default',
+    supportsVariants: false,
+    fieldOrder: [
+      'badge',
+      'title',
+      'titlePrimaryColor',
+      'titleSecondaryColor',
+      'visionIcon',
+      'visionTitle',
+      'visionDescription',
+      'visionPoints',
+      'missionIcon',
+      'missionTitle',
+      'missionDescription',
+      'missionPoints'
+    ],
+  },
+  {
+    type: 'about-us-why-ess',
+    label: 'About Us Why Businesses Trust ESS',
+    description: 'Dark glass section with badge and 6 trust cards',
+    icon: Grid,
+    color: 'bg-purple-50 text-purple-600',
+    defaultVariant: 'default',
+    supportsVariants: false,
+    fieldOrder: ['badge', 'title', 'primaryTitleColor', 'secondaryTitleColor', 'description', 'items'],
+  },
+  {
     type: 'ass-intro',
     label: 'ASS Intro',
     description: 'Intro overview for After Sales Service',
@@ -1211,6 +1284,16 @@ export const SECTION_REGISTRY: SectionTypeDefinition[] = [
     defaultVariant: 'default',
     supportsVariants: false,
     fieldOrder: ['title', 'cards'],
+  },
+  {
+    type: 'rpa-capabilities',
+    label: 'RPA Core Capabilities',
+    description: 'Orbital wheel of RPA core offerings with center node',
+    icon: Grid,
+    color: 'bg-purple-50 text-purple-600',
+    defaultVariant: 'default',
+    supportsVariants: false,
+    fieldOrder: ['title', 'primaryTitleColor', 'secondaryTitleColor', 'description', 'hubSubtitle', 'hubTitle', 'items'],
   },
   {
     type: 'fmcg-challenges',
@@ -2356,10 +2439,12 @@ export const SECTION_REGISTRY: SectionTypeDefinition[] = [
     color: 'bg-[#4B2A63]/10 text-[#4B2A63]',
     defaultVariant: 'default',
     supportsVariants: false,
-    fieldOrder: ['badge', 'title', 'description', 'challenges']
   },
 ];
 
+export const SECTION_REGISTRY: SectionTypeDefinition[] = RAW_SECTION_REGISTRY.filter(
+  (sec, index, self) => index === self.findIndex((t) => t.type === sec.type)
+);
 
 export function getSectionDefinition(type: string): SectionTypeDefinition | undefined {
   return SECTION_REGISTRY.find((s) => s.type === type);

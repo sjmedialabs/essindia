@@ -65,7 +65,7 @@ export function UgandaPresence({ content }: { content?: UgandaPresenceContent })
                 </span>
               )}
               {stat.description && (
-                <p className="text-xs sm:text-sm font-semibold text-slate-800 tracking-tight leading-relaxed mt-2 max-w-[220px]">
+                <p className="text-sm sm:text-base md:text-lg font-semibold text-slate-800 tracking-tight leading-relaxed mt-2 max-w-[240px]">
                   {stat.description}
                 </p>
               )}

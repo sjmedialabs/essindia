@@ -428,10 +428,11 @@ export class NavigationTreeRepository {
     location: string,
     mode: 'public' | 'admin' = 'public'
   ): Promise<NavigationTreeItem[]> {
-    const menu = await db.query.navigationMenus.findFirst({
-      where: eq(navigationMenus.location, location),
-    });
-    if (!menu) return [];
+    try {
+      const menu = await db.query.navigationMenus.findFirst({
+        where: eq(navigationMenus.location, location),
+      });
+      if (!menu) return [];
 
     const items = await db.query.navigationItems.findMany({
       where:
@@ -583,6 +584,10 @@ export class NavigationTreeRepository {
     }
 
     return result;
+    } catch (err) {
+      logger.error(`[NavigationTreeRepository] fetchTree error for ${location}`, err);
+      return [];
+    }
   }
 
   /** Build mega menu payloads for header from tree (DB-only, sanitized). */

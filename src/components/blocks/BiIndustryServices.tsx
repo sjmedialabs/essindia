@@ -134,13 +134,20 @@ export function BiIndustryServices({ content }: { content?: BiIndustryServicesCo
                   transition={{ duration: 0.3 }}
                   className="absolute inset-0 w-full h-full"
                 >
-                  <Image
-                    src={activeTab.image}
-                    alt={activeTab.tabName}
-                    fill
-                    className="object-cover"
-                    priority
-                  />
+                  {typeof activeTab.image === 'string' && activeTab.image.trim() !== '' && (activeTab.image.startsWith('/') || activeTab.image.startsWith('http://') || activeTab.image.startsWith('https://')) ? (
+                    <Image
+                      src={activeTab.image}
+                      alt={activeTab.tabName || 'Industry Service'}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                      className="object-cover"
+                      priority
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-slate-100 flex items-center justify-center text-slate-400 text-sm">
+                      No Image Available
+                    </div>
+                  )}
                 </motion.div>
               </AnimatePresence>
             </div>

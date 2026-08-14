@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ChevronRight } from 'lucide-react';
 
 interface TabItem {
   tabName: string;
@@ -93,28 +94,28 @@ export function BiTabs({ content }: { content?: BiTabsContent }) {
   const visibleTabs = tabs.slice(startIndex, startIndex + 3);
 
   return (
-    <section className="bg-[#61459a] text-white overflow-hidden font-sans">
+    <section className="bg-[#F4F0FD] text-slate-900 overflow-hidden font-sans">
 
-      {/* Top Part: Tab Headers with background color #4c327f */}
-      <div className="bg-[#4c327f] pt-14 pb-0">
+      {/* Top Part: Tab Headers with dark background color #0e1a43 */}
+      <div className="bg-[#0e1a43] pt-14 pb-0 text-white">
         <div className="container mx-auto max-w-7xl px-6">
           {title && (
-            <h2 className="text-3xl font-extrabold text-white text-center mb-6">
+            <h2 className="text-3xl font-bold text-white text-center mb-6">
               {title}
             </h2>
           )}
 
           {/* Tab Headers Navigation */}
-          <div className="flex items-center gap-4 pb-0 border-b border-white/20">
+          <div className="flex items-center gap-4 pb-0 border-b border-white/15">
             {/* Backward Arrow */}
             {tabs.length > 3 && (
               <button
                 type="button"
                 onClick={handlePrev}
                 disabled={startIndex === 0}
-                className={`p-2 rounded-full border border-white/25 text-white transition-all duration-300 flex items-center justify-center shrink-0 ${startIndex === 0
-                  ? 'opacity-35 cursor-not-allowed'
-                  : 'opacity-100 hover:bg-white/10 hover:border-white/50 cursor-pointer active:scale-95'
+                className={`p-2.5 rounded-full border border-white/20 text-white transition-all duration-300 flex items-center justify-center shrink-0 ${startIndex === 0
+                    ? 'opacity-30 cursor-not-allowed'
+                    : 'opacity-100 hover:bg-white/10 hover:border-white/50 cursor-pointer active:scale-95'
                   }`}
                 aria-label="Previous tabs"
               >
@@ -136,10 +137,10 @@ export function BiTabs({ content }: { content?: BiTabsContent }) {
                     onClick={() => setActiveTabIdx(actualIdx)}
                     className="text-left shrink-0 transition-all duration-300 select-none cursor-pointer outline-none focus:outline-none py-1 block w-full relative group"
                   >
-                    <div className={`text-base sm:text-lg font-bold transition-colors duration-300 ${isActive ? 'text-white' : 'text-white/70 group-hover:text-white'}`}>
+                    <div className={`text-base sm:text-lg font-bold transition-colors duration-300 ${isActive ? 'text-white' : 'text-white/60 group-hover:text-white'}`}>
                       {tab.tabName}
                     </div>
-                    <div className={`text-xs sm:text-sm mt-0.5 font-light transition-colors duration-300 ${isActive ? 'text-white' : 'text-white/50 group-hover:text-white/80'}`}>
+                    <div className={`text-xs sm:text-sm mt-0.5 font-light transition-colors duration-300 ${isActive ? 'text-white/90' : 'text-white/40 group-hover:text-white/70'}`}>
                       {tab.tabDesc}
                     </div>
                     {/* Active Underline */}
@@ -147,7 +148,7 @@ export function BiTabs({ content }: { content?: BiTabsContent }) {
                       {isActive && (
                         <motion.div
                           layoutId="activeTabUnderline"
-                          className="absolute inset-0 bg-white"
+                          className="absolute inset-0 bg-[#A855F7]"
                           transition={{ type: 'spring', stiffness: 380, damping: 30 }}
                         />
                       )}
@@ -163,9 +164,9 @@ export function BiTabs({ content }: { content?: BiTabsContent }) {
                 type="button"
                 onClick={handleNext}
                 disabled={startIndex >= maxStartIndex}
-                className={`p-2 rounded-full border border-white/25 text-white transition-all duration-300 flex items-center justify-center shrink-0 ${startIndex >= maxStartIndex
-                  ? 'opacity-35 cursor-not-allowed'
-                  : 'opacity-100 hover:bg-white/10 hover:border-white/50 cursor-pointer active:scale-95'
+                className={`p-2.5 rounded-full border border-white/20 text-white transition-all duration-300 flex items-center justify-center shrink-0 ${startIndex >= maxStartIndex
+                    ? 'opacity-30 cursor-not-allowed'
+                    : 'opacity-100 hover:bg-white/10 hover:border-white/50 cursor-pointer active:scale-95'
                   }`}
                 aria-label="Next tabs"
               >
@@ -178,8 +179,8 @@ export function BiTabs({ content }: { content?: BiTabsContent }) {
         </div>
       </div>
 
-      {/* Bottom Part: Content Panel with background color #61459a */}
-      <div className="py-14">
+      {/* Bottom Part: Content Panel with light soft background #F4F0FD */}
+      <div className="py-14 bg-[#F4F0FD]">
         <div className="container mx-auto max-w-7xl px-6">
           <AnimatePresence mode="wait">
             <motion.div
@@ -190,9 +191,9 @@ export function BiTabs({ content }: { content?: BiTabsContent }) {
               transition={{ duration: 0.25 }}
               className="flex flex-col lg:flex-row items-center gap-12 lg:gap-16"
             >
-               <div className="flex-1 space-y-6 text-left w-full">
+              <div className="flex-1 space-y-6 text-left w-full">
                 <div className="space-y-1">
-                  <h3 className="text-3xl sm:text-4xl font-extrabold tracking-tight leading-tight">
+                  <h3 className="text-3xl sm:text-4xl font-bold text-slate-900 tracking-tight leading-tight">
                     {typeof activeTab.heading === 'string' && (activeTab.heading.includes('<p>') || activeTab.heading.includes('<')) ? (
                       <span dangerouslySetInnerHTML={{ __html: activeTab.heading }} />
                     ) : (
@@ -200,7 +201,7 @@ export function BiTabs({ content }: { content?: BiTabsContent }) {
                     )}
                   </h3>
                   {activeTab.subheading && (
-                    <p className="text-white/95 text-base sm:text-lg font-light tracking-wide">
+                    <p className="text-slate-600 text-base sm:text-lg font-normal tracking-wide">
                       {typeof activeTab.subheading === 'string' && (activeTab.subheading.includes('<p>') || activeTab.subheading.includes('<')) ? (
                         <span dangerouslySetInnerHTML={{ __html: activeTab.subheading }} />
                       ) : (
@@ -210,7 +211,7 @@ export function BiTabs({ content }: { content?: BiTabsContent }) {
                   )}
                 </div>
 
-                {/* Questions List (Matching lavender rounded pills) */}
+                {/* Questions List (Matching light rounded pills with chevron icon) */}
                 {activeTab.questions && activeTab.questions.length > 0 && (
                   <div className="space-y-3 w-full max-w-xl">
                     {activeTab.questions.map((question, qIdx) => (
@@ -219,13 +220,16 @@ export function BiTabs({ content }: { content?: BiTabsContent }) {
                         initial={{ opacity: 0, x: -10 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: qIdx * 0.04 }}
-                        className="bg-white/15 border border-white/20 hover:bg-white/25 text-white font-normal text-[15px] sm:text-base px-6 py-4 rounded-xl shadow-sm transition-all duration-300 hover:translate-x-1"
+                        className="bg-white border border-slate-200/80 hover:border-purple-300 text-slate-800 font-medium text-[15px] sm:text-base px-6 py-4 rounded-2xl shadow-[0_2px_8px_rgba(0,0,0,0.03)] transition-all duration-300 hover:shadow-md hover:translate-x-1 flex items-center justify-between gap-4 group cursor-default"
                       >
-                        {typeof question === 'string' && (question.includes('<p>') || question.includes('<')) ? (
-                          <span dangerouslySetInnerHTML={{ __html: question }} />
-                        ) : (
-                          question
-                        )}
+                        <span className="flex-1">
+                          {typeof question === 'string' && (question.includes('<p>') || question.includes('<')) ? (
+                            <span dangerouslySetInnerHTML={{ __html: question }} />
+                          ) : (
+                            question
+                          )}
+                        </span>
+                        <ChevronRight className="w-5 h-5 text-purple-600 shrink-0 group-hover:translate-x-0.5 transition-transform" />
                       </motion.div>
                     ))}
                   </div>
@@ -235,12 +239,13 @@ export function BiTabs({ content }: { content?: BiTabsContent }) {
               {/* Right Image Column */}
               {activeTab.image && (
                 <div className="flex-1 w-full max-w-lg lg:max-w-2xl shrink-0 flex justify-center items-center">
-                  <div className="w-full relative aspect-[4/3] sm:aspect-[1.4] rounded-2xl overflow-hidden shadow-2xl border border-white/10 bg-[#4e2a96]">
+                  <div className="w-full relative aspect-[4/3] sm:aspect-[1.4] rounded-2xl overflow-hidden shadow-xl border border-slate-200/80 bg-white">
                     <Image
                       src={activeTab.image}
-                      alt={activeTab.heading}
+                      alt={typeof activeTab.heading === 'string' ? activeTab.heading : 'BI Tab'}
                       fill
-                      className="object-cover"
+                      sizes="(max-width: 1024px) 100vw, 50vw"
+                      className="object-contain p-2"
                       priority
                     />
                   </div>
@@ -253,3 +258,5 @@ export function BiTabs({ content }: { content?: BiTabsContent }) {
     </section>
   );
 }
+
+export default BiTabs;

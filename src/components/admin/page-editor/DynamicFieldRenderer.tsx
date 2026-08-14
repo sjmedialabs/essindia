@@ -32,12 +32,12 @@ export function DynamicFieldRenderer({
   depth = 0,
   sectionType,
 }: DynamicFieldRendererProps) {
-  if (isHiddenCmsField(fieldKey)) return null;
+  if (isHiddenCmsField(fieldKey, sectionType)) return null;
 
   const fieldLabel = humanLabel(fieldKey, { sectionType, keyPath });
 
   let fieldType = detectFieldType(fieldKey, value, sectionType);
-  if (fieldKey.toLowerCase().includes('pdf')) {
+  if (fieldKey.toLowerCase().includes('pdf') || fieldKey.toLowerCase().includes('document')) {
     fieldType = 'image';
   }
 
@@ -176,6 +176,15 @@ export function DynamicFieldRenderer({
       );
 
     case 'array':
+      if (fieldKey === 'contentSegments' && sectionType === 'blog-detail-block') {
+        return (
+          <ContentSegmentsEditor
+            keyPath={keyPath}
+            value={value as any[]}
+            onChange={(newVal) => onChange(keyPath, newVal)}
+          />
+        );
+      }
       if (sectionType === 'services' && fieldKey === 'services') {
         return (
           <SelectedPagesField
@@ -971,7 +980,7 @@ function CountryCodeField({
   );
 }
 
-const TOPIC_OPTIONS = [
+const DEFAULT_TOPIC_OPTIONS = [
   'Business Intelligence',
   'ERP Solutions',
   'IoT Solutions',
@@ -992,6 +1001,26 @@ function TopicSelectField({
   value: string;
   onChange: (value: string) => void;
 }) {
+  const [options, setOptions] = React.useState<string[]>(DEFAULT_TOPIC_OPTIONS);
+
+  React.useEffect(() => {
+    async function fetchDynamicTopics() {
+      try {
+        const res = await fetch('/api/blogs');
+        if (res.ok) {
+          const data = await res.json();
+          const configured = Array.isArray(data?.configuredTopics) && data.configuredTopics.length > 0
+            ? data.configuredTopics
+            : DEFAULT_TOPIC_OPTIONS;
+          setOptions(Array.from(new Set(configured)));
+        }
+      } catch (e) {
+        // Fallback to defaults
+      }
+    }
+    fetchDynamicTopics();
+  }, []);
+
   return (
     <div className="space-y-1.5 flex-1 min-w-[200px]">
       <label className="admin-label">{label || humanLabel(fieldKey)}</label>
@@ -1001,7 +1030,7 @@ function TopicSelectField({
         className="admin-input"
       >
         <option value="">Select a topic...</option>
-        {TOPIC_OPTIONS.map((t) => (
+        {options.map((t) => (
           <option key={t} value={t}>
             {t}
           </option>
@@ -1011,12 +1040,22 @@ function TopicSelectField({
   );
 }
 
-const INDUSTRY_OPTIONS = [
+const DEFAULT_INDUSTRY_OPTIONS = [
   'FMCG',
   'Pharma',
   'Manufacturing',
   'Retail',
-  'Electronics'
+  'Electronics',
+  'Automotive',
+  'Healthcare',
+  'Logistics & Supply Chain',
+  'Chemicals',
+  'Textiles',
+  'Construction & Real Estate',
+  'Food & Beverages',
+  'Agriculture',
+  'Energy & Utilities',
+  'Financial Services'
 ];
 
 function IndustrySelectField({
@@ -1030,6 +1069,26 @@ function IndustrySelectField({
   value: string;
   onChange: (value: string) => void;
 }) {
+  const [options, setOptions] = React.useState<string[]>(DEFAULT_INDUSTRY_OPTIONS);
+
+  React.useEffect(() => {
+    async function fetchDynamicIndustries() {
+      try {
+        const res = await fetch('/api/blogs');
+        if (res.ok) {
+          const data = await res.json();
+          const configured = Array.isArray(data?.configuredIndustries) && data.configuredIndustries.length > 0
+            ? data.configuredIndustries
+            : DEFAULT_INDUSTRY_OPTIONS;
+          setOptions(Array.from(new Set(configured)));
+        }
+      } catch (e) {
+        // Fallback to defaults
+      }
+    }
+    fetchDynamicIndustries();
+  }, []);
+
   return (
     <div className="space-y-1.5 flex-1 min-w-[200px]">
       <label className="admin-label">{label || humanLabel(fieldKey)}</label>
@@ -1039,9 +1098,9 @@ function IndustrySelectField({
         className="admin-input"
       >
         <option value="">Select an industry...</option>
-        {INDUSTRY_OPTIONS.map((i) => (
-          <option key={i} value={i}>
-            {i}
+        {options.map((ind) => (
+          <option key={ind} value={ind}>
+            {ind}
           </option>
         ))}
       </select>
@@ -1180,6 +1239,453 @@ function SelectedPagesField({
               <option key={p.id} value={p.routePath}>{p.title} ({p.routePath})</option>
             ))}
           </select>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ContentSegmentsEditor({
+  keyPath,
+  value,
+  onChange,
+}: {
+  keyPath: string;
+  value: any[];
+  onChange: (newVal: any[]) => void;
+}) {
+  const contentSegments = Array.isArray(value) ? value : [];
+
+  const addSegment = (type: string) => {
+    const copy = [...contentSegments];
+    if (type === 'key-takeaways') {
+      copy.push({
+        type: 'key-takeaways',
+        id: `takeaways-${Date.now()}`,
+        tocTitle: 'Key takeaways',
+        title: 'Key takeaways:',
+        points: [''],
+        descriptions: ['']
+      });
+    } else if (type === 'items') {
+      copy.push({
+        type: 'items',
+        id: `items-${Date.now()}`,
+        tocTitle: 'New Items Section',
+        items: [{ title: 'Item Title', image: '', descriptions: [''] }]
+      });
+    } else if (type === 'cards') {
+      copy.push({
+        type: 'cards',
+        id: `cards-${Date.now()}`,
+        tocTitle: 'Cards Section',
+        cards: [{ title: 'Card Title', description: '' }]
+      });
+    } else if (type === 'table') {
+      copy.push({
+        type: 'table',
+        id: `table-${Date.now()}`,
+        tocTitle: 'Table Section',
+        column1Title: 'Column 1 Title',
+        column2Title: 'Column 2 Title',
+        rows: [{ col1Title: 'Item', col2Text: 'Matched Value' }]
+      });
+    }
+    onChange(copy);
+  };
+
+  const removeSegment = (sIdx: number) => {
+    const copy = contentSegments.filter((_, idx) => idx !== sIdx);
+    onChange(copy);
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between">
+        <label className="admin-label">Dynamic Content Segments</label>
+        <div className="flex items-center gap-2 flex-wrap">
+          <button
+            type="button"
+            onClick={() => addSegment('key-takeaways')}
+            className="px-2.5 py-1 text-xs bg-purple-50 text-purple-700 hover:bg-purple-100 rounded-lg font-medium cursor-pointer border border-purple-200"
+          >
+            + Key Takeaways
+          </button>
+          <button
+            type="button"
+            onClick={() => addSegment('items')}
+            className="px-2.5 py-1 text-xs bg-blue-50 text-blue-700 hover:bg-blue-100 rounded-lg font-medium cursor-pointer border border-blue-200"
+          >
+            + Items Section
+          </button>
+          <button
+            type="button"
+            onClick={() => addSegment('cards')}
+            className="px-2.5 py-1 text-xs bg-emerald-50 text-emerald-700 hover:bg-emerald-100 rounded-lg font-medium cursor-pointer border border-emerald-200"
+          >
+            + Cards
+          </button>
+          <button
+            type="button"
+            onClick={() => addSegment('table')}
+            className="px-2.5 py-1 text-xs bg-amber-50 text-amber-700 hover:bg-amber-100 rounded-lg font-medium cursor-pointer border border-amber-200"
+          >
+            + Table
+          </button>
+        </div>
+      </div>
+
+      {contentSegments.length === 0 ? (
+        <div className="p-6 text-center border-2 border-dashed border-slate-200 rounded-xl text-slate-400 text-xs">
+          No content segments added yet. Click an option above to add segment blocks.
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {contentSegments.map((seg: any, sIdx: number) => (
+            <div key={sIdx} className="p-4 border border-slate-200 rounded-xl bg-slate-50/70 space-y-4 relative">
+              <div className="flex items-center justify-between border-b border-slate-200 pb-2">
+                <span className="text-xs font-bold uppercase tracking-wider text-slate-700">
+                  {seg.type === 'key-takeaways' && 'Key Takeaways Segment'}
+                  {seg.type === 'items' && 'Items Section Segment'}
+                  {seg.type === 'cards' && 'Cards Segment'}
+                  {seg.type === 'table' && 'Table Segment'}
+                </span>
+                <button
+                  type="button"
+                  onClick={() => removeSegment(sIdx)}
+                  className="text-rose-600 hover:text-rose-700 text-xs font-semibold cursor-pointer"
+                >
+                  Remove Segment
+                </button>
+              </div>
+
+              <div className="space-y-1">
+                <label className="admin-label">Sidebar Tab Title (For Auto-scroll TOC)</label>
+                <input
+                  type="text"
+                  value={seg.tocTitle || ''}
+                  onChange={(e) => {
+                    const copy = [...contentSegments];
+                    copy[sIdx].tocTitle = e.target.value;
+                    onChange(copy);
+                  }}
+                  placeholder="e.g. Key takeaways"
+                  className="admin-input"
+                />
+              </div>
+
+              {/* 1. Key Takeaways */}
+              {seg.type === 'key-takeaways' && (
+                <div className="space-y-4 bg-white p-3 rounded-xl border border-slate-200">
+                  <div className="space-y-1">
+                    <label className="admin-label">Segment Title</label>
+                    <input
+                      type="text"
+                      value={seg.title || ''}
+                      onChange={(e) => {
+                        const copy = [...contentSegments];
+                        copy[sIdx].title = e.target.value;
+                        onChange(copy);
+                      }}
+                      className="admin-input font-bold"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="admin-label">Points List</label>
+                    {seg.points?.map((pText: string, pIdx: number) => (
+                      <div key={pIdx} className="flex items-center gap-2">
+                        <input
+                          type="text"
+                          value={pText}
+                          onChange={(e) => {
+                            const copy = [...contentSegments];
+                            copy[sIdx].points[pIdx] = e.target.value;
+                            onChange(copy);
+                          }}
+                          className="admin-input flex-1 text-xs"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const copy = [...contentSegments];
+                            copy[sIdx].points = copy[sIdx].points.filter((_: any, i: number) => i !== pIdx);
+                            onChange(copy);
+                          }}
+                          className="text-xs text-rose-500 font-bold px-1"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ))}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const copy = [...contentSegments];
+                        copy[sIdx].points = [...(copy[sIdx].points || []), ''];
+                        onChange(copy);
+                      }}
+                      className="text-xs font-semibold text-purple-600 hover:text-purple-700 cursor-pointer"
+                    >
+                      + Add Point
+                    </button>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="admin-label">Descriptions List</label>
+                    {seg.descriptions?.map((dText: string, dIdx: number) => (
+                      <div key={dIdx} className="flex items-center gap-2">
+                        <textarea
+                          rows={2}
+                          value={dText}
+                          onChange={(e) => {
+                            const copy = [...contentSegments];
+                            copy[sIdx].descriptions[dIdx] = e.target.value;
+                            onChange(copy);
+                          }}
+                          className="admin-input flex-1 text-xs"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const copy = [...contentSegments];
+                            copy[sIdx].descriptions = copy[sIdx].descriptions.filter((_: any, i: number) => i !== dIdx);
+                            onChange(copy);
+                          }}
+                          className="text-xs text-rose-500 font-bold px-1"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ))}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const copy = [...contentSegments];
+                        copy[sIdx].descriptions = [...(copy[sIdx].descriptions || []), ''];
+                        onChange(copy);
+                      }}
+                      className="text-xs font-semibold text-purple-600 hover:text-purple-700 cursor-pointer"
+                    >
+                      + Add Description
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* 2. Items */}
+              {seg.type === 'items' && (
+                <div className="space-y-4 bg-white p-3 rounded-xl border border-slate-200">
+                  {seg.items?.map((item: any, itemIdx: number) => (
+                    <div key={itemIdx} className="p-3 border border-slate-100 rounded-lg space-y-3 bg-slate-50/50">
+                      <div className="space-y-1">
+                        <label className="admin-label">Item Title</label>
+                        <input
+                          type="text"
+                          value={item.title || ''}
+                          onChange={(e) => {
+                            const copy = [...contentSegments];
+                            copy[sIdx].items[itemIdx].title = e.target.value;
+                            onChange(copy);
+                          }}
+                          className="admin-input font-bold"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <label className="admin-label">Item Image Upload</label>
+                        <MediaField
+                          fieldKey={`item-image-${itemIdx}`}
+                          value={item.image || ''}
+                          onChange={(v) => {
+                            const copy = [...contentSegments];
+                            copy[sIdx].items[itemIdx].image = v;
+                            onChange(copy);
+                          }}
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="admin-label">Item Descriptions</label>
+                        {item.descriptions?.map((dText: string, dIdx: number) => (
+                          <div key={dIdx} className="flex items-center gap-2">
+                            <textarea
+                              rows={2}
+                              value={dText}
+                              onChange={(e) => {
+                                const copy = [...contentSegments];
+                                copy[sIdx].items[itemIdx].descriptions[dIdx] = e.target.value;
+                                onChange(copy);
+                              }}
+                              className="admin-input flex-1 text-xs"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const copy = [...contentSegments];
+                                copy[sIdx].items[itemIdx].descriptions = copy[sIdx].items[itemIdx].descriptions.filter((_: any, i: number) => i !== dIdx);
+                                onChange(copy);
+                              }}
+                              className="text-xs text-rose-500 font-bold px-1"
+                            >
+                              ✕
+                            </button>
+                          </div>
+                        ))}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const copy = [...contentSegments];
+                            copy[sIdx].items[itemIdx].descriptions = [...(copy[sIdx].items[itemIdx].descriptions || []), ''];
+                            onChange(copy);
+                          }}
+                          className="text-xs font-semibold text-blue-600 hover:text-blue-700 cursor-pointer"
+                        >
+                          + Add Description
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const copy = [...contentSegments];
+                      copy[sIdx].items = [...(copy[sIdx].items || []), { title: 'New Item', image: '', descriptions: [''] }];
+                      onChange(copy);
+                    }}
+                    className="text-xs font-semibold text-blue-600 hover:text-blue-700 cursor-pointer border border-blue-200 bg-blue-50/50 py-1.5 px-3 rounded-lg w-full"
+                  >
+                    + Add Item
+                  </button>
+                </div>
+              )}
+
+              {/* 3. Cards */}
+              {seg.type === 'cards' && (
+                <div className="space-y-3 bg-white p-3 rounded-xl border border-slate-200">
+                  {seg.cards?.map((card: any, cIdx: number) => (
+                    <div key={cIdx} className="p-3 border border-slate-100 rounded-lg space-y-2 bg-slate-50/50">
+                      <div className="space-y-1">
+                        <label className="admin-label">Card Title</label>
+                        <input
+                          type="text"
+                          value={card.title || ''}
+                          onChange={(e) => {
+                            const copy = [...contentSegments];
+                            copy[sIdx].cards[cIdx].title = e.target.value;
+                            onChange(copy);
+                          }}
+                          className="admin-input font-bold"
+                        />
+                      </div>
+                      <div className="space-y-1">
+                        <div className="flex items-center justify-between">
+                          <label className="admin-label">Description (200 Char Limit)</label>
+                          <span className={cn('text-[10px] font-mono', (card.description?.length || 0) > 200 ? 'text-rose-600 font-bold' : 'text-slate-400')}>
+                            {card.description?.length || 0}/200
+                          </span>
+                        </div>
+                        <input
+                          type="text"
+                          maxLength={200}
+                          value={card.description || ''}
+                          onChange={(e) => {
+                            const copy = [...contentSegments];
+                            copy[sIdx].cards[cIdx].description = e.target.value.slice(0, 200);
+                            onChange(copy);
+                          }}
+                          className="admin-input text-xs"
+                        />
+                      </div>
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const copy = [...contentSegments];
+                      copy[sIdx].cards = [...(copy[sIdx].cards || []), { title: 'New Card', description: 'Short desc max 200 chars' }];
+                      onChange(copy);
+                    }}
+                    className="text-xs font-semibold text-emerald-600 hover:text-emerald-700 cursor-pointer border border-emerald-200 bg-emerald-50/50 py-1.5 px-3 rounded-lg w-full"
+                  >
+                    + Add Card
+                  </button>
+                </div>
+              )}
+
+              {/* 4. Table */}
+              {seg.type === 'table' && (
+                <div className="space-y-3 bg-white p-3 rounded-xl border border-slate-200">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1">
+                      <label className="admin-label">Column 1 Title</label>
+                      <input
+                        type="text"
+                        value={seg.column1Title || ''}
+                        onChange={(e) => {
+                          const copy = [...contentSegments];
+                          copy[sIdx].column1Title = e.target.value;
+                          onChange(copy);
+                        }}
+                        className="admin-input font-bold"
+                      />
+                    </div>
+                    <div className="space-y-1">
+                      <label className="admin-label">Column 2 Title</label>
+                      <input
+                        type="text"
+                        value={seg.column2Title || ''}
+                        onChange={(e) => {
+                          const copy = [...contentSegments];
+                          copy[sIdx].column2Title = e.target.value;
+                          onChange(copy);
+                        }}
+                        className="admin-input font-bold"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    {seg.rows?.map((row: any, rIdx: number) => (
+                      <div key={rIdx} className="grid grid-cols-2 gap-2 items-center p-2 border border-slate-100 rounded-lg">
+                        <input
+                          type="text"
+                          placeholder="Column 1 Item"
+                          value={row.col1Title || ''}
+                          onChange={(e) => {
+                            const copy = [...contentSegments];
+                            copy[sIdx].rows[rIdx].col1Title = e.target.value;
+                            onChange(copy);
+                          }}
+                          className="admin-input text-xs"
+                        />
+                        <input
+                          type="text"
+                          placeholder="Column 2 Matched Item"
+                          value={row.col2Text || ''}
+                          onChange={(e) => {
+                            const copy = [...contentSegments];
+                            copy[sIdx].rows[rIdx].col2Text = e.target.value;
+                            onChange(copy);
+                          }}
+                          className="admin-input text-xs"
+                        />
+                      </div>
+                    ))}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const copy = [...contentSegments];
+                        copy[sIdx].rows = [...(copy[sIdx].rows || []), { col1Title: 'Item', col2Text: 'Matched Value' }];
+                        onChange(copy);
+                      }}
+                      className="text-xs font-semibold text-amber-600 hover:text-amber-700 cursor-pointer border border-amber-200 bg-amber-50/50 py-1.5 px-3 rounded-lg w-full"
+                    >
+                      + Add Table Row
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          ))}
         </div>
       )}
     </div>

@@ -84,8 +84,8 @@ export class PageRepository {
         }
       });
     } catch (error) {
-      if (isMissingSchemaError(error)) {
-        logger.warn(`[PageRepository] Skipping CMS page for path "${path}" (schema mismatch).`);
+      if (isMissingSchemaError(error) || isConnectionError(error)) {
+        logger.warn(`[PageRepository] Database temporary connection or schema notice for path "${path}". Returning fallback content.`);
         return null;
       }
       logger.error(`[PageRepository] Error fetching page path: ${path}`, error);
