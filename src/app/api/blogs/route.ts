@@ -5,6 +5,25 @@ import { eq } from 'drizzle-orm';
 
 export async function GET() {
   try {
+    // 1. Fetch configured topics & industries from blog-list-block section
+    const listSections = await db.query.pageSections.findMany({
+      where: eq(pageSections.type, 'blog-list-block'),
+    });
+
+    let configuredTopics: string[] = [];
+    let configuredIndustries: string[] = [];
+
+    listSections.forEach((s) => {
+      const content = (s.content || {}) as Record<string, any>;
+      if (Array.isArray(content.topics) && content.topics.length > 0) {
+        configuredTopics.push(...content.topics.filter(Boolean));
+      }
+      if (Array.isArray(content.industries) && content.industries.length > 0) {
+        configuredIndustries.push(...content.industries.filter(Boolean));
+      }
+    });
+
+    // 2. Fetch blog pages containing blog-detail-block
     const blogPages = await db.query.pages.findMany({
       where: eq(pages.status, 'published'),
       with: {
@@ -31,18 +50,26 @@ export async function GET() {
             year: 'numeric'
           }),
           topic: content.category || 'Technology',
-          industries: content.industries || [],
+          industries: Array.isArray(content.industries) && content.industries.length > 0
+            ? content.industries
+            : content.industry
+              ? [content.industry]
+              : ['FMCG'],
           author: {
-            name: content.authorName || 'Staff Writer',
-            avatar: content.authorAvatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=Staff',
+            name: content.authorCardName || content.authorName || 'Staff Writer',
+            avatar: content.authorCardAvatar || content.authorAvatar || 'https://api.dicebear.com/7.x/avataaars/svg?seed=Staff',
           },
-          image: content.image || content.featuredImage || '/blog-1.png',
+          image: content.heroBgImage || content.image || content.featuredImage || '/blog details/Image.png',
           description: content.description || '',
           contentHtml: content.contentHtml || '',
         };
       });
 
-    return NextResponse.json(blogs);
+    return NextResponse.json({
+      blogs,
+      configuredTopics: Array.from(new Set(configuredTopics)),
+      configuredIndustries: Array.from(new Set(configuredIndustries)),
+    });
   } catch (error: any) {
     console.error('[Blogs API Error]', error);
     return NextResponse.json({ error: 'Failed to fetch blogs' }, { status: 500 });

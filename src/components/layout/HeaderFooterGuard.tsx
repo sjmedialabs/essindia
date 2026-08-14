@@ -44,16 +44,6 @@ export function HeaderFooterGuard({ header, footer, children }: HeaderFooterGuar
     return () => observer.disconnect();
   }, [pathname]);
 
-  const hideHeaderFooter = isLandingPath || isLandingSectionPresent;
-
-  if (hideHeaderFooter) {
-    return (
-      <main className="flex-1 w-full min-h-screen">
-        {children}
-      </main>
-    );
-  }
-
   return (
     <>
       {header}

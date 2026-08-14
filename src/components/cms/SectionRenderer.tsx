@@ -549,7 +549,7 @@ export function SectionRenderer({ section }: SectionRendererProps) {
     case 'landing2-why-ess':
       return <Landing2WhyEss content={section.content} />;
     case 'landing2-footer-banner':
-      return <Landing2FooterBanner content={section.content} />;
+      return null;
     case 'landing1-brands':
       return <Landing1Brands content={section.content} />;
     case 'landing1-intro':

@@ -12,6 +12,8 @@ interface Blog {
   title: string;
   description: string;
   image: string;
+  topic?: string;
+  industries?: string[];
   ctaText?: string;
   ctaUrl?: string;
   ctaFormType?: string;
@@ -33,6 +35,8 @@ const defaultBlogs = [
     title: 'Why Are More Finance Departments Adopting RPA for Core Processes?',
     description: 'How RPA Is Reshaping the Way Finance Departments Operate In most finance departments....',
     image: '/blog-1.png',
+    topic: 'App Development',
+    industries: ['Finance'],
     ctaText: 'Read More',
     ctaUrl: '#',
   },
@@ -40,6 +44,8 @@ const defaultBlogs = [
     title: 'Which Enterprise IT Solutions Are High-Performing Companies Quietly Investing In?',
     description: 'The Patterns Shaping Enterprise IT Solutions Today Not every business investment is visible. Some of the most.....',
     image: '/blog-2.png',
+    topic: 'Technology',
+    industries: ['Enterprise'],
     ctaText: 'Read More',
     ctaUrl: '#',
   },
@@ -47,6 +53,8 @@ const defaultBlogs = [
     title: 'Is Your Business Ready for Oracle Migration? A Checklist for Decision-Makers',
     description: 'Ready for Oracle Migration? Check This First In our previous blogs, we discussed why businesses should....',
     image: '/blog-3.png',
+    topic: 'Digital Transformation',
+    industries: ['Manufacturing'],
     ctaText: 'Read More',
     ctaUrl: '#',
   },
@@ -69,11 +77,14 @@ export function BlogSection({ content }: BlogSectionProps) {
         const res = await fetch('/api/blogs');
         if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
         const data = await res.json();
-        if (Array.isArray(data) && data.length > 0) {
-          const formatted = data.slice(0, 3).map((b: any) => ({
+        const blogList = Array.isArray(data) ? data : data?.blogs || [];
+        if (Array.isArray(blogList) && blogList.length > 0) {
+          const formatted = blogList.slice(0, 3).map((b: any) => ({
             title: b.title,
             description: b.description || 'Read more about this topic in our blog.',
             image: b.image || '/blog-1.png',
+            topic: b.topic || 'Technology',
+            industries: Array.isArray(b.industries) ? b.industries : (b.industry ? [b.industry] : []),
             ctaText: 'Read More',
             ctaUrl: b.fullPath || `/blog/${b.slug}`
           }));
@@ -115,9 +126,10 @@ export function BlogSection({ content }: BlogSectionProps) {
               }}
               whileHover={{ y: -8, transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] } }}
               className="flex flex-col group cursor-pointer"
+              onClick={() => blog.ctaUrl && blog.ctaUrl !== '#' && navigate(blog.ctaUrl)}
             >
               {/* Image */}
-              <div className="rounded-[32px] overflow-hidden bg-slate-200 aspect-[16/10] mb-8 shadow-sm">
+              <div className="rounded-[32px] overflow-hidden bg-slate-200 aspect-[16/10] mb-6 shadow-sm relative">
                 <motion.img 
                   whileHover={{ scale: 1.05 }}
                   transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
@@ -128,10 +140,26 @@ export function BlogSection({ content }: BlogSectionProps) {
                     (e.target as HTMLImageElement).style.display = 'none';
                   }}
                 />
+
+                {/* Topic & Industries Floating Tags */}
+                <div className="absolute bottom-4 left-4 flex flex-wrap gap-2 items-center">
+                  {blog.topic && (
+                    <div className="bg-white/95 backdrop-blur px-2.5 py-1 rounded-xl shadow-sm text-left flex flex-col justify-center">
+                      <span className="text-[8px] text-[#859bfc] font-bold uppercase tracking-wider block leading-none mb-0.5">Topic</span>
+                      <span className="text-[11px] text-slate-800 font-semibold leading-none">{blog.topic}</span>
+                    </div>
+                  )}
+                  {blog.industries && blog.industries.filter((ind: string) => ind && ind !== 'Industries').map((ind: string) => (
+                    <div key={ind} className="bg-[#103D38]/95 backdrop-blur px-2.5 py-1 rounded-xl shadow-sm text-left flex flex-col justify-center">
+                      <span className="text-[8px] text-emerald-300 font-bold uppercase tracking-wider block leading-none mb-0.5">Industry</span>
+                      <span className="text-[11px] text-white font-semibold leading-none">{ind}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
 
-              {/* Title */}
-              <h3 className="text-[20px] font-bold text-[#6240B2] mb-4 leading-tight tracking-tight group-hover:text-black transition-colors pr-2">
+              {/* Title - Black color */}
+              <h3 className="text-[20px] font-bold text-slate-900 mb-3 leading-tight tracking-tight group-hover:text-[#4A3AFF] transition-colors pr-2">
                 {blog.title}
               </h3>
               
@@ -142,17 +170,18 @@ export function BlogSection({ content }: BlogSectionProps) {
 
               {/* Link */}
               <div className="text-[#FF3B3B] text-[15px] font-bold group-hover:text-[#CC2E2E] transition-all flex items-center mt-auto cursor-pointer">
-                {blog.ctaUrl ? (
-                  <a href={blog.ctaUrl} className="flex items-center">
-                    {blog.ctaText || 'Read More'}
-                    <svg className="ml-2 w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
-                  </a>
-                ) : (
-                  <>
-                    {blog.ctaText || 'Read More'}
-                    <svg className="ml-2 w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
-                  </>
-                )}
+                <span
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (blog.ctaUrl && blog.ctaUrl !== '#') {
+                      navigate(blog.ctaUrl);
+                    }
+                  }}
+                  className="flex items-center"
+                >
+                  {blog.ctaText || 'Read More'}
+                  <svg className="ml-2 w-4 h-4 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+                </span>
               </div>
             </motion.div>
           ))}

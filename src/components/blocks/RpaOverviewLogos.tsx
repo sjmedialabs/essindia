@@ -52,6 +52,7 @@ export function RpaOverviewLogos({ content }: { content?: RpaOverviewLogosConten
                       src={logo.image}
                       alt={logo.name || 'Partner Logo'}
                       fill
+                      sizes="(max-width: 768px) 96px, 112px"
                       className="object-contain opacity-75 hover:opacity-100 transition-opacity duration-300"
                     />
                   )}
@@ -81,6 +82,7 @@ export function RpaOverviewLogos({ content }: { content?: RpaOverviewLogosConten
                     src={logo.image}
                     alt={logo.name || 'Partner Logo'}
                     fill
+                    sizes="(max-width: 768px) 96px, 112px"
                     className="object-contain"
                   />
                 )}

@@ -242,8 +242,9 @@ export function BiTabs({ content }: { content?: BiTabsContent }) {
                   <div className="w-full relative aspect-[4/3] sm:aspect-[1.4] rounded-2xl overflow-hidden shadow-xl border border-slate-200/80 bg-white">
                     <Image
                       src={activeTab.image}
-                      alt={activeTab.heading}
+                      alt={typeof activeTab.heading === 'string' ? activeTab.heading : 'BI Tab'}
                       fill
+                      sizes="(max-width: 1024px) 100vw, 50vw"
                       className="object-contain p-2"
                       priority
                     />

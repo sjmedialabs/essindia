@@ -547,6 +547,28 @@ const RAW_SECTION_REGISTRY: SectionTypeDefinition[] = [
     color: 'bg-indigo-50 text-indigo-600',
     defaultVariant: 'default',
     supportsVariants: false,
+
+    fieldOrder: [
+      'heroBgImage',
+      'category',
+      'industry',
+      'bgColor',
+      'gradientFrom',
+      'gradientVia',
+      'gradientTo',
+      'heroTitle',
+      'date',
+      'readTime',
+      'authorCardAvatar',
+      'authorCardName',
+      'authorCardRole',
+      'authorCardBio',
+      'contentSegments',
+      'conclusionParagraphs',
+      'calcTitle',
+      'calcDisclaimer',
+      'calcPoints'
+    ],
   },
   {
     type: 'quality-hero',

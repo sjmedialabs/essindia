@@ -31,7 +31,7 @@ export default function ManufacturingProcess({ content }: { content?: any }) {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="flex flex-wrap justify-center gap-8">
           {steps.map((step: any, i: number) => (
             <motion.div
               key={i}
@@ -39,7 +39,7 @@ export default function ManufacturingProcess({ content }: { content?: any }) {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: i * 0.1 }}
-              className="flex flex-col items-center text-center relative group"
+              className="flex flex-col items-center text-center relative group w-full sm:w-[calc(50%-2rem)] lg:w-[calc(25%-2rem)] max-w-[280px]"
             >
               <div className="relative mb-2 z-10 transition-transform group-hover:scale-105">
                 <img src={step.image || '/Modules-manufacturing/Production flow-1.png'} alt={step.label} className="w-[160px] max-w-full h-[160px] object-contain mx-auto" />

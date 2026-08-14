@@ -42,6 +42,7 @@ import {
 import type { PageSection, JsonValue } from '@/components/admin/page-editor';
 import { RichTextField } from '@/components/admin/page-editor/RichTextField';
 import { MediaField } from '@/components/admin/page-editor/MediaField';
+import { ColorPickerField } from '@/components/admin/page-editor/ColorPickerField';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -676,7 +677,17 @@ const DEFAULT_INDUSTRIES = [
   'Pharma',
   'Manufacturing',
   'Retail',
-  'Electronics'
+  'Electronics',
+  'Automotive',
+  'Healthcare',
+  'Logistics & Supply Chain',
+  'Chemicals',
+  'Textiles',
+  'Construction & Real Estate',
+  'Food & Beverages',
+  'Agriculture',
+  'Energy & Utilities',
+  'Financial Services'
 ];
 
 interface BlogManagerProps {
@@ -716,36 +727,56 @@ function BlogManager({ pageId, onRefresh, blogListSection }: BlogManagerProps) {
   const [slugTouched, setSlugTouched] = React.useState(false);
   const [category, setCategory] = React.useState('');
   const [industry, setIndustry] = React.useState('');
-  const [date, setDate] = React.useState('');
-  const [authorName, setAuthorName] = React.useState('');
-  const [authorAvatar, setAuthorAvatar] = React.useState('');
   const [image, setImage] = React.useState('');
   const [description, setDescription] = React.useState('');
   const [contentHtml, setContentHtml] = React.useState('');
   const [status, setStatus] = React.useState<'draft' | 'published'>('draft');
 
-  // Additional fields for Blog Detail Page
-  const [badgeText, setBadgeText] = React.useState('');
-  const [headingText, setHeadingText] = React.useState('');
-  const [subheadingText, setSubheadingText] = React.useState('');
-  const [bgImage, setBgImage] = React.useState('');
+  // Tab-1: Hero & Basic Details
+  const [heroBgImage, setHeroBgImage] = React.useState('');
+  const [bgColor, setBgColor] = React.useState('');
+  const [gradientFrom, setGradientFrom] = React.useState('#4A3AFF');
+  const [gradientVia, setGradientVia] = React.useState('#4842E9');
+  const [gradientTo, setGradientTo] = React.useState('#6095FF');
+  const [date, setDate] = React.useState('May 15,2026');
+  const [readTime, setReadTime] = React.useState('3min read');
 
-  // Highlights State
-  const [highlights, setHighlights] = React.useState<Array<{ title: string; description: string; image: string }>>([]);
+  // Tab-2: Author Card
+  const [authorCardAvatar, setAuthorCardAvatar] = React.useState('https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150&auto=format&fit=crop&q=80');
+  const [authorCardName, setAuthorCardName] = React.useState('Saurabh Singh');
+  const [authorCardRole, setAuthorCardRole] = React.useState('Managing Director');
+  const [authorCardBio, setAuthorCardBio] = React.useState('With over 15 years of experience driving large-scale digital initiatives, Saurabh Singh is the CEO and Managing Director specializing in mobile product strategy, app store optimization, monetization, and digital growth across enterprise, retail, and media.');
 
-  const addHighlight = () => {
-    setHighlights(prev => [...prev, { title: '', description: '', image: '' }]);
-  };
+  // Tab-3: Content Segments (Dynamic & Unsequenced)
+  const [contentSegments, setContentSegments] = React.useState<any[]>([
+    {
+      type: 'key-takeaways',
+      id: 'key-takeaways-1',
+      tocTitle: 'Key takeaways',
+      title: 'Key takeaways:',
+      points: [
+        'Most enterprise app delays start after approvals, integrations, and infrastructure reviews pile up across different teams.',
+        'Real-time features, AI systems, and legacy integrations usually add more time than frontend development work.'
+      ],
+      descriptions: ['How Power BI Services Help Fix Multi-System Data Mismatches...']
+    }
+  ]);
 
-  const removeHighlight = (index: number) => {
-    setHighlights(prev => prev.filter((_, idx) => idx !== index));
-  };
+  // Tab-4: Conclusion & Form
+  const [conclusionParagraphs, setConclusionParagraphs] = React.useState<string[]>([
+    'Managing data across multiple systems creates confusion, reporting errors, and slower decision-making.',
+    'If you want to learn more about how Power BI Services can help your business eliminate data mismatches, contact marketing@essindia.com.'
+  ]);
+  const [calcTitle, setCalcTitle] = React.useState('Calculate your app development timeline!');
+  const [calcDisclaimer, setCalcDisclaimer] = React.useState('I agree to receive the personalized development estimation report and future tech insights.');
+  const [calcPoints, setCalcPoints] = React.useState<string[]>([
+    '100% Free & No Commitment',
+    'Detailed Timeline Breakdown in 24h',
+    'Estimated Cost Range Included'
+  ]);
 
-  // Conclusion HTML
-  const [conclusionHtml, setConclusionHtml] = React.useState('');
-
-  // Tab control in the creation modal
-  const [activeTab, setActiveTab] = React.useState<'basic' | 'hero' | 'highlights'>('basic');
+  // Modal active tab control
+  const [activeTab, setActiveTab] = React.useState<'hero' | 'author' | 'content' | 'conclusion'>('hero');
 
   const fetchBlogs = React.useCallback(async () => {
     setIsLoading(true);
@@ -890,34 +921,31 @@ function BlogManager({ pageId, onRefresh, blogListSection }: BlogManagerProps) {
 
       const updatedContent = {
         ...defaultContent,
-        title: title,
+        heroBgImage: heroBgImage || undefined,
         category: category || undefined,
-        industries: industry ? [industry] : [],
-        authorName: authorName || undefined,
-        authorAvatar: authorAvatar || (authorName
-          ? `https://api.dicebear.com/7.x/avataaars/svg?seed=${authorName}`
-          : undefined),
+        industry: industry || undefined,
+        bgColor: bgColor || undefined,
+        gradientFrom: gradientFrom || '#4A3AFF',
+        gradientVia: gradientVia || '#4842E9',
+        gradientTo: gradientTo || '#6095FF',
+        heroTitle: title || undefined,
+        title: title || undefined,
         date: date || undefined,
-        image: image || undefined,
-        description: description || undefined,
-        contentHtml: contentHtml || undefined,
-        badgeText: badgeText || undefined,
-        headingText: headingText || undefined,
-        subheadingText: subheadingText || undefined,
-        bgImage: bgImage || undefined,
-        conclusionHtml: conclusionHtml || undefined,
-      };
+        readTime: readTime || '3min read',
 
-      // For highlights, only update if user edited them
-      if (highlights.some(h => h.title.trim() || h.description.trim() || h.image.trim())) {
-        (updatedContent as any).highlights = highlights
-          .filter(h => h.title.trim() || h.description.trim() || h.image.trim())
-          .map(h => ({
-            title: h.title.trim(),
-            description: h.description.trim(),
-            image: h.image.trim() || undefined,
-          }));
-      }
+        authorCardAvatar: authorCardAvatar || undefined,
+        authorCardName: authorCardName || undefined,
+        authorCardRole: authorCardRole || undefined,
+        authorCardBio: authorCardBio || undefined,
+
+        contentSegments: contentSegments && contentSegments.length > 0 ? contentSegments : defaultContent.contentSegments,
+
+        conclusionParagraphs: conclusionParagraphs || [],
+
+        calcTitle: calcTitle || 'Calculate your app development timeline!',
+        calcDisclaimer: calcDisclaimer || undefined,
+        calcPoints: calcPoints || [],
+      };
 
       // 4. Save section content
       const updateSectionRes = await fetch(
@@ -956,22 +984,25 @@ function BlogManager({ pageId, onRefresh, blogListSection }: BlogManagerProps) {
       setSlugTouched(false);
       setCategory('');
       setIndustry('');
-      setDate('');
-      setAuthorName('');
-      setAuthorAvatar('');
-      setImage('');
-      setDescription('');
-      setContentHtml('');
-      setStatus('draft');
+      setDate('May 15,2026');
+      setReadTime('3min read');
+      setHeroBgImage('');
+      setBgColor('');
+      setGradientFrom('#4A3AFF');
+      setGradientVia('#4842E9');
+      setGradientTo('#6095FF');
 
-      // Reset new fields
-      setBadgeText('');
-      setHeadingText('');
-      setSubheadingText('');
-      setBgImage('');
-      setHighlights([]);
-      setConclusionHtml('');
-      setActiveTab('basic');
+      // Reset author card
+      setAuthorCardAvatar('https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150&auto=format&fit=crop&q=80');
+      setAuthorCardName('Saurabh Singh');
+      setAuthorCardRole('Managing Director');
+      setAuthorCardBio('With over 15 years of experience driving large-scale digital initiatives...');
+
+      // Reset content segments & conclusion
+      setContentSegments([]);
+      setConclusionParagraphs([]);
+      setCalcTitle('Calculate your app development timeline!');
+      setActiveTab('hero');
 
       fetchBlogs();
       onRefresh();
@@ -1137,18 +1168,19 @@ function BlogManager({ pageId, onRefresh, blogListSection }: BlogManagerProps) {
               </div>
 
               {/* Tabs Navigation */}
-              <div className="flex border-b border-slate-100 px-6 bg-slate-50/50 shrink-0">
+              <div className="flex border-b border-slate-100 px-6 bg-slate-50/50 shrink-0 overflow-x-auto">
                 {[
-                  { id: 'basic', label: 'Basic Info' },
-                  { id: 'hero', label: 'Hero Banner' },
-                  { id: 'highlights', label: 'Highlights & Conclusion' },
+                  { id: 'hero', label: '1. Hero & Basic Details' },
+                  { id: 'author', label: '2. Author Card' },
+                  { id: 'content', label: '3. Content Segments' },
+                  { id: 'conclusion', label: '4. Conclusion & Form' },
                 ].map((tab) => (
                   <button
                     key={tab.id}
                     type="button"
                     onClick={() => setActiveTab(tab.id as any)}
                     className={cn(
-                      'px-4 py-3 text-xs font-bold border-b-2 transition-colors cursor-pointer',
+                      'px-4 py-3 text-xs font-bold border-b-2 transition-colors cursor-pointer whitespace-nowrap',
                       activeTab === tab.id
                         ? 'border-[#4B2A63] text-[#4B2A63] border-b-[#4B2A63]'
                         : 'border-transparent text-slate-400 hover:text-slate-600'
@@ -1161,13 +1193,12 @@ function BlogManager({ pageId, onRefresh, blogListSection }: BlogManagerProps) {
 
               {/* Modal Form Scroll Area */}
               <form onSubmit={handleCreate} className="flex-1 overflow-y-auto p-6 space-y-5">
-                {activeTab === 'basic' && (
-                  <>
+                {/* TAB 1: Hero & Basic Details */}
+                {activeTab === 'hero' && (
+                  <div className="space-y-5">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div className="space-y-1">
-                        <label className="admin-label">
-                          Blog Title
-                        </label>
+                        <label className="admin-label">Blog Title</label>
                         <input
                           type="text"
                           required
@@ -1178,9 +1209,7 @@ function BlogManager({ pageId, onRefresh, blogListSection }: BlogManagerProps) {
                         />
                       </div>
                       <div className="space-y-1">
-                        <label className="admin-label">
-                          URL Slug
-                        </label>
+                        <label className="admin-label">URL Slug</label>
                         <input
                           type="text"
                           required
@@ -1197,20 +1226,16 @@ function BlogManager({ pageId, onRefresh, blogListSection }: BlogManagerProps) {
 
                     <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
                       <div className="space-y-1">
-                        <label className="admin-label">
-                          Category / Topic
-                        </label>
+                        <label className="admin-label">Topic / Category</label>
                         <CustomDropdown
                           value={category}
                           onChange={setCategory}
-                          placeholder="Select Category"
+                          placeholder="Select Topic"
                           options={topics.map((t) => ({ value: t, label: t }))}
                         />
                       </div>
                       <div className="space-y-1">
-                        <label className="admin-label">
-                          Industry
-                        </label>
+                        <label className="admin-label">Industry</label>
                         <CustomDropdown
                           value={industry}
                           onChange={setIndustry}
@@ -1219,204 +1244,572 @@ function BlogManager({ pageId, onRefresh, blogListSection }: BlogManagerProps) {
                         />
                       </div>
                       <div className="space-y-1">
-                        <label className="admin-label">
-                          Author Name
-                        </label>
-                        <input
-                          type="text"
-                          value={authorName}
-                          onChange={(e) => setAuthorName(e.target.value)}
-                          placeholder="e.g. Jason Francisco"
-                          className="admin-input font-medium"
-                        />
-                      </div>
-                      <div className="space-y-1">
-                        <label className="admin-label">
-                          Publish Date String
-                        </label>
+                        <label className="admin-label">Published Date</label>
                         <input
                           type="text"
                           value={date}
                           onChange={(e) => setDate(e.target.value)}
-                          placeholder="e.g. May 15, 2026"
+                          placeholder="e.g. May 15,2026"
                           className="admin-input font-medium"
                         />
                       </div>
-                    </div>
-
-                    <MediaField
-                      fieldKey="authorAvatar"
-                      value={authorAvatar}
-                      onChange={setAuthorAvatar}
-                    />
-
-                    <MediaField
-                      fieldKey="featuredImage"
-                      value={image}
-                      onChange={setImage}
-                    />
-
-                    <div className="space-y-1">
-                      <label className="admin-label">
-                        Brief Description / Summary
-                      </label>
-                      <textarea
-                        rows={3}
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}
-                        placeholder="Short excerpt for lists and previews..."
-                        className="admin-input font-medium resize-none"
-                      />
-                    </div>
-
-                    <RichTextField
-                      fieldKey="contentHtml"
-                      value={contentHtml}
-                      onChange={setContentHtml}
-                      placeholder="Start writing article content..."
-                    />
-                  </>
-                )}
-
-                {activeTab === 'hero' && (
-                  <div className="space-y-5">
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                       <div className="space-y-1">
-                        <label className="admin-label">
-                          Badge Text
-                        </label>
+                        <label className="admin-label">Time Estimation</label>
                         <input
                           type="text"
-                          value={badgeText}
-                          onChange={(e) => setBadgeText(e.target.value)}
-                          placeholder="e.g. Latest Blogs"
-                          className="admin-input font-medium"
-                        />
-                      </div>
-                      <div className="space-y-1 sm:col-span-2">
-                        <label className="admin-label">
-                          Hero Heading Text
-                        </label>
-                        <input
-                          type="text"
-                          value={headingText}
-                          onChange={(e) => setHeadingText(e.target.value)}
-                          placeholder="e.g. Explore our knowledge hub"
+                          value={readTime}
+                          onChange={(e) => setReadTime(e.target.value)}
+                          placeholder="e.g. 3min read"
                           className="admin-input font-medium"
                         />
                       </div>
                     </div>
 
-                    <div className="space-y-1">
-                      <label className="admin-label">
-                        Hero Subheading Text
-                      </label>
-                      <textarea
-                        rows={2}
-                        value={subheadingText}
-                        onChange={(e) => setSubheadingText(e.target.value)}
-                        placeholder="Subheading below hero heading..."
-                        className="admin-input font-medium resize-none"
+                    <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                      <ColorPickerField
+                        fieldKey="bgColor"
+                        label="Hero BG Color"
+                        value={bgColor}
+                        onChange={setBgColor}
+                      />
+                      <ColorPickerField
+                        fieldKey="gradientFrom"
+                        label="BG Gradient 1"
+                        value={gradientFrom}
+                        onChange={setGradientFrom}
+                      />
+                      <ColorPickerField
+                        fieldKey="gradientVia"
+                        label="BG Gradient 2"
+                        value={gradientVia}
+                        onChange={setGradientVia}
+                      />
+                      <ColorPickerField
+                        fieldKey="gradientTo"
+                        label="BG Gradient 3"
+                        value={gradientTo}
+                        onChange={setGradientTo}
                       />
                     </div>
 
                     <MediaField
-                      fieldKey="heroBackgroundImage"
-                      value={bgImage}
-                      onChange={setBgImage}
+                      fieldKey="heroBgImage"
+                      label="Banner Image Upload"
+                      value={heroBgImage}
+                      onChange={setHeroBgImage}
                     />
                   </div>
                 )}
 
-                {activeTab === 'highlights' && (
+                {/* TAB 2: Author Card */}
+                {activeTab === 'author' && (
                   <div className="space-y-5">
-                    <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider">Key Highlights / Solutions</h4>
+                    <MediaField
+                      fieldKey="authorCardAvatar"
+                      label="Author Image Upload"
+                      value={authorCardAvatar}
+                      onChange={setAuthorCardAvatar}
+                    />
 
-                    {highlights.length === 0 ? (
-                      <div className="bg-slate-50/50 rounded-2xl p-6 text-center border border-dashed border-slate-200">
-                        <p className="text-xs text-slate-400 font-medium">No highlights added yet.</p>
-                        <p className="text-[10px] text-slate-300 mt-0.5">Click &ldquo;Add Highlight&rdquo; below to insert a highlight card.</p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="space-y-1">
+                        <label className="admin-label">Author Name</label>
+                        <input
+                          type="text"
+                          value={authorCardName}
+                          onChange={(e) => setAuthorCardName(e.target.value)}
+                          placeholder="e.g. Saurabh Singh"
+                          className="admin-input font-bold"
+                        />
+                        <p className="text-[10px] text-slate-400">Note: Author Name is automatically called in the Hero section before Published Date.</p>
                       </div>
-                    ) : (
-                      <div className="flex flex-col gap-4">
-                        {highlights.map((highlight, index) => (
-                          <div key={index} className="bg-slate-50/50 p-4 rounded-2xl border border-slate-100 space-y-3 flex flex-col justify-between">
-                            <div className="space-y-3">
-                              <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-                                <h5 className="text-[10px] font-black text-[#4B2A63] uppercase tracking-wider">Highlight {index + 1}</h5>
-                                <button
-                                  type="button"
-                                  onClick={() => removeHighlight(index)}
-                                  className="p-1 rounded-full text-rose-500 hover:bg-rose-50 hover:text-rose-700 transition-colors"
-                                  title="Delete Highlight"
-                                >
-                                  <Trash2 className="w-4 h-4" />
-                                </button>
-                              </div>
-                              <div className="space-y-1">
-                                <label className="admin-label">Title</label>
-                                <input
-                                  type="text"
-                                  value={highlight.title}
-                                  onChange={(e) => {
-                                    const newHighlights = [...highlights];
-                                    newHighlights[index].title = e.target.value;
-                                    setHighlights(newHighlights);
-                                  }}
-                                  placeholder="Feature or solution title..."
-                                  className="admin-input font-medium"
-                                />
-                              </div>
-                              <div className="space-y-1">
-                                <label className="admin-label">Description</label>
-                                <textarea
-                                  rows={2}
-                                  value={highlight.description}
-                                  onChange={(e) => {
-                                    const newHighlights = [...highlights];
-                                    newHighlights[index].description = e.target.value;
-                                    setHighlights(newHighlights);
-                                  }}
-                                  placeholder="Detail explanation..."
-                                  className="w-full bg-white rounded-xl px-4 py-2 text-sm outline-none border border-slate-200 focus:border-[#4B2A63]/20 focus:ring-2 focus:ring-[#4B2A63]/10 font-medium resize-none"
-                                />
-                              </div>
-                            </div>
-                            <div className="pt-2 border-t border-slate-100 mt-2">
-                              <MediaField
-                                fieldKey={`highlight-${index + 1}-image`}
-                                value={highlight.image}
-                                onChange={(url) => {
-                                  const newHighlights = [...highlights];
-                                  newHighlights[index].image = url;
-                                  setHighlights(newHighlights);
+                      <div className="space-y-1">
+                        <label className="admin-label">Designation</label>
+                        <input
+                          type="text"
+                          value={authorCardRole}
+                          onChange={(e) => setAuthorCardRole(e.target.value)}
+                          placeholder="e.g. Managing Director"
+                          className="admin-input font-medium"
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-1">
+                      <label className="admin-label">Author Description</label>
+                      <textarea
+                        rows={3}
+                        value={authorCardBio}
+                        onChange={(e) => setAuthorCardBio(e.target.value)}
+                        placeholder="Author biography or short details..."
+                        className="admin-input font-medium resize-none"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* TAB 3: Content Segments (Dynamic & Unsequenced) */}
+                {activeTab === 'content' && (
+                  <div className="space-y-6">
+                    <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+                      <div>
+                        <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider">Dynamic Content Segments</h4>
+                        <p className="text-[11px] text-slate-400">Add Key Takeaways, Items, Cards (50 char limit), or Tables in any order.</p>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setContentSegments(prev => [...prev, { type: 'key-takeaways', id: `seg-${Date.now()}`, tocTitle: 'Key takeaways', title: 'Key takeaways:', points: ['New takeaway point'], descriptions: [] }])}
+                          className="text-xs rounded-full"
+                        >
+                          + Key Takeaways
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setContentSegments(prev => [...prev, { type: 'items', id: `seg-${Date.now()}`, tocTitle: 'New Section', items: [{ title: 'Section Title', descriptions: ['Paragraph text...'], image: '' }] }])}
+                          className="text-xs rounded-full"
+                        >
+                          + Items Section
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setContentSegments(prev => [...prev, { type: 'cards', id: `seg-${Date.now()}`, tocTitle: 'Benefits', cards: [{ title: 'Card Title', description: 'Description max 50 chars' }] }])}
+                          className="text-xs rounded-full"
+                        >
+                          + Cards
+                        </Button>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setContentSegments(prev => [...prev, { type: 'table', id: `seg-${Date.now()}`, tocTitle: 'Timeline Table', column1Title: 'Complexity', column2Title: 'Timelines', rows: [{ col1Title: 'Simple App', col1Desc: 'Basic setup', col2Text: '2-4 Months' }] }])}
+                          className="text-xs rounded-full"
+                        >
+                          + Table
+                        </Button>
+                      </div>
+                    </div>
+
+                    {contentSegments.map((seg, sIdx) => (
+                      <div key={sIdx} className="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-4 relative">
+                        <div className="flex items-center justify-between border-b border-slate-200 pb-2">
+                          <span className="text-xs font-black text-[#4B2A63] uppercase">
+                            Segment #{sIdx + 1} &mdash; {seg.type}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => setContentSegments(prev => prev.filter((_, i) => i !== sIdx))}
+                            className="p-1 text-rose-500 hover:bg-rose-100 rounded-full text-xs font-bold"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+
+                        <div className="space-y-1">
+                          <label className="admin-label">Left Sidebar TOC Tab Label</label>
+                          <input
+                            type="text"
+                            value={seg.tocTitle || ''}
+                            onChange={(e) => {
+                              const copy = [...contentSegments];
+                              copy[sIdx].tocTitle = e.target.value;
+                              setContentSegments(copy);
+                            }}
+                            placeholder="e.g. Why Multi-System Data Mismatches Happen"
+                            className="admin-input font-medium"
+                          />
+                        </div>
+
+                        {/* 1. Key Takeaways Segment */}
+                        {seg.type === 'key-takeaways' && (
+                          <div className="space-y-3 bg-white p-3 rounded-xl border border-slate-200">
+                            <div className="space-y-1">
+                              <label className="admin-label">Segment Title</label>
+                              <input
+                                type="text"
+                                value={seg.title || ''}
+                                onChange={(e) => {
+                                  const copy = [...contentSegments];
+                                  copy[sIdx].title = e.target.value;
+                                  setContentSegments(copy);
                                 }}
+                                className="admin-input font-bold"
                               />
                             </div>
+
+                            <div className="space-y-2">
+                              <div className="flex items-center justify-between">
+                                <label className="admin-label">Points</label>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const copy = [...contentSegments];
+                                    copy[sIdx].points = [...(copy[sIdx].points || []), 'New point...'];
+                                    setContentSegments(copy);
+                                  }}
+                                  className="text-[11px] font-bold text-[#4B2A63] hover:underline"
+                                >
+                                  + Add Point
+                                </button>
+                              </div>
+                              {seg.points?.map((pt: string, pIdx: number) => (
+                                <div key={pIdx} className="flex items-center gap-2">
+                                  <input
+                                    type="text"
+                                    value={pt}
+                                    onChange={(e) => {
+                                      const copy = [...contentSegments];
+                                      copy[sIdx].points[pIdx] = e.target.value;
+                                      setContentSegments(copy);
+                                    }}
+                                    className="admin-input text-xs"
+                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      const copy = [...contentSegments];
+                                      copy[sIdx].points = copy[sIdx].points.filter((_: any, i: number) => i !== pIdx);
+                                      setContentSegments(copy);
+                                    }}
+                                    className="text-rose-500 p-1"
+                                  >
+                                    ✕
+                                  </button>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
+                        {/* 2. Items Segment */}
+                        {seg.type === 'items' && (
+                          <div className="space-y-4 bg-white p-3 rounded-xl border border-slate-200">
+                            {seg.items?.map((item: any, iIdx: number) => (
+                              <div key={iIdx} className="p-3 border border-slate-100 rounded-lg space-y-3 bg-slate-50/50">
+                                <div className="space-y-1">
+                                  <label className="admin-label">Item Title</label>
+                                  <input
+                                    type="text"
+                                    value={item.title || ''}
+                                    onChange={(e) => {
+                                      const copy = [...contentSegments];
+                                      copy[sIdx].items[iIdx].title = e.target.value;
+                                      setContentSegments(copy);
+                                    }}
+                                    className="admin-input font-bold"
+                                  />
+                                </div>
+
+                                <MediaField
+                                  fieldKey={`item-image-${iIdx}`}
+                                  label="Image Upload"
+                                  value={item.image || ''}
+                                  onChange={(val) => {
+                                    const copy = [...contentSegments];
+                                    copy[sIdx].items[iIdx].image = val;
+                                    setContentSegments(copy);
+                                  }}
+                                />
+
+                                <div className="space-y-2">
+                                  <div className="flex items-center justify-between">
+                                    <label className="admin-label">Descriptions</label>
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        const copy = [...contentSegments];
+                                        copy[sIdx].items[iIdx].descriptions = [...(copy[sIdx].items[iIdx].descriptions || []), 'New description paragraph...'];
+                                        setContentSegments(copy);
+                                      }}
+                                      className="text-[11px] font-bold text-[#4B2A63] hover:underline"
+                                    >
+                                      + Add Description
+                                    </button>
+                                  </div>
+                                  {item.descriptions?.map((desc: string, dIdx: number) => (
+                                    <div key={dIdx} className="flex items-start gap-2">
+                                      <textarea
+                                        rows={2}
+                                        value={desc}
+                                        onChange={(e) => {
+                                          const copy = [...contentSegments];
+                                          copy[sIdx].items[iIdx].descriptions[dIdx] = e.target.value;
+                                          setContentSegments(copy);
+                                        }}
+                                        className="admin-input text-xs resize-y"
+                                      />
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          const copy = [...contentSegments];
+                                          copy[sIdx].items[iIdx].descriptions = copy[sIdx].items[iIdx].descriptions.filter((_: any, i: number) => i !== dIdx);
+                                          setContentSegments(copy);
+                                        }}
+                                        className="text-rose-500 p-1"
+                                      >
+                                        ✕
+                                      </button>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            ))}
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                const copy = [...contentSegments];
+                                copy[sIdx].items = [...(copy[sIdx].items || []), { title: 'New Item', descriptions: [], image: '' }];
+                                setContentSegments(copy);
+                              }}
+                              className="text-xs rounded-full w-full"
+                            >
+                              + Add Item Button
+                            </Button>
+                          </div>
+                        )}
+
+                        {/* 3. Cards Segment */}
+                        {seg.type === 'cards' && (
+                          <div className="space-y-3 bg-white p-3 rounded-xl border border-slate-200">
+                            {seg.cards?.map((card: any, cIdx: number) => (
+                              <div key={cIdx} className="p-3 border border-slate-100 rounded-lg space-y-2 bg-slate-50/50">
+                                <div className="space-y-1">
+                                  <label className="admin-label">Card Title</label>
+                                  <input
+                                    type="text"
+                                    value={card.title || ''}
+                                    onChange={(e) => {
+                                      const copy = [...contentSegments];
+                                      copy[sIdx].cards[cIdx].title = e.target.value;
+                                      setContentSegments(copy);
+                                    }}
+                                    className="admin-input font-bold"
+                                  />
+                                </div>
+                                <div className="space-y-1">
+                                  <div className="flex items-center justify-between">
+                                    <label className="admin-label">Description (200 Char Limit)</label>
+                                    <span className={cn('text-[10px] font-mono', (card.description?.length || 0) > 200 ? 'text-rose-600 font-bold' : 'text-slate-400')}>
+                                      {card.description?.length || 0}/200
+                                    </span>
+                                  </div>
+                                  <input
+                                    type="text"
+                                    maxLength={200}
+                                    value={card.description || ''}
+                                    onChange={(e) => {
+                                      const copy = [...contentSegments];
+                                      copy[sIdx].cards[cIdx].description = e.target.value.slice(0, 200);
+                                      setContentSegments(copy);
+                                    }}
+                                    className="admin-input text-xs"
+                                  />
+                                </div>
+                              </div>
+                            ))}
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                const copy = [...contentSegments];
+                                copy[sIdx].cards = [...(copy[sIdx].cards || []), { title: 'New Card', description: 'Short desc max 200 chars' }];
+                                setContentSegments(copy);
+                              }}
+                              className="text-xs rounded-full w-full"
+                            >
+                              + Add Card Button
+                            </Button>
+                          </div>
+                        )}
+
+                        {/* 4. Table Segment */}
+                        {seg.type === 'table' && (
+                          <div className="space-y-3 bg-white p-3 rounded-xl border border-slate-200">
+                            <div className="grid grid-cols-2 gap-3">
+                              <div className="space-y-1">
+                                <label className="admin-label">Column 1 Title</label>
+                                <input
+                                  type="text"
+                                  value={seg.column1Title || ''}
+                                  onChange={(e) => {
+                                    const copy = [...contentSegments];
+                                    copy[sIdx].column1Title = e.target.value;
+                                    setContentSegments(copy);
+                                  }}
+                                  className="admin-input font-bold"
+                                />
+                              </div>
+                              <div className="space-y-1">
+                                <label className="admin-label">Column 2 Title</label>
+                                <input
+                                  type="text"
+                                  value={seg.column2Title || ''}
+                                  onChange={(e) => {
+                                    const copy = [...contentSegments];
+                                    copy[sIdx].column2Title = e.target.value;
+                                    setContentSegments(copy);
+                                  }}
+                                  className="admin-input font-bold"
+                                />
+                              </div>
+                            </div>
+
+                            <div className="space-y-2">
+                              {seg.rows?.map((row: any, rIdx: number) => (
+                                <div key={rIdx} className="grid grid-cols-2 gap-2 items-center p-2 border border-slate-100 rounded-lg">
+                                  <input
+                                    type="text"
+                                    placeholder="Column 1 Item"
+                                    value={row.col1Title || ''}
+                                    onChange={(e) => {
+                                      const copy = [...contentSegments];
+                                      copy[sIdx].rows[rIdx].col1Title = e.target.value;
+                                      setContentSegments(copy);
+                                    }}
+                                    className="admin-input text-xs"
+                                  />
+                                  <input
+                                    type="text"
+                                    placeholder="Column 2 Matched Item"
+                                    value={row.col2Text || ''}
+                                    onChange={(e) => {
+                                      const copy = [...contentSegments];
+                                      copy[sIdx].rows[rIdx].col2Text = e.target.value;
+                                      setContentSegments(copy);
+                                    }}
+                                    className="admin-input text-xs"
+                                  />
+                                </div>
+                              ))}
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                  const copy = [...contentSegments];
+                                  copy[sIdx].rows = [...(copy[sIdx].rows || []), { col1Title: 'Item', col2Text: 'Matched Value' }];
+                                  setContentSegments(copy);
+                                }}
+                                className="text-xs rounded-full w-full"
+                              >
+                                + Add Table Row
+                              </Button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                {/* TAB 4: Conclusion & Form */}
+                {activeTab === 'conclusion' && (
+                  <div className="space-y-6">
+                    <div className="space-y-3 bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                      <div className="flex items-center justify-between border-b border-slate-200 pb-2">
+                        <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider">Conclusion (Single Block)</h4>
+                        <button
+                          type="button"
+                          onClick={() => setConclusionParagraphs(prev => [...prev, 'New conclusion paragraph...'])}
+                          className="text-xs font-bold text-[#4B2A63] hover:underline"
+                        >
+                          + Add Description Button
+                        </button>
+                      </div>
+
+                      {conclusionParagraphs.map((para, cIdx) => (
+                        <div key={cIdx} className="flex items-start gap-2">
+                          <textarea
+                            rows={3}
+                            value={para}
+                            onChange={(e) => {
+                              const copy = [...conclusionParagraphs];
+                              copy[cIdx] = e.target.value;
+                              setConclusionParagraphs(copy);
+                            }}
+                            className="admin-input text-xs resize-y"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setConclusionParagraphs(prev => prev.filter((_, i) => i !== cIdx))}
+                            className="text-rose-500 p-1"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="space-y-4 bg-slate-50 p-4 rounded-2xl border border-slate-200">
+                      <h4 className="text-xs font-bold text-slate-700 uppercase tracking-wider border-b border-slate-200 pb-2">Sidebar Form</h4>
+
+                      <div className="space-y-1">
+                        <label className="admin-label">Form Title</label>
+                        <input
+                          type="text"
+                          value={calcTitle}
+                          onChange={(e) => setCalcTitle(e.target.value)}
+                          placeholder="e.g. Calculate your app development timeline!"
+                          className="admin-input font-bold"
+                        />
+                      </div>
+
+                      <div className="space-y-1">
+                        <label className="admin-label">Disclaimer</label>
+                        <input
+                          type="text"
+                          value={calcDisclaimer}
+                          onChange={(e) => setCalcDisclaimer(e.target.value)}
+                          placeholder="Form disclaimer agreement..."
+                          className="admin-input font-medium"
+                        />
+                      </div>
+
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <label className="admin-label">Points</label>
+                          <button
+                            type="button"
+                            onClick={() => setCalcPoints(prev => [...prev, 'New feature point'])}
+                            className="text-xs font-bold text-[#4B2A63] hover:underline"
+                          >
+                            + Add Points Button
+                          </button>
+                        </div>
+                        {calcPoints.map((pt, pIdx) => (
+                          <div key={pIdx} className="flex items-center gap-2">
+                            <input
+                              type="text"
+                              value={pt}
+                              onChange={(e) => {
+                                const copy = [...calcPoints];
+                                copy[pIdx] = e.target.value;
+                                setCalcPoints(copy);
+                              }}
+                              className="admin-input text-xs"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setCalcPoints(prev => prev.filter((_, i) => i !== pIdx))}
+                              className="text-rose-500 p-1"
+                            >
+                              ✕
+                            </button>
                           </div>
                         ))}
                       </div>
-                    )}
-
-                    <Button
-                      type="button"
-                      onClick={addHighlight}
-                      variant="outline"
-                      className="w-full border-dashed border-[#4B2A63]/30 hover:border-[#4B2A63] text-[#4B2A63] gap-2 rounded-xl py-4 h-auto shadow-none font-bold"
-                    >
-                      <Plus className="w-4 h-4" />
-                      Add Highlight
-                    </Button>
-
-                    <RichTextField
-                      fieldKey="conclusionHtml"
-                      value={conclusionHtml}
-                      onChange={setConclusionHtml}
-                      placeholder="Write concluding paragraphs here..."
-                    />
+                    </div>
                   </div>
                 )}
-
                 <div className="border-t border-slate-100 pt-4 flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <label className="admin-label">

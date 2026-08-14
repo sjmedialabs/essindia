@@ -66,9 +66,12 @@ export function RichTextField({ fieldKey, label, value, onChange, placeholder, m
   const isHtml = value.includes('<') && value.includes('>');
 
   const editor = useEditor({
+    immediatelyRender: false,
     extensions: [
       StarterKit.configure({
         heading: { levels: [1, 2, 3] },
+        link: false,
+        underline: false,
       }),
       Underline,
       Link.configure({

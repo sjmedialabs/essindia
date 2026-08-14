@@ -20,9 +20,26 @@ export type FieldType =
   | 'null';
 
 /** Fields editors should not change — heading level is fixed in the component. */
-export function isHiddenCmsField(key: string): boolean {
+export function isHiddenCmsField(key: string, sectionType?: string): boolean {
   const lower = key.toLowerCase();
-  return lower === 'headingtag' || lower === 'titletag';
+  if (lower === 'headingtag' || lower === 'titletag') return true;
+
+  if (sectionType === 'blog-detail-block') {
+    if (
+      key === 'type' ||
+      key === 'id' ||
+      key === 'authorName' ||
+      key === 'authorAvatar' ||
+      key === 'image' ||
+      key === 'contentHtml' ||
+      key === 'description' ||
+      key === 'title'
+    ) {
+      return true;
+    }
+  }
+
+  return false;
 }
 
 /**
@@ -297,6 +314,27 @@ export function humanLabel(
     if (key === 'videoUrl') return 'Video Upload';
   }
 
+  if (options?.sectionType === 'blog-detail-block') {
+    if (key === 'category') return 'Topic';
+    if (key === 'heroBgImage') return 'Banner Image Upload';
+    if (key === 'bgColor') return 'Hero Background Color';
+    if (key === 'gradientFrom') return 'Hero BG Gradient 1';
+    if (key === 'gradientVia') return 'Hero BG Gradient 2';
+    if (key === 'gradientTo') return 'Hero BG Gradient 3';
+    if (key === 'heroTitle') return 'Blog Title';
+    if (key === 'date') return 'Published Date';
+    if (key === 'readTime') return 'Time Estimation (e.g. 3min read)';
+    if (key === 'authorCardAvatar') return 'Author Image Upload';
+    if (key === 'authorCardName') return 'Author Name';
+    if (key === 'authorCardRole') return 'Designation';
+    if (key === 'authorCardBio') return 'Author Description';
+    if (key === 'contentSegments') return 'Content Segments (Dynamic)';
+    if (key === 'conclusionParagraphs') return 'Conclusion Descriptions';
+    if (key === 'calcTitle') return 'Form Title';
+    if (key === 'calcDisclaimer') return 'Form Disclaimer';
+    if (key === 'calcPoints') return 'Form Points';
+  }
+
   if (options?.sectionType === 'landing2-why-ess') {
     if (key === 'title') return 'Feature Title';
     if (key === 'description') return 'Feature Description';
@@ -350,13 +388,13 @@ export function detectFieldType(
     if (sectionType?.startsWith('landing1-') && (lower === 'desc' || lower === 'description')) {
       return 'textarea';
     }
-    if (lower === 'topic') return 'topicSelect';
-    if (lower === 'industry') return 'industrySelect';
+    if (lower === 'topic' || lower === 'category') return 'topicSelect';
+    if (lower === 'industry' || lower === 'industries') return 'industrySelect';
     if (lower.endsWith('formtype')) return 'formSelect';
     if (lower === 'icon' && (sectionType === 'bi-business-impact' || sectionType === 'rpa-overview' || sectionType === 'rpa-capabilities' || sectionType === 'rpa-industries' || value.startsWith('/') || value.includes('.') || value.includes('://'))) return 'image';
     if (IMAGE_PATTERNS.some((p) => lower.includes(p)) && !lower.endsWith('alt')) return 'image';
-    if (lower === 'color' || lower.endsWith('color') || lower.startsWith('color') || lower.includes('accent')) {
-      if (COLOR_PATTERN.test(value) || value.startsWith('rgb') || value.startsWith('hsl')) return 'color';
+    if (lower === 'color' || lower.endsWith('color') || lower.startsWith('color') || lower.includes('accent') || lower.startsWith('gradient')) {
+      return 'color';
     }
     if (COLOR_PATTERN.test(value)) return 'color';
     if (URL_PATTERNS.some((p) => lower === p || lower.endsWith(p.charAt(0).toUpperCase() + p.slice(1)) || lower.endsWith('_' + p))) return 'url';

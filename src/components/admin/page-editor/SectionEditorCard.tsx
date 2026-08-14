@@ -31,9 +31,33 @@ export interface PageSection {
 }
 
 const BLOG_DETAIL_TABS: Record<string, string[]> = {
-  basic: ['title', 'category', 'industries', 'authorName', 'authorAvatar', 'date', 'image', 'description', 'contentHtml'],
-  hero: ['badgeText', 'headingText', 'subheadingText', 'bgImage'],
-  highlights: ['highlights', 'conclusionHtml']
+  hero: [
+    'heroBgImage',
+    'category',
+    'industry',
+    'bgColor',
+    'gradientFrom',
+    'gradientVia',
+    'gradientTo',
+    'heroTitle',
+    'date',
+    'readTime'
+  ],
+  author: [
+    'authorCardAvatar',
+    'authorCardName',
+    'authorCardRole',
+    'authorCardBio'
+  ],
+  content: [
+    'contentSegments'
+  ],
+  conclusion: [
+    'conclusionParagraphs',
+    'calcTitle',
+    'calcDisclaimer',
+    'calcPoints'
+  ]
 };
 
 const TESTIMONIALS_TABS: Record<string, string[]> = {
@@ -119,20 +143,98 @@ const DEFAULT_CASE_STUDY_CONTENT: Record<string, any> = {
 };
 
 const DEFAULT_BLOG_CONTENT: Record<string, any> = {
-  title: '',
-  category: '',
-  authorName: '',
-  authorAvatar: '',
-  date: '',
-  image: '',
-  description: '',
-  contentHtml: '',
-  badgeText: '',
-  headingText: '',
-  subheadingText: '',
-  bgImage: '',
-  highlights: [{ title: '', content: '', icon: '' }],
-  conclusionHtml: ''
+  heroBgImage: '',
+  bgColor: '',
+  gradientFrom: '#4A3AFF',
+  gradientVia: '#4842E9',
+  gradientTo: '#6095FF',
+  heroTitle: 'How Power BI Services Help Fix Multi-System Data Mismatches',
+  date: 'May 15,2026',
+  readTime: '3min read',
+
+  authorCardAvatar: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150&auto=format&fit=crop&q=80',
+  authorCardName: 'Saurabh Singh',
+  authorCardRole: 'Managing Director',
+  authorCardBio: 'With over 15 years of experience driving large-scale digital initiatives, Saurabh Singh is the CEO and Managing Director specializing in mobile product strategy, app store optimization, monetization, and digital growth across enterprise, retail, and media.',
+
+  contentSegments: [
+    {
+      type: 'key-takeaways',
+      id: 'key-takeaways-1',
+      tocTitle: 'Key takeaways',
+      title: 'Key takeaways:',
+      points: [
+        'Most enterprise app delays start after approvals, integrations, and infrastructure reviews pile up across different teams.',
+        'Real-time features, AI systems, and legacy integrations usually add more time than frontend development work.',
+        'A mobile app may launch quickly, but scaling it for production traffic takes much longer.',
+        'Teams that release faster usually fix delivery gaps early, not just increase developer headcount.',
+        'Enterprise apps often spend months in testing, security validation, and production readiness before public launch.'
+      ],
+      descriptions: []
+    },
+    {
+      type: 'items',
+      id: 'items-1',
+      tocTitle: 'Why Multi-System Data Mismatches Happen',
+      items: [
+        {
+          title: 'Why Multi-System Data Mismatches Happen',
+          image: '/blog details/Image.png',
+          descriptions: [
+            'As businesses grow, they naturally start using multiple tools and software to manage different operations. The sales team may use one CRM, the marketing team may rely on separate analytics platforms, while finance, customer support, and operations work on completely different systems. At first, this setup seems manageable. But over time, it often creates disconnected data across the organization.',
+            'For example, your sales dashboard may show one set of customer numbers while your finance reports display something different. Marketing platforms may report leads differently from your CRM, and manually updating spreadsheets only increases the chances of human error. Eventually, teams start questioning which report is actually accurate.',
+            'In most cases, businesses already have more data than they can handle. The problem is that the data exists in different systems, making it difficult to get a complete and reliable picture of business performance.',
+            'This is exactly why businesses are increasingly adopting Power BI Services. Instead of switching between multiple dashboards, spreadsheets, and software tools, Microsoft Power BI brings all your business data together into one centralized platform. This helps teams access consistent reports, track real-time insights, and make decisions with greater confidence.'
+          ]
+        },
+        {
+          title: 'Plan Your Itinerary',
+          image: '/blog details/Image@2x-1.png',
+          descriptions: [
+            'One of the biggest advantages of Power BI Services is their ability to connect with multiple business platforms at the same time. Whether your data comes from CRMs, cloud applications, Excel sheets, accounting software, marketing tools, or internal databases, Power BI can bring everything together into a single reporting environment.',
+            'Instead of manually collecting reports from different teams and comparing spreadsheets line by line, businesses can automate the reporting process and reduce inconsistencies across systems.'
+          ]
+        }
+      ]
+    },
+    {
+      type: 'cards',
+      id: 'cards-1',
+      tocTitle: 'Benefits & Advantages',
+      cards: [
+        { title: 'Centralize Data from Multiple Sources', description: 'Power BI connects data from different platforms into one dashboard.' },
+        { title: 'Reduce Manual Reporting Errors', description: 'Automated data syncing minimizes duplicate entries and spreadsheets.' },
+        { title: 'Standardize Inconsistent Data', description: 'Customer names or sales figures clean and organize into consistent format.' },
+        { title: 'Provide Real-Time Business Insights', description: 'Track live dashboards and quickly identify unusual trends.' }
+      ]
+    },
+    {
+      type: 'table',
+      id: 'table-1',
+      tocTitle: 'App Complexity Timeline',
+      column1Title: 'App Complexity',
+      column2Title: 'Estimated Timelines by App Complexity',
+      rows: [
+        { col1Title: 'Simple Apps', col2Text: '2 to 4 Months' },
+        { col1Title: 'Mid-Complexity Apps', col2Text: '4 to 8 Months' },
+        { col1Title: 'Enterprise-Grade Applications', col2Text: '9 to 18+ Months' },
+        { col1Title: 'AI-Powered Applications', col2Text: '10 to 20+ Months' }
+      ]
+    }
+  ],
+
+  conclusionParagraphs: [
+    'Managing data across multiple systems creates confusion, reporting errors, and slower decision-making. Power BI Services help businesses bring all their data into one centralized platform, making reporting more accurate, organized, and easier to understand. With real-time insights, Business Intelligence dashboards, and consistent data, businesses can make faster and more confident decisions.',
+    'If you want to learn more about how Power BI Services can help your business eliminate data mismatches and improve reporting efficiency, feel free to contact our team at marketing@essindia.com.'
+  ],
+
+  calcTitle: 'Calculate your app development timeline!',
+  calcDisclaimer: 'I agree to receive the personalized development estimation report and future tech insights.',
+  calcPoints: [
+    '100% Free & No Commitment',
+    'Detailed Timeline Breakdown in 24h',
+    'Estimated Cost Range Included'
+  ]
 };
 
 const DEFAULT_BLOG_LIST_CONTENT: Record<string, any> = {
@@ -154,7 +256,15 @@ const DEFAULT_BLOG_LIST_CONTENT: Record<string, any> = {
     'Pharma',
     'Manufacturing',
     'Retail',
-    'Electronics'
+    'Electronics',
+    'Automotive',
+    'Healthcare',
+    'Logistics & Supply Chain',
+    'Chemicals',
+    'Textiles',
+    'Construction & Real Estate',
+    'Food & Beverages',
+    'Agriculture'
   ]
 };
 
@@ -2558,9 +2668,10 @@ export function SectionEditorCard({
                             { id: 'results', label: 'Results' },
                           ]
                           : [
-                            { id: 'basic', label: 'Basic Info' },
-                            { id: 'hero', label: 'Hero Banner' },
-                            { id: 'highlights', label: 'Highlights & Conclusion' },
+                            { id: 'hero', label: '1. Hero & Basic Details' },
+                            { id: 'author', label: '2. Author Card' },
+                            { id: 'content', label: '3. Content Segments' },
+                            { id: 'conclusion', label: '4. Conclusion & Form' },
                           ];
                       // Fallback tab if currently activeTab is not valid for the switch
                       const tabsMap = section.type === 'testimonials-block'
@@ -2571,7 +2682,7 @@ export function SectionEditorCard({
 
                       const validTab = tabsMap[activeTab]
                         ? activeTab
-                        : (section.type === 'testimonials-block' || section.type === 'case-study-detail' ? 'hero' : 'basic');
+                        : (section.type === 'testimonials-block' || section.type === 'case-study-detail' ? 'hero' : 'hero');
 
                       return tabs.map((tab) => (
                         <button
@@ -2600,7 +2711,7 @@ export function SectionEditorCard({
                           ? CASE_STUDY_DETAIL_TABS
                           : BLOG_DETAIL_TABS;
 
-                      const activeKeys = tabsMap[activeTab] || (section.type === 'testimonials-block' || section.type === 'case-study-detail' ? tabsMap.hero : tabsMap.basic);
+                      const activeKeys = tabsMap[activeTab] || (section.type === 'testimonials-block' || section.type === 'case-study-detail' || section.type === 'blog-detail-block' ? tabsMap.hero : []);
                       return activeKeys.map((key) => {
                         if (!contentKeys.includes(key)) return null;
                         return (

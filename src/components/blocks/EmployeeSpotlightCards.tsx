@@ -1,7 +1,8 @@
 'use client';
 
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowRight, ChevronLeft, ChevronRight, X } from 'lucide-react';
 
 const EMPLOYEES = [
   {
@@ -27,7 +28,7 @@ const EMPLOYEES = [
   {
     id: 'nitin',
     name: 'NITIN SHUKLA',
-    subtitle: 'The Man Turning Waste Into Life\nNitin Shukla – An Eco Warrior Employee',
+    subtitle: 'Turning Everyday Waste Into\nTomorrow\'s Green Spaces',
     description: 'Every Morning At 5 AM, Nitin Shukla Begins His Day Not With E-Mails Or Meetings—But With His 100+ Beloved Plants Spread Across His Four Balconies. From Tall Ashoka And Bael Trees To Graceful Bamboo Shoots, Each Plant Tells A Story Of Care, Love, And One Man\'s Dedication To A Greener World.',
     quote: '“Every Small Action Matters For A Cleaner Future.”',
     image: '/About-employee spot light/image 113.png',
@@ -42,7 +43,7 @@ const EMPLOYEES = [
   {
     id: 'lalit',
     name: 'LALIT KUMAR',
-    subtitle: 'Lalit Rides His Way To A Cleaner Tomorrow\nA Small Ride. A Big Impact.',
+    subtitle: 'Not Every Hero Drives,\nSome Pedal.',
     description: 'We Would Like You To Meet Mr Lalit Kumar, Our Eco-Conscious Champion Who Pedals 42km For Work Every Day Proving How Small Contributions Can Make A Big Impact To The Environment. What Started As A Practical Solution To Avoid Traffic Jams Has Transformed Into A Lifestyle Choice That Promotes Health, Reduces Carbon Footprint And Raises Environmental Awareness. Lalit Is A Part Of The RPA Delivery Team At ESS.',
     quote: '“Every Little Ride Today, Leads To A Cleaner Tomorrow.”',
     image: '/About-employee spot light/image 115.png',
@@ -73,71 +74,238 @@ const EMPLOYEES = [
 
 export function EmployeeSpotlightCards({ content }: { content?: any }) {
   const employees = content?.employees || EMPLOYEES;
+  const [selectedEmp, setSelectedEmp] = useState<any | null>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [canScrollLeft, setCanScrollLeft] = useState(false);
+  const [canScrollRight, setCanScrollRight] = useState(false);
+
+  const updateScrollState = useCallback(() => {
+    if (scrollRef.current) {
+      const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
+      setCanScrollLeft(scrollLeft > 5);
+      setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 5);
+
+      const index = Math.round(scrollLeft / (clientWidth / 3 || 1));
+      setActiveIndex(Math.min(Math.max(index, 0), employees.length - 1));
+    }
+  }, [employees.length]);
+
+  useEffect(() => {
+    updateScrollState();
+    const el = scrollRef.current;
+    if (el) {
+      el.addEventListener('scroll', updateScrollState);
+      window.addEventListener('resize', updateScrollState);
+    }
+    return () => {
+      if (el) {
+        el.removeEventListener('scroll', updateScrollState);
+      }
+      window.removeEventListener('resize', updateScrollState);
+    };
+  }, [updateScrollState, employees]);
+
+  const scrollToSlide = (index: number) => {
+    if (scrollRef.current) {
+      const cardWidth = scrollRef.current.clientWidth / 3;
+      scrollRef.current.scrollTo({
+        left: index * cardWidth,
+        behavior: 'smooth'
+      });
+      setActiveIndex(index);
+    }
+  };
+
+  const handleScroll = (direction: 'left' | 'right') => {
+    if (scrollRef.current) {
+      const scrollAmount = direction === 'left' ? -360 : 360;
+      scrollRef.current.scrollBy({
+        left: scrollAmount,
+        behavior: 'smooth'
+      });
+    }
+  };
 
   return (
-    <section className="py-20 bg-slate-50">
-      <div className="container mx-auto px-4 max-w-7xl">
-        <div className="space-y-16">
-          {employees.map((emp: any, index: number) => (
-            <motion.div
-              key={emp.id || index}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.6, delay: index * 0.1 }}
-              className="bg-white rounded-3xl shadow-md overflow-hidden p-8 border border-gray-300"
+    <section className="py-16 bg-[#fcfbfe] border-b relative">
+      <div className="container mx-auto px-4 max-w-7xl relative">
+        
+        <div className="relative group/carousel">
+          {/* Scroll Left Button - Outside on left, conditionally visible */}
+          {canScrollLeft && (
+            <button
+              onClick={() => handleScroll('left')}
+              aria-label="Scroll Left"
+              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 md:-translate-x-12 lg:-translate-x-14 xl:-translate-x-16 z-20 w-11 h-11 rounded-full bg-white/90 hover:bg-white text-purple-700 shadow-md border border-purple-200 flex items-center justify-center transition-all cursor-pointer hover:scale-110 active:scale-95"
             >
-              <div className="flex flex-col-reverse lg:flex-row gap-12 items-center">
+              <ChevronLeft className="w-6 h-6" />
+            </button>
+          )}
+
+          {/* Scroll Right Button - Outside on right, conditionally visible */}
+          {canScrollRight && (
+            <button
+              onClick={() => handleScroll('right')}
+              aria-label="Scroll Right"
+              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 md:translate-x-12 lg:translate-x-14 xl:translate-x-16 z-20 w-11 h-11 rounded-full bg-white/90 hover:bg-white text-purple-700 shadow-md border border-purple-200 flex items-center justify-center transition-all cursor-pointer hover:scale-110 active:scale-95"
+            >
+              <ChevronRight className="w-6 h-6" />
+            </button>
+          )}
+
+          {/* Scrollable Track */}
+          <div
+            ref={scrollRef}
+            className="flex gap-6 overflow-x-auto scroll-smooth py-4 px-2 no-scrollbar snap-x snap-mandatory"
+            style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+          >
+            {employees.map((emp: any, index: number) => {
+              const isSelected = selectedEmp?.id === emp.id || selectedEmp?.name === emp.name;
+              return (
+                <motion.div
+                  key={emp.id || index}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  className={`bg-white border rounded-2xl p-5 sm:p-6 flex flex-col sm:flex-row justify-between items-center shrink-0 w-full md:w-[calc(50%-12px)] lg:w-[calc(33.333%-16px)] snap-start shadow-sm hover:shadow-md transition-all duration-300 relative group ${
+                    isSelected ? 'border-purple-400 ring-2 ring-purple-400/20' : 'border-slate-200'
+                  }`}
+                >
+                  {/* Left Side: Name, Subtitle, Divider & Expand Button */}
+                  <div className="flex-1 space-y-3 pr-2 w-full text-left">
+                    <div>
+                      <h3 className="text-base sm:text-lg font-black text-[#2e2640] tracking-tight uppercase">
+                        {emp.name}
+                      </h3>
+                      <p className="text-[11px] sm:text-xs text-slate-500 font-medium leading-snug mt-1 whitespace-pre-line line-clamp-2">
+                        {emp.subtitle}
+                      </p>
+                    </div>
+
+                    {/* Expand button */}
+                    <div className="pt-1">
+                      <button
+                        onClick={() => setSelectedEmp(isSelected ? null : emp)}
+                        className="inline-flex items-center gap-0.5 border border-purple-300 text-purple-800 hover:bg-purple-50 text-[8px] font-medium leading-none px-1.5 py-[2px] rounded-sm transition-all duration-200 cursor-pointer tracking-tight"
+                      >
+                        <span>{isSelected ? 'Collapse' : 'Expand to see more'}</span>
+                        <ArrowRight className={`w-1.5 h-1.5 transition-transform duration-200 ${isSelected ? 'rotate-90' : ''}`} />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Right Side: Image with Circular Gradient Graphic */}
+                  <div className="relative w-36 h-36 sm:w-40 sm:h-40 shrink-0 mt-4 sm:mt-0 flex items-center justify-center">
+                    {/* Outer Circular Gradient Background */}
+                    <div className="absolute inset-0 rounded-full bg-gradient-to-br from-blue-50/60 via-purple-50/30 to-slate-100/40" />
+
+                    <img
+                      src={emp.image}
+                      alt={emp.name}
+                      className="w-full h-full object-contain relative z-10 transition-transform duration-300 group-hover:scale-105"
+                    />
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+
+      </div>
+
+      {/* Full View Inline Expanded Card (below carousel, not a popup) */}
+      <AnimatePresence>
+        {selectedEmp && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.4 }}
+            className="container mx-auto px-4 max-w-7xl mt-12 overflow-hidden"
+          >
+            {/* Top Indicator Triangle pointing to selected card */}
+            <div className="flex justify-center -mb-2 z-10 relative">
+              <div className="w-4 h-4 bg-white border-t border-l border-purple-300 transform rotate-45" />
+            </div>
+
+            <div className="relative w-full bg-white rounded-3xl shadow-xl overflow-hidden p-6 sm:p-10 border border-purple-200">
+              {/* Close / Collapse Button */}
+              <button
+                onClick={() => setSelectedEmp(null)}
+                className="absolute top-5 right-5 z-20 w-10 h-10 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 flex items-center justify-center transition-colors cursor-pointer"
+                aria-label="Collapse view"
+              >
+                <X className="w-5 h-5" />
+              </button>
+
+              <div className="flex flex-col-reverse lg:flex-row gap-8 lg:gap-12 items-center">
                 {/* Content Side */}
-                <div className="w-full lg:w-1/2 space-y-6">
+                <div className="w-full lg:w-1/2 space-y-6 text-left">
                   <div>
-                    <h2 className={`text-4xl md:text-5xl lg:text-[56px] font-black tracking-tight mb-1 uppercase ${emp.nameColor}`}>
-                      {emp.name}
+                    <h2 className={`text-3xl sm:text-4xl lg:text-[48px] font-black tracking-tight mb-1 uppercase ${selectedEmp.nameColor || 'text-[#4a2c5a]'}`}>
+                      {selectedEmp.name}
                     </h2>
-                    <h3 className="text-xl md:text-2xl lg:text-[28px] text-gray-800 font-normal leading-snug whitespace-pre-line">
-                      {emp.subtitle}
+                    <h3 className="text-lg sm:text-xl lg:text-[24px] text-gray-800 font-normal leading-snug whitespace-pre-line">
+                      {selectedEmp.subtitle}
                     </h3>
                   </div>
 
                   <div className="text-gray-500 leading-relaxed text-sm md:text-[15px] font-medium max-w-3xl whitespace-pre-line">
-                    {typeof emp.description === 'string' && (emp.description.includes('<p>') || emp.description.includes('<')) ? (
-                      <div dangerouslySetInnerHTML={{ __html: emp.description }} />
+                    {typeof selectedEmp.description === 'string' ? (
+                      selectedEmp.description.includes('<') || selectedEmp.description.includes('&lt;') ? (
+                        <div
+                          dangerouslySetInnerHTML={{
+                            __html: selectedEmp.description
+                              .replace(/&lt;br\s*\/?!?&gt;/gi, '<br />')
+                              .replace(/&lt;p&gt;/gi, '<p>')
+                              .replace(/&lt;\/p&gt;/gi, '</p>')
+                          }}
+                        />
+                      ) : (
+                        selectedEmp.description
+                      )
                     ) : (
-                      emp.description
+                      selectedEmp.description
                     )}
                   </div>
 
-                  <div className="font-bold text-black text-xl md:text-2xl pt-2">
-                    {emp.quote.split('\n').map((line: string, idx: number) => (
-                      <React.Fragment key={idx}>
-                        {line}
-                        {idx < emp.quote.split('\n').length - 1 && <br />}
-                      </React.Fragment>
-                    ))}
-                  </div>
+                  {selectedEmp.quote && (
+                    <div className="font-bold text-black text-lg md:text-xl pt-2 border-l-4 border-purple-400 pl-4">
+                      {selectedEmp.quote.split('\n').map((line: string, idx: number) => (
+                        <React.Fragment key={idx}>
+                          {line}
+                          {idx < selectedEmp.quote.split('\n').length - 1 && <br />}
+                        </React.Fragment>
+                      ))}
+                    </div>
+                  )}
 
                   {/* Stats Grid */}
-                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4 pt-6">
-                    {emp.stats.map((stat: any, i: number) => (
-                      <div key={i} className="bg-white border border-[#4a2c5a] rounded-2xl py-4 px-1 flex flex-col items-center justify-center text-center">
-                        <div className="h-[33px] flex items-center justify-center mb-3">
-                          <img src={stat.iconImage || stat.icon} alt={stat.label} className="max-h-full max-w-full object-contain" />
+                  {selectedEmp.stats && (
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4 pt-4">
+                      {selectedEmp.stats.map((stat: any, i: number) => (
+                        <div key={i} className="bg-white border border-[#4a2c5a] rounded-2xl py-3 px-1 flex flex-col items-center justify-center text-center">
+                          <div className="h-[30px] flex items-center justify-center mb-2">
+                            <img src={stat.iconImage || stat.icon} alt={stat.label} className="max-h-full max-w-full object-contain" />
+                          </div>
+                          <div className="font-light text-[#333333] text-[12px] lg:text-[14px] leading-none mb-1 uppercase whitespace-nowrap">{stat.value}</div>
+                          <div className="text-[10px] text-black font-bold tracking-tight leading-none whitespace-pre-line">{stat.label}</div>
                         </div>
-                        <div className="font-light text-[#333333] text-[12px] lg:text-[15px] leading-none mb-1.5 uppercase whitespace-nowrap">{stat.value}</div>
-                        <div className="text-[10px] text-black font-bold tracking-tight leading-none whitespace-pre-line">{stat.label}</div>
-                      </div>
-                    ))}
-                  </div>
+                      ))}
+                    </div>
+                  )}
 
-                  {/* Pills if any */}
-                  {emp.pills && (
-                    <div className="w-full md:w-fit max-w-full flex flex-wrap md:flex-nowrap gap-4 lg:gap-8 items-center justify-start bg-white rounded-2xl px-4 lg:px-6 py-4 border border-gray-200 shadow-[0_2px_15px_-3px_rgba(0,0,0,0.07)] mt-4">
-                      {emp.pills.map((pill: any, i: number) => (
+                  {/* Pills */}
+                  {selectedEmp.pills && (
+                    <div className="w-full flex flex-wrap gap-4 items-center justify-start bg-slate-50 rounded-2xl px-4 py-3 border border-slate-200 mt-4">
+                      {selectedEmp.pills.map((pill: any, i: number) => (
                         <div key={i} className="flex items-center gap-2 min-w-0">
-                          <img src={pill.iconImage || pill.icon} alt={pill.subtitle} className="w-8 h-8 lg:w-11 lg:h-11 object-contain shrink-0" />
+                          <img src={pill.iconImage || pill.icon} alt={pill.subtitle} className="w-8 h-8 lg:w-10 lg:h-10 object-contain shrink-0" />
                           <div className="flex flex-col min-w-0">
-                            <span className="text-[12px] lg:text-[18px] font-light text-[#333333] leading-none mb-1 whitespace-nowrap">{pill.title}</span>
-                            <span className="text-[12px] text-[#666666] leading-[1.2] whitespace-normal">{pill.subtitle}</span>
+                            <span className="text-[12px] lg:text-[16px] font-medium text-[#333333] leading-none mb-1 whitespace-nowrap">{pill.title}</span>
+                            <span className="text-[11px] text-[#666666] leading-[1.2] whitespace-normal">{pill.subtitle}</span>
                           </div>
                         </div>
                       ))}
@@ -146,21 +314,20 @@ export function EmployeeSpotlightCards({ content }: { content?: any }) {
                 </div>
 
                 {/* Image Side */}
-                <div className="w-full lg:w-1/2 flex justify-center lg:justify-end relative">
-                  <div className="relative w-full">
-                    {/* Circle Background Pattern (simulated if image doesn't have it natively, but assuming the image has it) */}
+                <div className="w-full lg:w-1/2 flex justify-center relative">
+                  <div className="relative w-full max-w-[450px]">
                     <img
-                      src={emp.image}
-                      alt={emp.name}
-                      className="w-full h-auto object-contain relative z-10 max-h-[800px]"
+                      src={selectedEmp.image}
+                      alt={selectedEmp.name}
+                      className="w-full h-auto object-contain max-h-[600px] mx-auto"
                     />
                   </div>
                 </div>
               </div>
-            </motion.div>
-          ))}
-        </div>
-      </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 }

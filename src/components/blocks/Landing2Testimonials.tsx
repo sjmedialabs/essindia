@@ -25,14 +25,12 @@ const DEFAULT_TESTIMONIALS: TestimonialCardItem[] = [
     author: 'Dianne Russell',
     role: 'Founder, ExtendSales',
     image: '/Landing Page-2/assets/3ddf828267cb844171aaad94b1f6da3e7949acbd.png',
-    videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
   },
   {
     quote: '“I can’t tell how easy it was to grow my small shop with it”',
     author: 'Jenny Wilson',
     role: 'Founder, ExtendSales',
     image: '/Landing Page-2/assets/BG.png',
-    videoUrl: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
   },
 ];
 

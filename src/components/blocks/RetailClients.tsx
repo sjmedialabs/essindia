@@ -30,7 +30,7 @@ export function RetailClients({ content }: { content: RetailClientsContent }) {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-xl md:text-2xl font-bold text-indigo-900 mb-10 text-center md:text-left"
+          className="text-xl md:text-2xl font-bold text-indigo-900 mb-10 text-center"
         >
           {title}
         </motion.h3>
