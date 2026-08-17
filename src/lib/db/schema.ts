@@ -273,6 +273,8 @@ export const navigationMenus = pgTable('navigation_menus', {
   logoUrl: text('logo_url').default('/footer-logo.png'),
   getStartedText: varchar('get_started_text', { length: 255 }).default('Get started'),
   getStartedLink: varchar('get_started_link', { length: 500 }).default('/contact-us'),
+  countryDropdownText: varchar('country_dropdown_text', { length: 255 }).default('Select Country'),
+  countryLinks: jsonb('country_links').default('[]'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });

@@ -1,4 +1,5 @@
 import { getHeroBackgroundStyles } from '@/lib/utils';
+import { HeroTitle } from '@/components/ui/HeroTitle';
 export interface ContactHeroContent {
   gradientColor1?: string;
   gradientColor2?: string;
@@ -61,12 +62,23 @@ export function ContactHero({ content }: { content?: ContactHeroContent }) {
             </span>
           </div>
 
-          <h1 
-            className="text-5xl md:text-6xl font-light tracking-tight whitespace-pre-line"
-            style={{ color: titleColor }}
-          >
-            {heading}
-          </h1>
+          {((content as any)?.titleGradientFrom || (content as any)?.titleGradientTo) && (content as any)?.enableTitleGradientAnimation !== false ? (
+            <HeroTitle
+              as="h1"
+              title={heading}
+              gradientFrom={(content as any)?.titleGradientFrom}
+              gradientTo={(content as any)?.titleGradientTo}
+              enableAnimation={(content as any)?.enableTitleGradientAnimation}
+              className="text-5xl md:text-6xl font-light tracking-tight whitespace-pre-line justify-center"
+            />
+          ) : (
+            <h1 
+              className="text-5xl md:text-6xl font-light tracking-tight whitespace-pre-line"
+              style={{ color: titleColor }}
+            >
+              {heading}
+            </h1>
+          )}
 
           <div 
             className="text-gray-300 text-sm md:text-base max-w-2xl font-light prose prose-invert"

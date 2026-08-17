@@ -125,7 +125,7 @@ export function ErpModulesGrid({ content }: ErpModulesGridProps) {
                 {/* Read More dynamic CTA */}
                 <button 
                   type="button" 
-                  className="text-[10px] mt-4 font-semibold text-white bg-[#462294] hover:bg-white hover:text-black rounded-full h-7 px-4 border border-[#462294] transition-colors duration-300 cursor-pointer" 
+                  className="text-[10px] mt-4 font-semibold text-black bg-white hover:bg-[#452191] hover:text-white hover:border-[#452191] rounded-full h-7 px-4 border border-gray-300 transition-colors duration-300 cursor-pointer" 
                   onClick={(e) => {
                     e.stopPropagation();
                     window.open(module.ctaUrl || '#', '_blank');

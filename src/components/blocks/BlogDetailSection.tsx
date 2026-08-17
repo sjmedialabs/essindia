@@ -4,6 +4,7 @@ import * as React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, Check, ArrowRight, Loader2 } from 'lucide-react';
 import { useInternalNavigate } from '@/hooks/useInternalNavigate';
+import { HeroTitle } from '@/components/ui/HeroTitle';
 
 export interface KeyTakeawaysSegment {
   type: 'key-takeaways';
@@ -41,6 +42,7 @@ export interface CardsSegment {
 
 export interface TableRowEntry {
   col1Title?: string;
+  col1Desc?: string;
   col2Text?: string;
 }
 
@@ -64,6 +66,8 @@ export interface BlogDetailContent {
   gradientFrom?: string;
   gradientVia?: string;
   gradientTo?: string;
+  titleGradientFrom?: string;
+  titleGradientTo?: string;
   heroTitle?: string;
   title?: string;
   date?: string;
@@ -239,10 +243,10 @@ export function BlogDetailSection({ content }: BlogDetailSectionProps) {
       column1Title: 'App Complexity',
       column2Title: 'Estimated Timelines by App Complexity',
       rows: [
-        { col1Title: 'Simple Apps', col2Text: '2 to 4 Months' },
-        { col1Title: 'Mid-Complexity Apps', col2Text: '4 to 8 Months' },
-        { col1Title: 'Enterprise-Grade Applications', col2Text: '9 to 18+ Months' },
-        { col1Title: 'AI-Powered Applications', col2Text: '10 to 20+ Months' }
+        { col1Title: 'Simple Apps', col1Desc: 'Basic features with minimal integrations and workflows.', col2Text: '2 to 4 Months' },
+        { col1Title: 'Mid-Complexity Apps', col1Desc: 'More features, user roles, and third-party integrations.', col2Text: '4 to 8 Months' },
+        { col1Title: 'Enterprise-Grade Applications', col1Desc: 'Advanced workflows, high scalability, security & compliance.', col2Text: '9 to 18+ Months' },
+        { col1Title: 'AI-Powered Applications', col1Desc: 'AI/ML capabilities, data processing, and predictive intelligence.', col2Text: '10 to 20+ Months' }
       ]
     }
   ];
@@ -406,9 +410,20 @@ export function BlogDetailSection({ content }: BlogDetailSectionProps) {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(255,255,255,0.15),transparent_50%)] pointer-events-none" />
 
         <div className="max-w-5xl mx-auto space-y-6 relative z-10">
-          <h1 className="text-3xl sm:text-5xl md:text-6xl font-light tracking-tight leading-tight max-w-4xl mx-auto text-white/95">
-            {heroTitle}
-          </h1>
+          {(content?.titleGradientFrom || content?.titleGradientTo) && (content as any)?.enableTitleGradientAnimation !== false ? (
+            <HeroTitle
+              as="h1"
+              title={heroTitle}
+              gradientFrom={content.titleGradientFrom}
+              gradientTo={content.titleGradientTo}
+              enableAnimation={(content as any)?.enableTitleGradientAnimation}
+              className="text-3xl sm:text-5xl md:text-6xl font-light tracking-tight leading-tight max-w-4xl mx-auto justify-center"
+            />
+          ) : (
+            <h1 className="text-3xl sm:text-5xl md:text-6xl font-light tracking-tight leading-tight max-w-4xl mx-auto text-white/95">
+              {heroTitle}
+            </h1>
+          )}
 
           <div className="flex items-center justify-center gap-3 text-sm sm:text-base font-normal text-white/80">
             <span>{authorCardName}</span>
@@ -578,18 +593,28 @@ export function BlogDetailSection({ content }: BlogDetailSectionProps) {
               if (seg.type === 'table') {
                 return (
                   <div key={segId} id={segId} className="scroll-mt-28 pt-4 space-y-4">
-                    <div className="rounded-2xl overflow-hidden border border-purple-900 shadow-md">
-                      <div className="grid grid-cols-12 bg-[#310080] text-white font-bold text-xs sm:text-sm p-4 border-b border-purple-800">
-                        <div className="col-span-6">{seg.column1Title || 'Column 1'}</div>
-                        <div className="col-span-6 text-center">{seg.column2Title || 'Column 2'}</div>
+                    <div className="rounded-2xl overflow-hidden border border-slate-200/80 shadow-md bg-white">
+                      <div className="grid grid-cols-12 bg-[#290d78] text-white font-bold text-xs sm:text-sm border-b-4 border-amber-400">
+                        <div className="col-span-6 p-4 border-r border-white/20">{seg.column1Title || 'Column 1'}</div>
+                        <div className="col-span-6 p-4 text-center">{seg.column2Title || 'Column 2'}</div>
                       </div>
                       <div className="divide-y divide-slate-100 bg-white text-xs sm:text-sm">
                         {seg.rows?.map((row, rIdx) => (
-                          <div key={rIdx} className="grid grid-cols-12 p-4 items-center gap-2">
-                            <div className="col-span-6 font-bold text-[#5500D4] border-l-2 border-[#5500D4] pl-2">
-                              {row.col1Title}
+                          <div key={rIdx} className="grid grid-cols-12 items-center">
+                            <div className="col-span-6 p-4 sm:p-5 border-r border-slate-200 space-y-1">
+                              <div className="flex items-stretch gap-3">
+                                <span className="w-1 bg-amber-400 rounded-full shrink-0 my-0.5" />
+                                <div>
+                                  <div className="font-bold text-[#290d78] text-base sm:text-lg">{row.col1Title}</div>
+                                  {row.col1Desc && (
+                                    <div className="text-xs sm:text-sm text-slate-500 font-normal mt-1 leading-relaxed">
+                                      {row.col1Desc}
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
                             </div>
-                            <div className="col-span-6 text-center font-extrabold text-[#310080] text-sm sm:text-base">
+                            <div className="col-span-6 p-4 sm:p-5 text-center font-bold text-[#290d78] text-base sm:text-lg">
                               {row.col2Text}
                             </div>
                           </div>
@@ -638,8 +663,12 @@ export function BlogDetailSection({ content }: BlogDetailSectionProps) {
           <aside className="lg:col-span-3 sticky top-24">
             <div className="bg-black text-white rounded-3xl overflow-hidden border border-slate-800 shadow-2xl p-6 sm:p-7 space-y-6">
 
-              <div className="relative p-6 -mx-7 -mt-7 bg-gradient-to-b from-[#1E0B4B] to-[#0A041B] border-b border-purple-900/40 text-center space-y-2">
-                <h3 className="text-lg sm:text-xl font-bold text-white leading-snug">
+              <div
+                className="relative p-6 sm:p-7 -mx-7 -mt-7 bg-cover bg-center border-b border-purple-900/40 text-center space-y-2 overflow-hidden rounded-t-3xl min-h-[140px] flex items-center justify-center"
+                style={{ backgroundImage: 'url("/blog details/hero-header.png")' }}
+              >
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/30 pointer-events-none" />
+                <h3 className="relative z-10 text-lg sm:text-xl font-extrabold text-white leading-snug tracking-tight max-w-[240px] mx-auto text-left sm:text-center">
                   {calcTitle}
                 </h3>
               </div>

@@ -3,6 +3,7 @@
 import React from 'react';
 import { getHeroBackgroundStyles } from '@/lib/utils';
 import { motion } from 'framer-motion';
+import { HeroTitle } from '@/components/ui/HeroTitle';
 
 interface QualityHeroContent {
   gradientColor1?: string;
@@ -55,14 +56,25 @@ export function QualityHero({ content }: QualityHeroProps) {
           </motion.div>
 
           {/* Main Headline */}
-          <motion.h1
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 1, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-            className="text-4xl md:text-5xl lg:text-6xl font-extralight text-white leading-[1.2] max-w-5xl tracking-tight"
-          >
-            {title}
-          </motion.h1>
+          {((content as any)?.titleGradientFrom || (content as any)?.titleGradientTo) && (content as any)?.enableTitleGradientAnimation !== false ? (
+            <HeroTitle
+              as="h1"
+              title={title}
+              gradientFrom={(content as any)?.titleGradientFrom}
+              gradientTo={(content as any)?.titleGradientTo}
+              enableAnimation={(content as any)?.enableTitleGradientAnimation}
+              className="text-4xl md:text-5xl lg:text-6xl font-extralight leading-[1.2] max-w-5xl tracking-tight justify-center"
+            />
+          ) : (
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
+              className="text-4xl md:text-5xl lg:text-6xl font-extralight text-white leading-[1.2] max-w-5xl tracking-tight"
+            >
+              {title}
+            </motion.h1>
+          )}
 
           {/* Sub-headline */}
           <motion.p

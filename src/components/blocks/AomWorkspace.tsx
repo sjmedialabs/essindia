@@ -1,4 +1,5 @@
 'use client';
+'use client';
 
 import React, { useState } from 'react';
 import Image from 'next/image';
@@ -26,6 +27,23 @@ interface WorkspaceCategory {
 interface AomWorkspaceContent {
   title?: string;
   categories?: WorkspaceCategory[];
+}
+
+function safeImageUrl(url?: string, fallback = ''): string {
+  if (!url || typeof url !== 'string') return fallback;
+  const trimmed = url.trim();
+  if (!trimmed) return fallback;
+  if (trimmed.startsWith('/') || trimmed.startsWith('http://') || trimmed.startsWith('https://') || trimmed.startsWith('data:')) {
+    try {
+      if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) {
+        new URL(trimmed);
+      }
+      return trimmed;
+    } catch {
+      return fallback;
+    }
+  }
+  return fallback;
 }
 
 export function AomWorkspace({ content }: { content?: AomWorkspaceContent }) {
@@ -158,9 +176,12 @@ export function AomWorkspace({ content }: { content?: AomWorkspaceContent }) {
           <div className="w-full lg:w-[320px] bg-white border border-slate-100 rounded-3xl p-5 shadow-md flex-shrink-0 space-y-4">
             {categories.map((category, catIdx) => {
               const isOpen = !!expandedCategories[catIdx];
-              const arrowIcon = isOpen 
-                ? '/App- App over view (mobile app)/arrow-up-square_svgrepo.com.png'
-                : '/App- App over view (mobile app)/Page-1.png';
+              const arrowIcon = safeImageUrl(
+                isOpen 
+                  ? '/App- App over view (mobile app)/arrow-up-square_svgrepo.com.png'
+                  : '/App- App over view (mobile app)/Page-1.png',
+                '/App- App over view (mobile app)/Page-1.png'
+              );
 
               return (
                 <div key={catIdx} className="space-y-2 border-b border-slate-50 last:border-b-0 pb-3 last:pb-0">
@@ -185,6 +206,7 @@ export function AomWorkspace({ content }: { content?: AomWorkspaceContent }) {
                     <div className="space-y-1 pl-1">
                       {category.tabs.map((tab, tabIdx) => {
                         const isSelected = activeCategoryIdx === catIdx && activeTabIdx === tabIdx;
+                        const validTabIcon = safeImageUrl(tab.icon);
                         return (
                           <button
                             key={tabIdx}
@@ -195,12 +217,12 @@ export function AomWorkspace({ content }: { content?: AomWorkspaceContent }) {
                                 : 'bg-transparent border-transparent text-slate-500 hover:bg-slate-50'
                             }`}
                           >
-                            {tab.icon && (
+                            {validTabIcon && (
                               <div className={`w-8 h-8 relative p-1.5 rounded-lg flex items-center justify-center shrink-0 ${
                                 isSelected ? 'bg-indigo-100/70 text-indigo-700' : 'bg-slate-50 border border-slate-100'
                               }`}>
                                 <Image
-                                  src={tab.icon}
+                                  src={validTabIcon}
                                   alt={tab.label}
                                   fill
                                   className="object-contain p-1.5"
@@ -268,16 +290,16 @@ export function AomWorkspace({ content }: { content?: AomWorkspaceContent }) {
             </div>
 
             {/* Right side mockup screenshot inside card */}
-            {currentTab.contentImage && (
+            {safeImageUrl(currentTab.contentImage) ? (
               <div className="w-full md:w-[320px] lg:w-[400px] aspect-[4/3] md:aspect-auto md:h-[300px] relative shrink-0 shadow-2xl rounded-2xl overflow-hidden border border-slate-100">
                 <Image
-                  src={currentTab.contentImage}
+                  src={safeImageUrl(currentTab.contentImage)!}
                   alt={currentTab.contentTitle || ''}
                   fill
                   className="object-cover"
                 />
               </div>
-            )}
+            ) : null}
 
           </div>
 

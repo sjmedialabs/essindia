@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { useCtaAction, type CtaFormType } from '@/hooks/useCtaAction';
 import { getHeroBackgroundStyles } from '@/lib/utils';
+import { HeroTitle } from '@/components/ui/HeroTitle';
 
 interface RpaHeroContent {
   gradientColor1?: string;
@@ -109,15 +110,30 @@ export function RpaHero({ content }: { content?: RpaHeroContent }) {
 
             {/* Title */}
             {title && (
-              <motion.h1
+              <motion.div
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: 0.1 }}
-                className="text-4xl sm:text-5xl lg:text-6xl font-light tracking-tight leading-[1.1] mb-6 whitespace-pre-line"
-                style={{ color: titleColor }}
+                className="mb-6 whitespace-pre-line"
               >
-                {title}
-              </motion.h1>
+                {((content as any)?.titleGradientFrom || (content as any)?.titleGradientTo) && (content as any)?.enableTitleGradientAnimation !== false ? (
+                  <HeroTitle
+                    as="h1"
+                    title={title}
+                    gradientFrom={(content as any)?.titleGradientFrom}
+                    gradientTo={(content as any)?.titleGradientTo}
+                    enableAnimation={(content as any)?.enableTitleGradientAnimation}
+                    className="text-4xl sm:text-5xl lg:text-6xl font-light tracking-tight leading-[1.1] text-left"
+                  />
+                ) : (
+                  <h1
+                    className="text-4xl sm:text-5xl lg:text-6xl font-light tracking-tight leading-[1.1]"
+                    style={{ color: titleColor }}
+                  >
+                    {title}
+                  </h1>
+                )}
+              </motion.div>
             )}
 
             {/* Description */}

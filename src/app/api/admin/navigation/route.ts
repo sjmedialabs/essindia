@@ -120,7 +120,7 @@ export async function PUT(request: Request) {
 
   try {
     const body = await request.json();
-    const { location, logoUrl, getStartedText, getStartedLink } = body;
+    const { location, logoUrl, getStartedText, getStartedLink, countryDropdownText, countryLinks } = body;
 
     if (!location) {
       return NextResponse.json({ error: 'location is required' }, { status: 400 });
@@ -132,6 +132,8 @@ export async function PUT(request: Request) {
         logoUrl: logoUrl !== undefined ? logoUrl : undefined,
         getStartedText: getStartedText !== undefined ? getStartedText : undefined,
         getStartedLink: getStartedLink !== undefined ? getStartedLink : undefined,
+        countryDropdownText: countryDropdownText !== undefined ? countryDropdownText : undefined,
+        countryLinks: countryLinks !== undefined ? countryLinks : undefined,
         updatedAt: new Date(),
       })
       .where(eq(navigationMenus.location, location))

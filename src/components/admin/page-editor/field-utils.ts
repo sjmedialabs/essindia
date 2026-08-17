@@ -166,6 +166,9 @@ function baseHumanLabel(key: string): string {
   if (key === 'badgeBorderColor') return 'Badge Border Color';
   if (key === 'titleColor') return 'Title Text Color';
   if (key === 'titleSecondaryColor') return 'Title Secondary Color (Highlights 4th, 5th, 7th words)';
+  if (key === 'titleGradientFrom' || key === 'titleGradientStart') return 'Title Gradient Start Color';
+  if (key === 'titleGradientTo' || key === 'titleGradientEnd') return 'Title Gradient End Color';
+  if (key === 'enableTitleGradientAnimation' || key === 'enableGradientAnimation' || key === 'animateTitleGradient') return 'Enable Title Gradient Animation';
   if (key === 'descriptionColor') return 'Description Text Color';
   if (key === 'button1Color') return 'Button 1 Text Color';
   if (key === 'button2Color') return 'Button 2 Text Color';
@@ -374,6 +377,7 @@ export function detectFieldType(
   value: JsonValue,
   sectionType?: string
 ): FieldType {
+  if (key === 'enableTitleGradientAnimation' || (key.startsWith('enable') && key.toLowerCase().includes('animation'))) return 'boolean';
   if (value === null || value === undefined) return 'null';
   if (key.toLowerCase() === 'rating') return 'ratingSelect';
   if (typeof value === 'boolean') return 'boolean';

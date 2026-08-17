@@ -6,6 +6,7 @@ import { ChevronDown, ChevronUp, Search, Calendar, User, SlidersHorizontal, Arro
 import { Button } from '@/components/ui/button';
 import { usePathname } from 'next/navigation';
 import { useInternalNavigate } from '@/hooks/useInternalNavigate';
+import { HeroTitle } from '@/components/ui/HeroTitle';
 
 import { defaultBlogs, type BlogPost } from '@/lib/blogs-data';
 
@@ -164,14 +165,25 @@ export function BlogListSection({ content }: BlogListSectionProps) {
           >
             {badge}
           </motion.div>
-          <motion.h1
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.1 }}
-            className="text-4xl md:text-6xl font-black font-extralight text-white tracking-tight leading-tight"
-          >
-            {heading}
-          </motion.h1>
+          {((content as any)?.titleGradientFrom || (content as any)?.titleGradientTo) && (content as any)?.enableTitleGradientAnimation !== false ? (
+            <HeroTitle
+              as="h1"
+              title={heading}
+              gradientFrom={(content as any)?.titleGradientFrom}
+              gradientTo={(content as any)?.titleGradientTo}
+              enableAnimation={(content as any)?.enableTitleGradientAnimation}
+              className="text-4xl md:text-6xl font-black font-extralight tracking-tight leading-tight justify-center"
+            />
+          ) : (
+            <motion.h1
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.1 }}
+              className="text-4xl md:text-6xl font-black font-extralight text-white tracking-tight leading-tight"
+            >
+              {heading}
+            </motion.h1>
+          )}
           <motion.p
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
@@ -348,14 +360,14 @@ export function BlogListSection({ content }: BlogListSectionProps) {
                             />
                             {/* Topic & Industries Floating Tags */}
                             <div className="absolute bottom-4 left-4 flex flex-wrap gap-2 items-center">
-                              <div className="bg-white/95 backdrop-blur px-3 py-1.5 rounded-xl shadow-sm text-left flex flex-col justify-center">
-                                <span className="text-[9px] text-[#859bfc] font-bold uppercase tracking-wider block leading-none mb-1">Topic</span>
-                                <span className="text-xs text-slate-800 font-semibold leading-none">{blog.topic}</span>
+                              <div className="bg-white/95 backdrop-blur px-3 py-1.5 rounded-xl border border-slate-200/80 shadow-md text-left flex flex-col justify-center">
+                                <span className="text-[9px] text-[#3b82f6] font-extrabold uppercase tracking-wider block leading-none mb-1">Topic</span>
+                                <span className="text-xs text-black font-extrabold leading-none">{blog.topic}</span>
                               </div>
                               {blog.industries && blog.industries.filter((ind: string) => ind !== 'Industries').map((ind: string) => (
-                                <div key={ind} className="bg-[#103D38]/95 backdrop-blur px-3 py-1.5 rounded-xl shadow-sm text-left flex flex-col justify-center">
-                                  <span className="text-[9px] text-emerald-300 font-bold uppercase tracking-wider block leading-none mb-1">Industry</span>
-                                  <span className="text-xs text-white font-semibold leading-none">{ind}</span>
+                                <div key={ind} className="bg-white/95 backdrop-blur px-3 py-1.5 rounded-xl border border-slate-200/80 shadow-md text-left flex flex-col justify-center">
+                                  <span className="text-[9px] text-[#3b82f6] font-extrabold uppercase tracking-wider block leading-none mb-1">Industry</span>
+                                  <span className="text-xs text-black font-extrabold leading-none">{ind}</span>
                                 </div>
                               ))}
                             </div>

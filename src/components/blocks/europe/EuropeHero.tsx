@@ -8,6 +8,7 @@ import { cn, getHeroBackgroundStyles } from '@/lib/utils';
 import { EuropeCommonSettings, EuropeSectionShell } from './EuropeSectionShell';
 import { CmsHeading } from '@/components/cms/CmsHeading';
 import { useCtaAction, type CtaFormType } from '@/hooks/useCtaAction';
+import { HeroTitle } from '@/components/ui/HeroTitle';
 
 export interface EuropeHeroContent extends EuropeCommonSettings {
   gradientColor1?: string;
@@ -130,14 +131,25 @@ export function EuropeHero({ content }: { content?: EuropeHeroContent }) {
           )}
 
           {title && (
-            <CmsHeading
-              tag={undefined}
-              fallback="h1"
-              className="text-4xl sm:text-5xl lg:text-[64px] font-thin tracking-tight leading-[1.15] whitespace-pre-line"
-              style={{ color: titleColor }}
-            >
-              {title}
-            </CmsHeading>
+            ((content as any)?.titleGradientFrom || (content as any)?.titleGradientTo) && (content as any)?.enableTitleGradientAnimation !== false ? (
+              <HeroTitle
+                as="h1"
+                title={title.replace(/\n/g, ' ')}
+                gradientFrom={(content as any)?.titleGradientFrom}
+                gradientTo={(content as any)?.titleGradientTo}
+                enableAnimation={(content as any)?.enableTitleGradientAnimation}
+                className="text-4xl sm:text-5xl lg:text-[64px] font-thin tracking-tight leading-[1.15] whitespace-pre-line justify-center"
+              />
+            ) : (
+              <CmsHeading
+                tag={undefined}
+                fallback="h1"
+                className="text-4xl sm:text-5xl lg:text-[64px] font-thin tracking-tight leading-[1.15] whitespace-pre-line"
+                style={{ color: titleColor }}
+              >
+                {title}
+              </CmsHeading>
+            )
           )}
 
           {description && (

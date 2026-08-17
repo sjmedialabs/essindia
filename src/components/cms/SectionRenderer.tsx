@@ -118,6 +118,7 @@ import { BiArchitecture } from '@/components/blocks/BiArchitecture';
 import { BiEmpowerment } from '@/components/blocks/BiEmpowerment';
 import { BiIndustries } from '@/components/blocks/BiIndustries';
 import { BiIndustryServices } from '@/components/blocks/BiIndustryServices';
+import { BiFeatures } from '@/components/blocks/BiFeatures';
 import { RpaHero } from '@/components/blocks/RpaHero';
 import { RpaOverview } from '@/components/blocks/RpaOverview';
 import { RpaOverviewIntro } from '@/components/blocks/RpaOverviewIntro';
@@ -448,6 +449,8 @@ export function SectionRenderer({ section }: SectionRendererProps) {
       return <BiIndustries content={section.content} />;
     case 'bi-industry-services':
       return <BiIndustryServices content={section.content} />;
+    case 'bi-features':
+      return <BiFeatures content={section.content} />;
     case 'rpa-hero':
       return <RpaHero content={section.content} />;
     case 'rpa-overview':

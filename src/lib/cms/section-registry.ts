@@ -56,6 +56,9 @@ const RAW_SECTION_REGISTRY: SectionTypeDefinition[] = [
       'gradientColor2',
       'gradientColor3',
       'title',
+      'titleGradientFrom',
+      'titleGradientTo',
+      'enableTitleGradientAnimation',
       'subtitle',
       'primaryCta',
       'secondaryCta',
@@ -1652,6 +1655,16 @@ const RAW_SECTION_REGISTRY: SectionTypeDefinition[] = [
     defaultVariant: 'default',
     supportsVariants: false,
     fieldOrder: ['title', 'subtitle', 'tabs']
+  },
+  {
+    type: 'bi-features',
+    label: 'BI Features Matrix',
+    description: 'Comparison table displaying BI features with Yes/No standard and professional column indicators',
+    icon: Grid,
+    color: 'bg-[#1e0a45] text-amber-400',
+    defaultVariant: 'default',
+    supportsVariants: false,
+    fieldOrder: ['sectionTitle', 'column1Title', 'column2Title', 'column3Title', 'rows']
   },
   {
     type: 'rpa-hero',

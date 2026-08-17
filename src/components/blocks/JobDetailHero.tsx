@@ -5,6 +5,7 @@ import { getHeroBackgroundStyles } from '@/lib/utils';
 import { motion } from 'framer-motion';
 import { ArrowLeft, MapPin, Clock, Briefcase, Building, Coins } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { HeroTitle } from '@/components/ui/HeroTitle';
 
 export interface JobDetailHeroContent {
   gradientColor1?: string;
@@ -22,6 +23,8 @@ export interface JobDetailHeroContent {
   tag2TextColor?: string;
   titleText?: string;
   titleTextColor?: string;
+  titleGradientFrom?: string;
+  titleGradientTo?: string;
   items?: Array<{ icon?: string | null; text?: string }>;
   backLinkUrl?: string;
   backLinkText?: string;
@@ -132,13 +135,23 @@ export default function JobDetailHero({ content }: { content?: JobDetailHeroCont
             )}
           </div>
 
-          {/* Job Title */}
-          <h1
-            className="text-4xl md:text-5xl lg:text-[56px] font-bold mb-8 tracking-tight"
-            style={{ color: titleTextColor }}
-          >
-            {titleText}
-          </h1>
+          {(content?.titleGradientFrom || content?.titleGradientTo) && (content as any)?.enableTitleGradientAnimation !== false ? (
+            <HeroTitle
+              as="h1"
+              title={titleText}
+              gradientFrom={content.titleGradientFrom}
+              gradientTo={content.titleGradientTo}
+              enableAnimation={(content as any)?.enableTitleGradientAnimation}
+              className="text-4xl md:text-5xl lg:text-[56px] font-bold mb-8 tracking-tight text-left"
+            />
+          ) : (
+            <h1
+              className="text-4xl md:text-5xl lg:text-[56px] font-bold mb-8 tracking-tight"
+              style={{ color: titleTextColor }}
+            >
+              {titleText}
+            </h1>
+          )}
 
           {/* Meta Information */}
           <div className="flex flex-wrap items-center gap-6 text-[15px] text-slate-600 font-medium">

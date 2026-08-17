@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { MotionSection } from '@/components/animations/MotionSection';
 import { useCtaAction, type CtaFormType } from '@/hooks/useCtaAction';
+import { HeroTitle } from '@/components/ui/HeroTitle';
 
 interface ErpHeroContent {
   bgColor?: string;
@@ -95,16 +96,27 @@ export function ErpHero({ content }: ErpHeroProps) {
               </span>
             </motion.div>
 
-            {/* Main Headline */}
-            <motion.h1
-              initial={{ opacity: 0, y: 20 }}
+            {/* Main Title */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-              className="text-4xl sm:text-5xl lg:text-6xl pb-2 font-light tracking-tight leading-[1.1]"
-              style={{ color: titleColor }}
+              transition={{ duration: 0.8, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
             >
-              {highlightTitle(titleText)}
-            </motion.h1>
+              {((content as any)?.titleGradientFrom || (content as any)?.titleGradientTo) && (content as any)?.enableTitleGradientAnimation !== false ? (
+                <HeroTitle
+                  as="h1"
+                  title={titleText}
+                  gradientFrom={(content as any)?.titleGradientFrom}
+                  gradientTo={(content as any)?.titleGradientTo}
+                  enableAnimation={(content as any)?.enableTitleGradientAnimation}
+                  className="text-4xl sm:text-[46px] font-black leading-[1.12] tracking-tight pb-6 text-left"
+                />
+              ) : (
+                <h1 className="text-4xl sm:text-[46px] font-black leading-[1.12] tracking-tight pb-6" style={{ color: titleColor }}>
+                  {highlightTitle(titleText)}
+                </h1>
+              )}
+            </motion.div>
 
             {/* Sub-headline */}
             <motion.p

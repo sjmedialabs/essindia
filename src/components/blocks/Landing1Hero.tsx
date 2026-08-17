@@ -8,12 +8,16 @@ import { useCtaAction, type CtaFormType } from '@/hooks/useCtaAction';
 
 import { getHeroBackgroundStyles } from '@/lib/utils';
 
+import { HeroTitle } from '@/components/ui/HeroTitle';
+
 export interface Landing1HeroContent {
   gradientColor1?: string;
   gradientColor2?: string;
   gradientColor3?: string;
   bgColor?: string;
   title?: string;
+  titleGradientFrom?: string;
+  titleGradientTo?: string;
   primaryCtaText?: string;
   primaryCtaUrl?: string;
   primaryCtaFormType?: string;
@@ -67,9 +71,20 @@ export function Landing1Hero({ content }: { content?: Landing1HeroContent }) {
       <div className="container mx-auto px-6 relative z-10 text-center max-w-5xl">
         {/* Title */}
         {data.title && (
-          <h1 className="text-[#3A225D] text-3xl md:text-[54px] font-medium tracking-tight leading-[1.2] mb-8 max-w-4xl mx-auto">
-            {data.title}
-          </h1>
+          (data.titleGradientFrom || data.titleGradientTo) && (data as any)?.enableTitleGradientAnimation !== false ? (
+            <HeroTitle
+              as="h1"
+              title={data.title}
+              gradientFrom={data.titleGradientFrom}
+              gradientTo={data.titleGradientTo}
+              enableAnimation={(data as any)?.enableTitleGradientAnimation}
+              className="text-3xl md:text-[54px] font-medium tracking-tight leading-[1.2] mb-8 max-w-4xl mx-auto justify-center"
+            />
+          ) : (
+            <h1 className="text-[#3A225D] text-3xl md:text-[54px] font-medium tracking-tight leading-[1.2] mb-8 max-w-4xl mx-auto">
+              {data.title}
+            </h1>
+          )
         )}
 
         {/* Buttons */}

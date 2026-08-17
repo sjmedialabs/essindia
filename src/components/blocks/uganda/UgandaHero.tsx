@@ -5,6 +5,7 @@ import { getHeroBackgroundStyles } from '@/lib/utils';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { useCtaAction, type CtaFormType } from '@/hooks/useCtaAction';
+import { HeroTitle } from '@/components/ui/HeroTitle';
 
 export interface UgandaHeroContent {
   gradientColor1?: string;
@@ -63,7 +64,6 @@ export function UgandaHero({ content }: { content?: UgandaHeroContent }) {
   const { handleClick: handlePrimaryClick, modalNode: primaryModal } = useCtaAction(primaryButtonUrl, primaryButtonFormType, content?.primaryButtonPdfUrl);
   const { handleClick: handleSecondaryClick, modalNode: secondaryModal } = useCtaAction(secondaryButtonUrl, secondaryButtonFormType, content?.secondaryButtonPdfUrl);
 
-  
   const bgStyles = getHeroBackgroundStyles({
     gradientColor1: content?.gradientColor1,
     gradientColor2: content?.gradientColor2,
@@ -96,12 +96,23 @@ export function UgandaHero({ content }: { content?: UgandaHeroContent }) {
           )}
 
           {title && (
-            <h1
-              className="text-4xl sm:text-[48px] md:text-[56px] font-thin leading-[1.15] tracking-wide mt-8 mb-6 max-w-5xl whitespace-pre-line"
-              style={{ color: titleColor }}
-            >
-              {title}
-            </h1>
+            ((content as any)?.titleGradientFrom || (content as any)?.titleGradientTo) && (content as any)?.enableTitleGradientAnimation !== false ? (
+              <HeroTitle
+                as="h1"
+                title={title.replace(/\n/g, ' ')}
+                gradientFrom={(content as any)?.titleGradientFrom}
+                gradientTo={(content as any)?.titleGradientTo}
+                enableAnimation={(content as any)?.enableTitleGradientAnimation}
+                className="text-4xl sm:text-[48px] md:text-[56px] font-thin leading-[1.15] tracking-wide mt-8 mb-6 max-w-5xl whitespace-pre-line justify-center"
+              />
+            ) : (
+              <h1
+                className="text-4xl sm:text-[48px] md:text-[56px] font-thin leading-[1.15] tracking-wide mt-8 mb-6 max-w-5xl whitespace-pre-line"
+                style={{ color: titleColor }}
+              >
+                {title}
+              </h1>
+            )
           )}
 
           {description && (

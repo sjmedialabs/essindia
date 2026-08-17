@@ -88,7 +88,9 @@ export class PageRepository {
         logger.warn(`[PageRepository] Database temporary connection or schema notice for path "${path}". Returning fallback content.`);
         return null;
       }
-      logger.error(`[PageRepository] Error fetching page path: ${path}`, error);
+      if (!path.includes('404')) {
+        logger.error(`[PageRepository] Error fetching page path: ${path}`, error);
+      }
       return null;
     }
   });

@@ -20,6 +20,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { ALL_COUNTRIES_LIST } from '@/lib/countries';
 
 export default function NavigationModule() {
   const [menus, setMenus] = useState<any[]>([]);
@@ -72,6 +73,8 @@ export default function NavigationModule() {
           logoUrl: menuSettings.logoUrl,
           getStartedText: menuSettings.getStartedText,
           getStartedLink: menuSettings.getStartedLink,
+          countryDropdownText: menuSettings.countryDropdownText,
+          countryLinks: menuSettings.countryLinks || [],
         }),
       });
 
@@ -745,6 +748,142 @@ export default function NavigationModule() {
                     placeholder="/contact-us"
                     className="w-full px-2.5 py-1.5 rounded-md border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#5C2B6A]/40 focus:border-[#5C2B6A] transition-all text-xs"
                   />
+                </div>
+
+                <div className="space-y-1 md:col-span-2">
+                  <label className="text-xs font-semibold text-slate-700">Country Dropdown Button Text</label>
+                  <p className="text-[11px] text-slate-400">Default label shown on the navbar dropdown button before a specific country is selected or matched.</p>
+                  <input
+                    type="text"
+                    value={menuSettings.countryDropdownText || ''}
+                    onChange={(e) => setMenuSettings((prev: any) => ({ ...prev, countryDropdownText: e.target.value }))}
+                    placeholder="Select Country"
+                    className="w-full px-2.5 py-1.5 rounded-md border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#5C2B6A]/40 focus:border-[#5C2B6A] transition-all text-xs"
+                  />
+                </div>
+
+                {/* Country Dropdown Links */}
+                <div className="space-y-3 md:col-span-2 pt-3 border-t border-slate-200">
+                  <div className="flex justify-between items-center">
+                    <div>
+                      <label className="text-xs font-bold text-slate-800">Header Country Dropdown Links</label>
+                      <p className="text-[11px] text-slate-400">Add countries and target URLs for the header dropdown before Contact Us button.</p>
+                    </div>
+                    <Button
+                      type="button"
+                      size="xs"
+                      variant="outline"
+                      onClick={() => {
+                        const existing: any[] = menuSettings.countryLinks || [];
+                        // Pick first available country not yet added
+                        const available = ALL_COUNTRIES_LIST.find((c) => !existing.some((e: any) => e.countryCode === c.code));
+                        if (!available) {
+                          toast.error('All countries have already been added.');
+                          return;
+                        }
+                        setMenuSettings((prev: any) => ({
+                          ...prev,
+                          countryLinks: [
+                            ...existing,
+                            { countryCode: available.code, countryName: available.name, redirectUrl: '' }
+                          ]
+                        }));
+                      }}
+                      className="gap-1 h-7 text-[10px]"
+                    >
+                      <Plus className="w-3 h-3" /> Add Country
+                    </Button>
+                  </div>
+
+                  <div className="space-y-2">
+                    {((menuSettings.countryLinks as any[]) || []).map((cLink: any, idx: number) => {
+                      const selectedCodes = (menuSettings.countryLinks as any[]).map((c: any) => c.countryCode);
+                      return (
+                        <div key={idx} className="p-3 bg-slate-50 rounded-xl border border-slate-200 flex items-center gap-3 relative">
+                          <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <div>
+                              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wide block mb-1">Country</span>
+                              <select
+                                value={cLink.countryCode}
+                                onChange={(e) => {
+                                  const code = e.target.value;
+                                  const countryObj = ALL_COUNTRIES_LIST.find((c) => c.code === code);
+                                  const updated = [...(menuSettings.countryLinks || [])];
+                                  updated[idx] = {
+                                    ...updated[idx],
+                                    countryCode: code,
+                                    countryName: countryObj ? countryObj.name : code,
+                                  };
+                                  setMenuSettings((prev: any) => ({ ...prev, countryLinks: updated }));
+                                }}
+                                className="w-full px-2 py-1 rounded bg-white border border-slate-200 text-xs focus:outline-none focus:ring-1 focus:ring-[#5C2B6A]"
+                              >
+                                {ALL_COUNTRIES_LIST.map((c) => {
+                                  const isSelectedElseWhere = selectedCodes.includes(c.code) && c.code !== cLink.countryCode;
+                                  return (
+                                    <option key={c.code} value={c.code} disabled={isSelectedElseWhere}>
+                                      {c.name} {isSelectedElseWhere ? '(Already Added)' : ''}
+                                    </option>
+                                  );
+                                })}
+                              </select>
+                            </div>
+
+                            <div>
+                              <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wide block mb-1">Target Published Page</span>
+                              <select
+                                value={cLink.pageId || ''}
+                                onChange={(e) => {
+                                  const pId = e.target.value;
+                                  const selectedPage = registryPages.find((p) => p.id === pId);
+                                  const updated = [...(menuSettings.countryLinks || [])];
+                                  updated[idx] = {
+                                    ...updated[idx],
+                                    pageId: pId,
+                                    redirectUrl: selectedPage ? selectedPage.routePath : '',
+                                  };
+                                  setMenuSettings((prev: any) => ({ ...prev, countryLinks: updated }));
+                                }}
+                                className="w-full px-2 py-1 rounded bg-white border border-slate-200 text-xs focus:outline-none focus:ring-1 focus:ring-[#5C2B6A]"
+                              >
+                                <option value="">Select target page...</option>
+                                {registryPages
+                                  .filter((p) => p.status === 'published')
+                                  .map((page) => {
+                                    const selectedPageIds = ((menuSettings.countryLinks as any[]) || []).map((c: any) => c.pageId);
+                                    const isPageSelectedElsewhere = selectedPageIds.includes(page.id) && page.id !== cLink.pageId;
+                                    return (
+                                      <option key={page.id} value={page.id} disabled={isPageSelectedElsewhere}>
+                                        {page.title} ({page.routePath}) {isPageSelectedElsewhere ? '(Assigned to another country)' : ''}
+                                      </option>
+                                    );
+                                  })}
+                              </select>
+                              {cLink.redirectUrl ? (
+                                <p className="text-[10px] font-mono text-slate-400 pt-0.5">Route: {cLink.redirectUrl}</p>
+                              ) : null}
+                            </div>
+                          </div>
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const updated = [...(menuSettings.countryLinks || [])];
+                              updated.splice(idx, 1);
+                              setMenuSettings((prev: any) => ({ ...prev, countryLinks: updated }));
+                            }}
+                            className="text-slate-400 hover:text-rose-500 p-1.5 transition-colors cursor-pointer shrink-0"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      );
+                    })}
+
+                    {(!menuSettings.countryLinks || menuSettings.countryLinks.length === 0) && (
+                      <p className="text-xs text-slate-400 italic py-2">No countries configured for header dropdown yet. Click "Add Country" to add one.</p>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>

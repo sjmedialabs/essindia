@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { getHeroBackgroundStyles } from '@/lib/utils';
 import { MotionSection } from '@/components/animations/MotionSection';
+import { HeroTitle } from '@/components/ui/HeroTitle';
 
 interface StatItem {
   title?: string;
@@ -13,6 +14,8 @@ interface AboutUsHeroContent {
   gradientColor1?: string;
   gradientColor2?: string;
   gradientColor3?: string;
+  titleGradientFrom?: string;
+  titleGradientTo?: string;
   subtitle?: string; // used for the badge
   title?: string;
   description?: string;
@@ -34,11 +37,12 @@ const defaultStats: StatItem[] = [
 export function AboutUsHero({ content }: AboutUsHeroProps) {
   const badge = content?.subtitle || "Our Legacy & Future";
   const title = content?.title || "Empowering Global Enterprises Through Digital Excellence";
+  const titleGradientFrom = content?.titleGradientFrom;
+  const titleGradientTo = content?.titleGradientTo;
   const description = content?.description || "At Eastern Software Solutions, we build technology solutions that drive transformation, create long-term value, and shape the future of business.";
   const stats = content?.items || defaultStats;
   const bgImage = content?.bgImage || "/about-us/banner.png";
 
-  
   const bgStyles = getHeroBackgroundStyles({
     gradientColor1: content?.gradientColor1,
     gradientColor2: content?.gradientColor2,
@@ -67,14 +71,27 @@ export function AboutUsHero({ content }: AboutUsHeroProps) {
         </motion.div>
 
         {/* Heading */}
-        <motion.h1
+        <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.1 }}
-          className="text-3xl md:text-4xl lg:text-5xl font-extralight tracking-tight max-w-3xl leading-[1.15] mb-6"
+          className="max-w-3xl mb-6"
         >
-          {title}
-        </motion.h1>
+          {(titleGradientFrom || titleGradientTo) && (content as any)?.enableTitleGradientAnimation !== false ? (
+            <HeroTitle
+              as="h1"
+              title={title}
+              gradientFrom={titleGradientFrom}
+              gradientTo={titleGradientTo}
+              enableAnimation={(content as any)?.enableTitleGradientAnimation}
+              className="text-3xl md:text-4xl lg:text-5xl font-extralight tracking-tight leading-[1.15] justify-center"
+            />
+          ) : (
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-extralight tracking-tight max-w-3xl leading-[1.15] text-white">
+              {title}
+            </h1>
+          )}
+        </motion.div>
 
         {/* Description */}
         <motion.p

@@ -6,6 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { useCtaAction, type CtaFormType } from '@/hooks/useCtaAction';
+import { HeroTitle } from '@/components/ui/HeroTitle';
 
 interface FmcgHeroContent {
   gradientColor1?: string;
@@ -82,12 +83,23 @@ export function FmcgHero({ content }: { content?: FmcgHeroContent }) {
               </span>
             )}
 
-            <h1
-              className="text-4xl sm:text-5xl lg:text-6xl font-light tracking-tight leading-[1.1] mb-6 whitespace-pre-line"
-              style={{ color: titleColor }}
-            >
-              {title}
-            </h1>
+            {((content as any)?.titleGradientFrom || (content as any)?.titleGradientTo) && (content as any)?.enableTitleGradientAnimation !== false ? (
+              <HeroTitle
+                as="h1"
+                title={title.replace(/<[^>]*>/g, '')}
+                gradientFrom={(content as any)?.titleGradientFrom}
+                gradientTo={(content as any)?.titleGradientTo}
+                enableAnimation={(content as any)?.enableTitleGradientAnimation}
+                className="text-4xl sm:text-5xl lg:text-6xl font-light tracking-tight leading-[1.1] mb-6 whitespace-pre-line text-left"
+              />
+            ) : (
+              <h1
+                className="text-4xl sm:text-5xl lg:text-6xl font-light tracking-tight leading-[1.1] mb-6 whitespace-pre-line"
+                style={{ color: titleColor }}
+              >
+                {title}
+              </h1>
+            )}
 
             <p
               className="text-base sm:text-lg leading-relaxed font-light mb-8 max-w-xl opacity-90"

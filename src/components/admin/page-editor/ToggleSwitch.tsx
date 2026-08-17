@@ -23,7 +23,7 @@ export function ToggleSwitch({ fieldKey, label, value, onChange }: ToggleSwitchP
         onClick={() => onChange(!value)}
         className={cn(
           'relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200',
-          value ? 'bg-[#4B2A63]' : 'bg-slate-200'
+          value ? 'bg-emerald-500' : 'bg-slate-300'
         )}
       >
         <span

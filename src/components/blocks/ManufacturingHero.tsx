@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { getHeroBackgroundStyles } from '@/lib/utils';
 import { motion } from 'framer-motion';
+import { HeroTitle } from '@/components/ui/HeroTitle';
 
 export default function ManufacturingHero({ content }: { content?: any }) {
   const bgColor = content?.bgColor || '#27256b';
@@ -51,7 +52,16 @@ export default function ManufacturingHero({ content }: { content?: any }) {
               </div>
             )}
 
-             {title.includes('<p>') ? (
+             {(content?.titleGradientFrom || content?.titleGradientTo) && (content as any)?.enableTitleGradientAnimation !== false ? (
+              <HeroTitle
+                as="h1"
+                title={title.replace(/<br\s*\/?>/gi, ' ').replace(/<[^>]*>/g, '')}
+                gradientFrom={content.titleGradientFrom}
+                gradientTo={content.titleGradientTo}
+                enableAnimation={(content as any)?.enableTitleGradientAnimation}
+                className="text-4xl sm:text-5xl lg:text-6xl leading-[1.1] font-light tracking-tight mb-6 text-left"
+              />
+            ) : title.includes('<p>') ? (
               <div 
                 className="text-4xl sm:text-5xl lg:text-6xl leading-[1.1] font-light tracking-tight mb-6 prose prose-invert max-w-none" 
                 style={{ color: titleColor }}

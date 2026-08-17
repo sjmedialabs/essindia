@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation';
 import { Check, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { useCtaAction, type CtaFormType } from '@/hooks/useCtaAction';
+import { HeroTitle } from '@/components/ui/HeroTitle';
 
 
 export interface BadgeItem {
@@ -18,6 +19,8 @@ export interface Landing2HeroContent {
   gradientColor3?: string;
   bgColor?: string;
   title?: string;
+  titleGradientFrom?: string;
+  titleGradientTo?: string;
   subtitle?: string;
   badges?: BadgeItem[];
   primaryCtaText?: string;
@@ -187,9 +190,20 @@ export function Landing2Hero({ content }: { content?: Landing2HeroContent }) {
         <div className="lg:col-span-7 space-y-4 text-left">
           {/* Main Title */}
           {data.title && (
-            <h1 className="text-white text-3xl md:text-5xl font-bold tracking-tight leading-[1.15]">
-              {data.title}
-            </h1>
+            (data.titleGradientFrom || data.titleGradientTo) && (data as any)?.enableTitleGradientAnimation !== false ? (
+              <HeroTitle
+                as="h1"
+                title={data.title}
+                gradientFrom={data.titleGradientFrom}
+                gradientTo={data.titleGradientTo}
+                enableAnimation={(data as any)?.enableTitleGradientAnimation}
+                className="text-3xl md:text-5xl font-bold tracking-tight leading-[1.15]"
+              />
+            ) : (
+              <h1 className="text-white text-3xl md:text-5xl font-bold tracking-tight leading-[1.15]">
+                {data.title}
+              </h1>
+            )
           )}
 
           {/* Subtitle */}

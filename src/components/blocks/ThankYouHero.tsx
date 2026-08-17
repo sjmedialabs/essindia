@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { CheckCircle2 } from 'lucide-react';
 import { ThankYouPdfHandler } from '@/components/forms/ThankYouPdfHandler';
+import { HeroTitle } from '@/components/ui/HeroTitle';
 
 export interface ThankYouHeroContent {
   badgeText?: string;
@@ -69,12 +70,23 @@ export function ThankYouHero({ content }: { content?: ThankYouHeroContent }) {
         )}
 
         {title && (
-          <h1
-            className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight"
-            style={{ color: titleColor }}
-          >
-            {title}
-          </h1>
+          ((content as any)?.titleGradientFrom || (content as any)?.titleGradientTo) && (content as any)?.enableTitleGradientAnimation !== false ? (
+            <HeroTitle
+              as="h1"
+              title={title}
+              gradientFrom={(content as any)?.titleGradientFrom}
+              gradientTo={(content as any)?.titleGradientTo}
+              enableAnimation={(content as any)?.enableTitleGradientAnimation}
+              className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight justify-center"
+            />
+          ) : (
+            <h1
+              className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight"
+              style={{ color: titleColor }}
+            >
+              {title}
+            </h1>
+          )
         )}
 
         {description && (

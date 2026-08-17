@@ -5,6 +5,7 @@ import { getHeroBackgroundStyles } from '@/lib/utils';
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import { HeroTitle } from '@/components/ui/HeroTitle';
 
 interface HospitalHeroContent {
   gradientColor1?: string;
@@ -72,7 +73,16 @@ export function HospitalHero({ content }: HospitalHeroProps) {
               {badgeText}
             </div>
 
-            {title.includes('<p>') ? (
+            {((content as any)?.titleGradientFrom || (content as any)?.titleGradientTo) && (content as any)?.enableTitleGradientAnimation !== false ? (
+              <HeroTitle
+                as="h1"
+                title={title.replace(/<[^>]*>/g, '')}
+                gradientFrom={(content as any)?.titleGradientFrom}
+                gradientTo={(content as any)?.titleGradientTo}
+                enableAnimation={(content as any)?.enableTitleGradientAnimation}
+                className="text-4xl sm:text-5xl lg:text-6xl font-light leading-[1.1] mb-6 text-left"
+              />
+            ) : title.includes('<p>') ? (
               <div
                 className="text-4xl sm:text-5xl lg:text-6xl font-light leading-[1.1] mb-6 prose prose-invert max-w-none"
                 style={{ color: titleColor }}
