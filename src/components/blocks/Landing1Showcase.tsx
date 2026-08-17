@@ -82,20 +82,25 @@ export function Landing1Showcase({ content }: { content?: Landing1ShowcaseConten
   const activeMedia = activeTabData?.image || (activeTabData as any)?.videoUrl || '';
 
   const isVideoFile = (url: string) => {
-    return url && (url.toLowerCase().match(/\.(mp4|webm|mov|ogg)$/) || url.startsWith('/uploads/') || url.includes('video'));
+    if (!url) return false;
+    const lower = url.toLowerCase();
+    return Boolean(lower.match(/\.(mp4|webm|mov|ogg)$/) || lower.includes('/video/') || lower.includes('youtube.com') || lower.includes('vimeo.com'));
   };
 
   const primaryFormType = (activeTabData?.primaryCtaFormType || '') as CtaFormType;
   const secondaryFormType = (activeTabData?.secondaryCtaFormType || '') as CtaFormType;
 
+  const primaryUrl = activeTabData?.primaryCtaUrl && activeTabData.primaryCtaUrl.trim() !== '' ? activeTabData.primaryCtaUrl : '/contact-us';
+  const secondaryUrl = activeTabData?.secondaryCtaUrl && activeTabData.secondaryCtaUrl.trim() !== '' ? activeTabData.secondaryCtaUrl : '/contact-us';
+
   const { handleClick: handlePrimaryClick, modalNode: primaryModal } = useCtaAction(
-    activeTabData?.primaryCtaUrl || '/contact-us',
+    primaryUrl,
     primaryFormType,
     activeTabData?.primaryCtaPdfUrl
   );
 
   const { handleClick: handleSecondaryClick, modalNode: secondaryModal } = useCtaAction(
-    activeTabData?.secondaryCtaUrl || '/contact-us',
+    secondaryUrl,
     secondaryFormType,
     activeTabData?.secondaryCtaPdfUrl
   );
@@ -191,12 +196,21 @@ export function Landing1Showcase({ content }: { content?: Landing1ShowcaseConten
                     onClick={() => activeMedia && setIsVideoModalOpen(true)}
                     className="relative w-full h-full cursor-pointer"
                   >
-                    <Image
-                      src={activeMedia || '/Landing page1/assets/Frame 1618872978.png'}
-                      alt={data.tabs[activeTab].title}
-                      fill
-                      className="object-cover object-top"
-                    />
+                    {(() => {
+                      let imgSrc = activeMedia && activeMedia.trim() !== '' ? activeMedia.trim() : '/Landing page1/assets/Frame 1618872978.png';
+                      if (!imgSrc.startsWith('/') && !imgSrc.startsWith('http://') && !imgSrc.startsWith('https://')) {
+                        imgSrc = `/${imgSrc}`;
+                      }
+                      return (
+                        <Image
+                          src={imgSrc}
+                          alt={data.tabs[activeTab].title || 'Showcase Image'}
+                          fill
+                          className="object-cover object-top"
+                          unoptimized={imgSrc.startsWith('http://') || imgSrc.startsWith('https://')}
+                        />
+                      );
+                    })()}
                     {/* Play Button Overlay */}
                     <div className="absolute inset-0 flex items-center justify-center bg-black/20 hover:bg-black/30 transition-colors">
                       <div className="w-16 h-16 rounded-full bg-red-600 flex items-center justify-center shadow-lg transition-transform group-hover:scale-110 duration-200">

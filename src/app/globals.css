@@ -232,3 +232,22 @@ img,
   background-size: 200% 200% !important;
   animation: heroGradientLoop 4s linear infinite !important;
 }
+
+/* Global Section Heading <h2> Default Styling */
+section h2 {
+  font-weight: 200 !important; /* font-extralight */
+  font-size: 1.25rem; /* text-xl */
+  line-height: 1.2;
+}
+
+@media (min-width: 640px) {
+  section h2 {
+    font-size: 2.25rem; /* sm:text-4xl */
+  }
+}
+
+@media (min-width: 1024px) {
+  section h2 {
+    font-size: 40px; /* lg:text-[40px] */
+  }
+}
