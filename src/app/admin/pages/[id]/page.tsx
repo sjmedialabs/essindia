@@ -1664,45 +1664,69 @@ function BlogManager({ pageId, onRefresh, blogListSection }: BlogManagerProps) {
                             </div>
 
                             <div className="space-y-2">
-                              {seg.rows?.map((row: any, rIdx: number) => (
-                                <div key={rIdx} className="grid grid-cols-2 gap-2 items-center p-2 border border-slate-100 rounded-lg">
-                                  <input
-                                    type="text"
-                                    placeholder="Column 1 Item"
-                                    value={row.col1Title || ''}
-                                    onChange={(e) => {
-                                      const copy = [...contentSegments];
-                                      copy[sIdx].rows[rIdx].col1Title = e.target.value;
-                                      setContentSegments(copy);
-                                    }}
-                                    className="admin-input text-xs"
-                                  />
-                                  <input
-                                    type="text"
-                                    placeholder="Column 2 Matched Item"
-                                    value={row.col2Text || ''}
-                                    onChange={(e) => {
-                                      const copy = [...contentSegments];
-                                      copy[sIdx].rows[rIdx].col2Text = e.target.value;
-                                      setContentSegments(copy);
-                                    }}
-                                    className="admin-input text-xs"
-                                  />
-                                </div>
-                              ))}
-                              <Button
-                                type="button"
-                                variant="outline"
-                                size="sm"
-                                onClick={() => {
-                                  const copy = [...contentSegments];
-                                  copy[sIdx].rows = [...(copy[sIdx].rows || []), { col1Title: 'Item', col2Text: 'Matched Value' }];
-                                  setContentSegments(copy);
-                                }}
-                                className="text-xs rounded-full w-full"
-                              >
-                                + Add Table Row
-                              </Button>
+                              <div className="space-y-3">
+                                {seg.rows?.map((row: any, rIdx: number) => (
+                                  <div key={rIdx} className="p-3 border border-slate-200 rounded-xl bg-white space-y-2">
+                                    <div className="grid grid-cols-2 gap-2 items-center">
+                                      <div>
+                                        <label className="block text-[10px] font-bold text-slate-500 mb-0.5">Col 1 Title</label>
+                                        <input
+                                          type="text"
+                                          placeholder="Column 1 Title"
+                                          value={row.col1Title || ''}
+                                          onChange={(e) => {
+                                            const copy = [...contentSegments];
+                                            copy[sIdx].rows[rIdx].col1Title = e.target.value;
+                                            setContentSegments(copy);
+                                          }}
+                                          className="admin-input text-xs"
+                                        />
+                                      </div>
+                                      <div>
+                                        <label className="block text-[10px] font-bold text-slate-500 mb-0.5">Col 2 Text</label>
+                                        <input
+                                          type="text"
+                                          placeholder="Column 2 Value"
+                                          value={row.col2Text || ''}
+                                          onChange={(e) => {
+                                            const copy = [...contentSegments];
+                                            copy[sIdx].rows[rIdx].col2Text = e.target.value;
+                                            setContentSegments(copy);
+                                          }}
+                                          className="admin-input text-xs"
+                                        />
+                                      </div>
+                                    </div>
+                                    <div>
+                                      <label className="block text-[10px] font-bold text-slate-500 mb-0.5">Col 1 Description (Optional)</label>
+                                      <textarea
+                                        rows={2}
+                                        placeholder="Enter Column 1 description..."
+                                        value={row.col1Desc || ''}
+                                        onChange={(e) => {
+                                          const copy = [...contentSegments];
+                                          copy[sIdx].rows[rIdx].col1Desc = e.target.value;
+                                          setContentSegments(copy);
+                                        }}
+                                        className="admin-input text-xs w-full resize-y"
+                                      />
+                                    </div>
+                                  </div>
+                                ))}
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => {
+                                    const copy = [...contentSegments];
+                                    copy[sIdx].rows = [...(copy[sIdx].rows || []), { col1Title: 'Item', col1Desc: '', col2Text: 'Matched Value' }];
+                                    setContentSegments(copy);
+                                  }}
+                                  className="text-xs rounded-full w-full"
+                                >
+                                  + Add Table Row
+                                </Button>
+                              </div>
                             </div>
                           </div>
                         )}

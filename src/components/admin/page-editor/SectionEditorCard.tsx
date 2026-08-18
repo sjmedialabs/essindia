@@ -215,10 +215,10 @@ const DEFAULT_BLOG_CONTENT: Record<string, any> = {
       column1Title: 'App Complexity',
       column2Title: 'Estimated Timelines by App Complexity',
       rows: [
-        { col1Title: 'Simple Apps', col2Text: '2 to 4 Months' },
-        { col1Title: 'Mid-Complexity Apps', col2Text: '4 to 8 Months' },
-        { col1Title: 'Enterprise-Grade Applications', col2Text: '9 to 18+ Months' },
-        { col1Title: 'AI-Powered Applications', col2Text: '10 to 20+ Months' }
+        { col1Title: 'Simple Apps', col1Desc: 'Basic features with minimal integrations and workflows.', col2Text: '2 to 4 Months' },
+        { col1Title: 'Mid-Complexity Apps', col1Desc: 'More features, user roles, and third-party integrations.', col2Text: '4 to 8 Months' },
+        { col1Title: 'Enterprise-Grade Applications', col1Desc: 'Advanced workflows, high scalability, security & compliance.', col2Text: '9 to 18+ Months' },
+        { col1Title: 'AI-Powered Applications', col1Desc: 'AI/ML capabilities, data processing, and predictive intelligence.', col2Text: '10 to 20+ Months' }
       ]
     }
   ],
@@ -808,6 +808,28 @@ const DEFAULT_FMCG_INTEGRATIONS_CONTENT: Record<string, any> = {
     { image: '/BI-industy solution-FMGC/Rectangle 150.png', title: 'POS' },
     { image: '/BI-industy solution-FMGC/Rectangle 150.png', title: 'External Data' }
   ]
+};
+
+const DEFAULT_BI_FEATURES_CONTENT: Record<string, any> = {
+  sectionTitle: 'Features for BI',
+  column1Title: 'FEATURES',
+  column2Title: 'SAGE 200 STANDARD',
+  column3Title: 'SAGE 200 PROFESSIONAL',
+  rows: [
+    { featureName: 'Interactive dashboards', standard: 'no', professional: 'yes' },
+    { featureName: 'Real-time data visualization', standard: 'no', professional: 'yes' },
+    { featureName: 'Drag & drop report builder', standard: 'no', professional: 'yes' },
+    { featureName: 'Pre-built BI reports & KPIs', standard: 'yes', professional: 'yes' },
+    { featureName: 'Ad-hoc reporting', standard: 'yes', professional: 'yes' },
+    { featureName: 'Data drill-down & filtering', standard: 'yes', professional: 'yes' },
+    { featureName: 'Multi-source data integration', standard: 'no', professional: 'yes' },
+    { featureName: 'Advanced analytics & forecasting', standard: 'no', professional: 'yes' },
+    { featureName: 'Custom metrics & calculated fields', standard: 'no', professional: 'yes' },
+    { featureName: 'Scheduled reports & email delivery', standard: 'no', professional: 'yes' },
+    { featureName: 'Mobile BI access', standard: 'no', professional: 'yes' },
+    { featureName: 'Role-based access to insights', standard: 'yes', professional: 'yes' },
+    { featureName: 'AI-powered insights & anomaly detection', standard: 'no', professional: 'yes' },
+  ],
 };
 
 const DEFAULT_FMCG_FAQ_CONTENT: Record<string, any> = {
@@ -1977,12 +1999,41 @@ const DEFAULT_UGANDA_PRESENCE_CONTENT: Record<string, any> = {
 
 const DEFAULT_UGANDA_SERVICES_CONTENT: Record<string, any> = {
   badgeText: 'OUR SERVICES',
-  title: 'We provide great services for our customers based on needs',
+  title: 'Smart digital solutions that drive real results.',
+  description: 'We turn ideas into powerful digital experiences that help your business grow and succeed.',
   cards: [
-    { image: '/About-Uganda/Designer-rafiki.png', title: 'Custom Software Development', description: 'With lots of unique blocks, you can easily build a page without coding. Build your next landing page.', ctaText: 'Learn more', ctaUrl: '/contact-us' },
-    { image: '/About-Uganda/Programming-rafiki.png', title: 'Web & Mobile App Development', description: 'With lots of unique blocks, you can easily build a page without coding. Build your next landing page.', ctaText: 'Learn more', ctaUrl: '/contact-us' },
-    { image: '/About-Uganda/Notes-rafiki.png', title: 'Enterprise & ERP Solutions', description: 'With lots of unique blocks, you can easily build a page without coding. Build your next landing page.', ctaText: 'Learn more', ctaUrl: '/contact-us' },
-    { image: '/About-Uganda/image 148.png', title: 'Cloud Application Development', description: 'With lots of unique blocks, you can easily build a page without coding. Build your next landing page.', ctaText: 'Learn more', ctaUrl: '/contact-us' },
+    {
+      image: '/software_svgrepo.com.png',
+      title: 'Custom Software Development',
+      description: 'Robust software solutions built around your business needs to solve complex challenges.',
+      points: ['Customized Solutions', 'Scalable Architecture', 'Ongoing Support'],
+      ctaText: 'Learn more',
+      ctaUrl: '/contact-us',
+    },
+    {
+      image: '/smartphone-coding_svgrepo.com.png',
+      title: 'Web & Mobile App Development',
+      description: 'Engaging web and mobile apps designed to deliver seamless experiences on any device.',
+      points: ['Responsive Design', 'Cross-platform Apps', 'User-centric UI/UX'],
+      ctaText: 'Learn more',
+      ctaUrl: '/contact-us',
+    },
+    {
+      image: '/online-payment_svgrepo.com.png',
+      title: 'Enterprise & ERP Solutions',
+      description: 'Comprehensive enterprise solutions to streamline operations and improve business performance.',
+      points: ['Process Automation', 'Data-driven Insights', 'Seamless Integration'],
+      ctaText: 'Learn more',
+      ctaUrl: '/contact-us',
+    },
+    {
+      image: '/cloud-app_svgrepo.com.png',
+      title: 'Cloud Application Development',
+      description: 'Secure, reliable and cost-effective cloud solutions to accelerate your business in the digital era.',
+      points: ['Cloud Migration', 'High Availability', 'Cost Optimization'],
+      ctaText: 'Learn more',
+      ctaUrl: '/contact-us',
+    },
   ],
 };
 
@@ -2272,6 +2323,8 @@ export function SectionEditorCard({
         baseSchema = DEFAULT_BI_INDUSTRIES_CONTENT as Record<string, JsonValue>;
       } else if (section.type === 'bi-industry-services') {
         baseSchema = DEFAULT_BI_INDUSTRY_SERVICES_CONTENT as Record<string, JsonValue>;
+      } else if (section.type === 'bi-features') {
+        baseSchema = DEFAULT_BI_FEATURES_CONTENT as Record<string, JsonValue>;
       } else if (section.type === 'rpa-hero') {
         baseSchema = DEFAULT_RPA_HERO_CONTENT as Record<string, JsonValue>;
       } else if (section.type === 'rpa-overview') {
@@ -2431,6 +2484,17 @@ export function SectionEditorCard({
       });
     }
 
+    // Ensure title gradient fields exist on Hero sections
+    if (section.type === 'hero' || section.type.endsWith('-hero')) {
+      if (!('titleGradientFrom' in finalMerged)) finalMerged.titleGradientFrom = (section.content as any)?.titleGradientFrom || '';
+      if (!('titleGradientTo' in finalMerged)) finalMerged.titleGradientTo = (section.content as any)?.titleGradientTo || '';
+      finalMerged.enableTitleGradientAnimation = Boolean(
+        typeof finalMerged.enableTitleGradientAnimation === 'boolean'
+          ? finalMerged.enableTitleGradientAnimation
+          : finalMerged.enableTitleGradientAnimation !== 'false'
+      );
+    }
+
     return finalMerged;
   }, [schema, section.content, section.type]);
 
@@ -2523,11 +2587,24 @@ export function SectionEditorCard({
     });
 
     // Fallback: append any active PDF keys that were missed
-    activePdfKeys.forEach((pk) => {
-      if (!orderedKeys.includes(pk)) {
-        orderedKeys.push(pk);
+    // Ensure hero title gradient keys are in orderedKeys if present in mergedContent
+    if (section.type === 'hero' || section.type.endsWith('-hero')) {
+      const gradientKeys = ['titleGradientFrom', 'titleGradientTo', 'enableTitleGradientAnimation'];
+      const titleIndex = orderedKeys.findIndex(k => k === 'title' || k === 'titleText' || k === 'heading');
+      if (titleIndex !== -1) {
+        gradientKeys.forEach((gk, offset) => {
+          if (!orderedKeys.includes(gk) && gk in mergedContent) {
+            orderedKeys.splice(titleIndex + 1 + offset, 0, gk);
+          }
+        });
+      } else {
+        gradientKeys.forEach((gk) => {
+          if (!orderedKeys.includes(gk) && gk in mergedContent) {
+            orderedKeys.push(gk);
+          }
+        });
       }
-    });
+    }
 
     return orderedKeys.filter((k) => !isHiddenCmsField(k));
   }, [mergedContent, meta, section.type]);

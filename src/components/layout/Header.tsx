@@ -20,7 +20,7 @@ import {
   navigationMenuTriggerStyle,
 } from '@/components/ui/navigation-menu';
 import { Button } from '@/components/ui/button';
-import { Menu, X, Search, ChevronDown } from 'lucide-react';
+import { Menu, X, Search, ChevronDown, Globe } from 'lucide-react';
 
 export type NavItem = {
   id: string;
@@ -32,16 +32,26 @@ export type NavItem = {
   megaMenu?: MegaMenuPayload;
 };
 
+export interface HeaderCountryLink {
+  countryCode: string;
+  countryName: string;
+  redirectUrl: string;
+}
+
 export function Header({
   navData = [],
   logoUrl = '/footer-logo.png',
   getStartedText = 'Get started',
   getStartedLink = '/contact-us',
+  countryDropdownText = 'Select Country',
+  countryLinks = [],
 }: {
   navData?: NavItem[];
   logoUrl?: string;
   getStartedText?: string;
   getStartedLink?: string;
+  countryDropdownText?: string;
+  countryLinks?: HeaderCountryLink[];
 }) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
   const [expandedMobileItems, setExpandedMobileItems] = React.useState<Record<string, boolean>>({});
@@ -87,7 +97,6 @@ export function Header({
           <Link href="/" className="flex items-center group">
             <div className="relative">
               <img src={logoUrl} alt="Eastern Software Solutions Pvt.Ltd" className="h-10 w-[160px]" />
-              {/* <span className="font-bold text-lg text-[#4B2A63] transition-transform duration-500 group-hover:scale-105 inline-block">EASTERN</span> */}
             </div>
           </Link>
 
@@ -97,10 +106,11 @@ export function Header({
           </div>
 
           {/* Right Actions */}
-          <div className="hidden lg:flex items-center space-x-4">
-            {/* <button className="text-slate-600 hover:text-slate-900 transition-colors p-2 hover:bg-slate-50 rounded-full cursor-pointer">
-              <Search className="w-5 h-5" />
-            </button> */}
+          <div className="hidden lg:flex items-center space-x-3">
+            {countryLinks && countryLinks.length > 0 && (
+              <HeaderCountryDropdown countries={countryLinks} buttonText={countryDropdownText} />
+            )}
+
             <Link href={getStartedLink}>
               <Button className="bg-[#111] hover:bg-black text-white rounded-none px-6 py-2 transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 active:scale-95 cursor-pointer">
                 {getStartedText}
@@ -210,7 +220,12 @@ export function Header({
               })}
             </nav>
 
-            <div className="pt-4 border-t border-slate-100">
+            <div className="pt-4 border-t border-slate-100 flex flex-col gap-3">
+              {countryLinks && countryLinks.length > 0 && (
+                <div className="w-full">
+                  <HeaderCountryDropdown countries={countryLinks} buttonText={countryDropdownText} isMobile onNavigate={() => setIsMobileMenuOpen(false)} />
+                </div>
+              )}
               <Link href={getStartedLink} onClick={() => setIsMobileMenuOpen(false)} className="w-full block">
                 <Button className="w-full bg-[#111] hover:bg-black text-white rounded-none py-2 px-6 transition-all duration-300 hover:shadow-xl font-medium">
                   {getStartedText}
@@ -239,9 +254,9 @@ function DesktopNav({ items = [] }: { items: NavItem[] }) {
 
   if (!mounted) {
     return (
-      <div className="flex items-center gap-6">
+      <div className="flex items-center gap-1.5">
         {items.map((item) => (
-          <span key={item.id} className="text-[13px] text-slate-700 font-medium opacity-80">
+          <span key={item.id} className="text-[13px] text-slate-700 font-medium opacity-80 px-2 py-1">
             {item.label}
           </span>
         ))}
@@ -251,7 +266,7 @@ function DesktopNav({ items = [] }: { items: NavItem[] }) {
 
   return (
     <NavigationMenu align="center" value={value} onValueChange={setValue}>
-      <NavigationMenuList className="gap-2">
+      <NavigationMenuList className="gap-0.5">
         {items.map((item) => {
           const isDropdown = item.megaMenuConfig?.displayType === 'dropdown';
           const simpleLinks = item.megaMenuConfig?.links || [];
@@ -264,7 +279,7 @@ function DesktopNav({ items = [] }: { items: NavItem[] }) {
               {hasRenderableMegaMenu(item.megaMenu) ? (
                 isDropdown || !hasSubCategories ? (
                   <>
-                    <NavigationMenuTrigger className="bg-transparent hover:bg-slate-50 text-[13px] text-slate-700 font-medium cursor-pointer">
+                    <NavigationMenuTrigger className="bg-transparent hover:bg-slate-50 text-[13px] text-slate-700 font-medium cursor-pointer px-2.5 py-1">
                       {item.label}
                     </NavigationMenuTrigger>
                     <NavigationMenuContent>
@@ -291,7 +306,7 @@ function DesktopNav({ items = [] }: { items: NavItem[] }) {
                   </>
                 ) : (
                   <>
-                    <NavigationMenuTrigger className="bg-transparent hover:bg-slate-50 text-[13px] text-slate-700 font-medium cursor-pointer">
+                    <NavigationMenuTrigger className="bg-transparent hover:bg-slate-50 text-[13px] text-slate-700 font-medium cursor-pointer px-2.5 py-1">
                       {item.label}
                     </NavigationMenuTrigger>
                     <MegaMenuContent data={item.megaMenu!} />
@@ -299,7 +314,7 @@ function DesktopNav({ items = [] }: { items: NavItem[] }) {
                 )
               ) : simpleLinks.length > 0 ? (
                 <>
-                  <NavigationMenuTrigger className="bg-transparent hover:bg-slate-50 text-[13px] text-slate-700 font-medium cursor-pointer">
+                  <NavigationMenuTrigger className="bg-transparent hover:bg-slate-50 text-[13px] text-slate-700 font-medium cursor-pointer px-2.5 py-1">
                     {item.label}
                   </NavigationMenuTrigger>
                   <NavigationMenuContent>
@@ -326,7 +341,7 @@ function DesktopNav({ items = [] }: { items: NavItem[] }) {
                 </>
               ) : item.children && item.children.length > 0 ? (
                 <>
-                  <NavigationMenuTrigger className="bg-transparent hover:bg-slate-50 text-[13px] text-slate-700 font-medium cursor-pointer">
+                  <NavigationMenuTrigger className="bg-transparent hover:bg-slate-50 text-[13px] text-slate-700 font-medium cursor-pointer px-2.5 py-1">
                     {item.label}
                   </NavigationMenuTrigger>
                   <NavigationMenuContent>
@@ -342,7 +357,7 @@ function DesktopNav({ items = [] }: { items: NavItem[] }) {
                   </NavigationMenuContent>
                 </>
               ) : (
-                <NavigationMenuLink render={<Link href={item.url || '#'} />} className={cn(navigationMenuTriggerStyle(), "bg-transparent hover:bg-slate-50 text-[13px] text-slate-700 font-medium cursor-pointer")}>
+                <NavigationMenuLink render={<Link href={item.url || '#'} />} className={cn(navigationMenuTriggerStyle(), "bg-transparent hover:bg-slate-50 text-[13px] text-slate-700 font-medium cursor-pointer px-2.5 py-1")}>
                   {item.label}
                 </NavigationMenuLink>
               )}
@@ -378,4 +393,98 @@ const ListItem = React.forwardRef<
   );
 });
 ListItem.displayName = 'ListItem';
+
+function HeaderCountryDropdown({
+  countries,
+  buttonText = 'Select Country',
+  isMobile = false,
+  onNavigate,
+}: {
+  countries: HeaderCountryLink[];
+  buttonText?: string;
+  isMobile?: boolean;
+  onNavigate?: () => void;
+}) {
+  const [isOpen, setIsOpen] = React.useState(false);
+  const dropdownRef = React.useRef<HTMLDivElement>(null);
+  const pathname = usePathname();
+
+  // Active country matching current path
+  const activeCountry = React.useMemo(() => {
+    return countries.find(
+      (c) => c.redirectUrl && c.redirectUrl !== '/' && pathname.startsWith(c.redirectUrl)
+    );
+  }, [countries, pathname]);
+
+  React.useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  if (!countries || countries.length === 0) return null;
+
+  const currentDisplayLabel = activeCountry ? activeCountry.countryName : buttonText;
+  const currentFlagCode = activeCountry ? activeCountry.countryCode : undefined;
+
+  return (
+    <div className={cn("relative inline-block text-left", isMobile && "w-full")} ref={dropdownRef}>
+      <button
+        type="button"
+        onClick={() => setIsOpen(!isOpen)}
+        className={cn(
+          "inline-flex items-center justify-between gap-2 px-3 py-2 text-xs font-semibold text-slate-700 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-md transition-all cursor-pointer",
+          isMobile ? "w-full py-2.5 px-4 text-sm" : "min-w-[130px]"
+        )}
+      >
+        <span className="flex items-center gap-2 truncate">
+          {currentFlagCode ? (
+            <span className={`fi fi-${currentFlagCode.toLowerCase()} shrink-0 rounded-xs w-4 h-3`} />
+          ) : (
+            <Globe className="w-3.5 h-3.5 text-[#5C2B6A] shrink-0" />
+          )}
+          <span className="truncate">{currentDisplayLabel}</span>
+        </span>
+        <ChevronDown className={cn("w-3.5 h-3.5 text-slate-400 transition-transform duration-200 shrink-0", isOpen && "rotate-180")} />
+      </button>
+
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: 6, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 6, scale: 0.98 }}
+            transition={{ duration: 0.15 }}
+            className={cn(
+              "absolute z-50 mt-1 bg-white border border-slate-200 rounded-md shadow-xl overflow-hidden py-1 max-h-60 overflow-y-auto",
+              isMobile ? "left-0 right-0 w-full" : "right-0 min-w-[170px]"
+            )}
+          >
+            {countries.map((item, idx) => (
+              <Link
+                key={idx}
+                href={item.redirectUrl || '#'}
+                onClick={() => {
+                  setIsOpen(false);
+                  if (onNavigate) onNavigate();
+                }}
+                className={cn(
+                  "flex items-center gap-2.5 px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 hover:text-[#4B2A63] transition-colors cursor-pointer",
+                  activeCountry?.countryCode === item.countryCode && "bg-purple-50 text-[#4B2A63] font-semibold"
+                )}
+              >
+                <span className={`fi fi-${item.countryCode.toLowerCase()} shrink-0 rounded-xs w-4 h-3`} />
+                <span className="truncate">{item.countryName}</span>
+              </Link>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
 

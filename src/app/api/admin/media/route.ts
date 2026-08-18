@@ -6,7 +6,6 @@ import { unauthorized, serverError } from '@/lib/cms/api-response';
 import { writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
 import { randomUUID } from 'crypto';
-import sharp from 'sharp';
 
 const IMAGE_MIME = /^image\/(jpeg|jpg|png|webp|gif|avif|tiff)$/i;
 const MAX_WIDTH = 2400;
@@ -22,6 +21,8 @@ async function optimizeImageBuffer(
   }
 
   try {
+    const sharpModule = await import('sharp');
+    const sharp = sharpModule.default || sharpModule;
     const optimized = await sharp(buffer)
       .rotate()
       .resize({
@@ -34,7 +35,8 @@ async function optimizeImageBuffer(
       .toBuffer();
 
     return { buffer: optimized, mimeType: 'image/webp', ext: 'webp' };
-  } catch {
+  } catch (err) {
+    console.warn('Image optimization skipped (sharp optional module fallback):', err);
     return { buffer, mimeType, ext: mimeType.split('/')[1] || 'bin' };
   }
 }

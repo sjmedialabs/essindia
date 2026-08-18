@@ -3,6 +3,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
+import { HeroTitle } from '@/components/ui/HeroTitle';
 
 export interface NotFoundHeroContent {
   badgeText?: string;
@@ -75,15 +76,26 @@ export function NotFoundHero({ content }: { content?: NotFoundHeroContent }) {
         )}
 
         {title && (
-          <motion.h1
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight"
-            style={{ color: titleColor }}
-          >
-            {title}
-          </motion.h1>
+          ((content as any)?.titleGradientFrom || (content as any)?.titleGradientTo) && (content as any)?.enableTitleGradientAnimation !== false ? (
+            <HeroTitle
+              as="h1"
+              title={title}
+              gradientFrom={(content as any)?.titleGradientFrom}
+              gradientTo={(content as any)?.titleGradientTo}
+              enableAnimation={(content as any)?.enableTitleGradientAnimation}
+              className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight justify-center"
+            />
+          ) : (
+            <motion.h1
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight"
+              style={{ color: titleColor }}
+            >
+              {title}
+            </motion.h1>
+          )
         )}
 
         {description && (

@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { useCtaAction, type CtaFormType } from '@/hooks/useCtaAction';
+import { HeroTitle } from '@/components/ui/HeroTitle';
 
 export interface RetailHeroContent {
   gradientColor1?: string;
@@ -71,7 +72,16 @@ export function RetailHero({ content }: { content: RetailHeroContent }) {
               </span>
             )}
 
-            {title.includes('<p>') ? (
+            {((content as any)?.titleGradientFrom || (content as any)?.titleGradientTo) && (content as any)?.enableTitleGradientAnimation !== false ? (
+              <HeroTitle
+                as="h1"
+                title={title.replace(/<[^>]*>/g, '')}
+                gradientFrom={(content as any)?.titleGradientFrom}
+                gradientTo={(content as any)?.titleGradientTo}
+                enableAnimation={(content as any)?.enableTitleGradientAnimation}
+                className="text-4xl sm:text-5xl lg:text-6xl font-light leading-[1.1] mb-6 text-left"
+              />
+            ) : title.includes('<p>') ? (
               <div
                 className="text-4xl sm:text-5xl lg:text-6xl font-light leading-[1.1] mb-6 prose max-w-none"
                 style={{ color: titleColor }}

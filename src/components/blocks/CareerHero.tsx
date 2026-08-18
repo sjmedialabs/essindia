@@ -3,6 +3,7 @@
 import React from 'react';
 import { getHeroBackgroundStyles } from '@/lib/utils';
 import { motion } from 'framer-motion';
+import { HeroTitle } from '@/components/ui/HeroTitle';
 
 export default function CareerHero({ content }: { content?: any }) {
   const {
@@ -41,10 +42,21 @@ export default function CareerHero({ content }: { content?: any }) {
             {ctaText}
           </div>
 
-          <h1
-            className="text-5xl md:text-6xl lg:text-[72px] font-thin tracking-wide text-white mb-8 max-w-5xl mx-auto leading-[1.15]"
-            dangerouslySetInnerHTML={{ __html: title.replace(/\n/g, '<br />') }}
-          />
+          {(content?.titleGradientFrom || content?.titleGradientTo) && (content as any)?.enableTitleGradientAnimation !== false ? (
+            <HeroTitle
+              as="h1"
+              title={title.replace(/\n/g, ' ')}
+              gradientFrom={content.titleGradientFrom}
+              gradientTo={content.titleGradientTo}
+              enableAnimation={(content as any)?.enableTitleGradientAnimation}
+              className="text-5xl md:text-6xl lg:text-[72px] font-thin tracking-wide mb-8 max-w-5xl mx-auto leading-[1.15] justify-center"
+            />
+          ) : (
+            <h1
+              className="text-5xl md:text-6xl lg:text-[72px] font-thin tracking-wide text-white mb-8 max-w-5xl mx-auto leading-[1.15]"
+              dangerouslySetInnerHTML={{ __html: title.replace(/\n/g, '<br />') }}
+            />
+          )}
 
           <p
             className="text-white/90 text-sm md:text-[15px] max-w-2xl mx-auto leading-tight tracking-wide"

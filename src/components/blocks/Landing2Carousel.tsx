@@ -88,7 +88,13 @@ export function Landing2Carousel({ content }: { content?: Landing2CarouselConten
             ) : (
               <div className="relative w-full h-full min-h-[240px] md:min-h-[340px] flex items-center justify-center">
                 <Image
-                  src={activeSlide.mediaUrl || '/Landing Page-2/assets/63e39c93deb059f6e6a6bccf_Bsh.svg.png'}
+                  src={
+                    activeSlide.mediaUrl &&
+                    !activeSlide.mediaUrl.includes('<iframe') &&
+                    (activeSlide.mediaUrl.startsWith('/') || activeSlide.mediaUrl.startsWith('http://') || activeSlide.mediaUrl.startsWith('https://'))
+                      ? activeSlide.mediaUrl
+                      : '/Landing Page-2/assets/63e39c93deb059f6e6a6bccf_Bsh.svg.png'
+                  }
                   alt={activeSlide.title || 'Carousel Media'}
                   fill
                   className="object-contain drop-shadow-2xl"

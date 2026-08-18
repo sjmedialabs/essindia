@@ -6,6 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { useCtaAction, type CtaFormType } from '@/hooks/useCtaAction';
+import { HeroTitle } from '@/components/ui/HeroTitle';
 
 interface StaffingHeroContent {
   gradientColor1?: string;
@@ -70,7 +71,16 @@ export function StaffingHero({ content }: StaffingHeroProps) {
               </span>
             )}
 
-             {title.includes('<p>') ? (
+             {((content as any)?.titleGradientFrom || (content as any)?.titleGradientTo) && (content as any)?.enableTitleGradientAnimation !== false ? (
+              <HeroTitle
+                as="h1"
+                title={title.replace(/<[^>]*>/g, '').replace(/\n/g, ' ')}
+                gradientFrom={(content as any)?.titleGradientFrom}
+                gradientTo={(content as any)?.titleGradientTo}
+                enableAnimation={(content as any)?.enableTitleGradientAnimation}
+                className="text-4xl sm:text-5xl lg:text-6xl font-light mb-6 leading-[1.1] text-left"
+              />
+            ) : title.includes('<p>') ? (
               <div 
                 className="text-4xl sm:text-5xl lg:text-6xl font-light mb-6 leading-[1.1] whitespace-pre-line prose prose-invert max-w-none"
                 style={{ color: titleColor }}

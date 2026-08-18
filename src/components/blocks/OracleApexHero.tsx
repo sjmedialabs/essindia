@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { useCtaAction, type CtaFormType } from '@/hooks/useCtaAction';
 import { getHeroBackgroundStyles } from '@/lib/utils';
+import { HeroTitle } from '@/components/ui/HeroTitle';
 
 interface OracleApexHeroContent {
   gradientColor1?: string;
@@ -110,15 +111,26 @@ export function OracleApexHero({ content }: { content?: OracleApexHeroContent })
 
             {/* Title */}
             {title && (
-              <motion.h1
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay: 0.1 }}
-                className="text-4xl sm:text-5xl lg:text-6xl font-light tracking-tight leading-[1.1] mb-6 whitespace-pre-line"
-                style={{ color: titleTextColor }}
-              >
-                {title}
-              </motion.h1>
+              ((content as any)?.titleGradientFrom || (content as any)?.titleGradientTo) && (content as any)?.enableTitleGradientAnimation !== false ? (
+                <HeroTitle
+                  as="h1"
+                  title={title.replace(/\n/g, ' ')}
+                  gradientFrom={(content as any)?.titleGradientFrom}
+                  gradientTo={(content as any)?.titleGradientTo}
+                  enableAnimation={(content as any)?.enableTitleGradientAnimation}
+                  className="text-4xl sm:text-5xl lg:text-6xl font-light tracking-tight leading-[1.1] mb-6 whitespace-pre-line text-left"
+                />
+              ) : (
+                <motion.h1
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: 0.1 }}
+                  className="text-4xl sm:text-5xl lg:text-6xl font-light tracking-tight leading-[1.1] mb-6 whitespace-pre-line"
+                  style={{ color: titleTextColor }}
+                >
+                  {title}
+                </motion.h1>
+              )
             )}
 
             {/* Description */}

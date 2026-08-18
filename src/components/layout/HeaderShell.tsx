@@ -16,9 +16,18 @@ export async function HeaderShell() {
     const megaMenus = await navigationTreeRepository.getMegaMenusByLocation('header-main');
     const navData = mapNavigationTreeToNavItems(navTree, megaMenus);
 
-    const menuRecord = await db.query.navigationMenus.findFirst({
-      where: eq(navigationMenus.location, 'header-main'),
-    }).catch(() => null);
+    const menuRecord = await db
+      .select({
+        logoUrl: navigationMenus.logoUrl,
+        getStartedText: navigationMenus.getStartedText,
+        getStartedLink: navigationMenus.getStartedLink,
+        countryDropdownText: navigationMenus.countryDropdownText,
+        countryLinks: navigationMenus.countryLinks,
+      })
+      .from(navigationMenus)
+      .where(eq(navigationMenus.location, 'header-main'))
+      .then((rows) => rows[0] || null)
+      .catch(() => null);
 
     return (
       <Header
@@ -26,6 +35,8 @@ export async function HeaderShell() {
         logoUrl={menuRecord?.logoUrl ?? undefined}
         getStartedText={menuRecord?.getStartedText ?? undefined}
         getStartedLink={menuRecord?.getStartedLink ?? undefined}
+        countryDropdownText={menuRecord?.countryDropdownText ?? undefined}
+        countryLinks={(menuRecord?.countryLinks as any[]) ?? []}
       />
     );
   } catch (err) {

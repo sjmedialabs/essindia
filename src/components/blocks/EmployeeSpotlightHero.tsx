@@ -3,6 +3,7 @@
 import React from 'react';
 import { getHeroBackgroundStyles } from '@/lib/utils';
 import { motion } from 'framer-motion';
+import { HeroTitle } from '@/components/ui/HeroTitle';
 
 export function EmployeeSpotlightHero({ content }: { content?: any }) {
   const badge = content?.badge || 'Employee Spotlight';
@@ -10,7 +11,6 @@ export function EmployeeSpotlightHero({ content }: { content?: any }) {
   const description = content?.description || 'At ESS, sustainability isn\'t just a choice—it\'s a lifestyle. Meet the trailblazers among us who are leading the charge for a cleaner planet. From daily cycles to inspiring runs, discover how our team is turning eco-conscious choices into habits that matter.';
   const image = content?.image || '/About-employee spot light/banner.png';
 
-  
   const bgStyles = getHeroBackgroundStyles({
     gradientColor1: content?.gradientColor1,
     gradientColor2: content?.gradientColor2,
@@ -39,7 +39,18 @@ export function EmployeeSpotlightHero({ content }: { content?: any }) {
             {badge}
           </div>
 
-          <h1 className="text-4xl md:text-5xl lg:text-[64px] font-light tracking-wide text-white mb-6 max-w-4xl mx-auto leading-[1.2]" dangerouslySetInnerHTML={{ __html: title }} />
+          {(content?.titleGradientFrom || content?.titleGradientTo) && (content as any)?.enableTitleGradientAnimation !== false ? (
+            <HeroTitle
+              as="h1"
+              title={title.replace(/<br\s*\/?>/gi, ' ').replace(/<[^>]*>/g, '')}
+              gradientFrom={content.titleGradientFrom}
+              gradientTo={content.titleGradientTo}
+              enableAnimation={(content as any)?.enableTitleGradientAnimation}
+              className="text-4xl md:text-5xl lg:text-[64px] font-light tracking-wide mb-6 max-w-4xl mx-auto leading-[1.2] justify-center"
+            />
+          ) : (
+            <h1 className="text-4xl md:text-5xl lg:text-[64px] font-light tracking-wide text-white mb-6 max-w-4xl mx-auto leading-[1.2]" dangerouslySetInnerHTML={{ __html: title }} />
+          )}
 
           <p className="text-white/90 text-sm md:text-base max-w-3xl mx-auto leading-relaxed tracking-wide">
             {description}

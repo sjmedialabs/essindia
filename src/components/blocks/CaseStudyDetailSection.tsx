@@ -6,6 +6,7 @@ import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { type CaseStudyPost, defaultCaseStudies } from '@/lib/case-studies-data';
 import { useInternalNavigate } from '@/hooks/useInternalNavigate';
+import { HeroTitle } from '@/components/ui/HeroTitle';
 
 interface CaseStudyDetailSectionProps {
   content?: any;
@@ -52,12 +53,23 @@ export function CaseStudyDetailSection({ content }: CaseStudyDetailSectionProps)
               )}
             </div>
 
-            <h1 
-              className="text-4xl md:text-5xl lg:text-[52px] font-bold leading-tight mb-6 transition-colors duration-300"
-              style={{ color: cs.titleColor || '#ffffff' }}
-            >
-              {cs.title}
-            </h1>
+            {((cs as any)?.titleGradientFrom || (cs as any)?.titleGradientTo) && (cs as any)?.enableTitleGradientAnimation !== false ? (
+              <HeroTitle
+                as="h1"
+                title={cs.title || ''}
+                gradientFrom={(cs as any)?.titleGradientFrom}
+                gradientTo={(cs as any)?.titleGradientTo}
+                enableAnimation={(cs as any)?.enableTitleGradientAnimation}
+                className="text-4xl md:text-5xl lg:text-[52px] font-bold leading-tight mb-6 text-left"
+              />
+            ) : (
+              <h1 
+                className="text-4xl md:text-5xl lg:text-[52px] font-bold leading-tight mb-6 transition-colors duration-300"
+                style={{ color: cs.titleColor || '#ffffff' }}
+              >
+                {cs.title}
+              </h1>
+            )}
 
             {cs.description && (
               <div 

@@ -8,6 +8,8 @@ import { MotionSection } from '@/components/animations/MotionSection';
 import { useCtaAction, type CtaFormType } from '@/hooks/useCtaAction';
 import { getHeroBackgroundStyles } from '@/lib/utils';
 
+import { HeroTitle } from '@/components/ui/HeroTitle';
+
 interface HeroCta {
   label: string;
   url: string;
@@ -17,6 +19,8 @@ interface HeroCta {
 
 interface HeroContent {
   title?: string;
+  titleGradientFrom?: string;
+  titleGradientTo?: string;
   subtitle?: string;
   primaryCta?: HeroCta;
   secondaryCta?: HeroCta;
@@ -34,6 +38,8 @@ interface HeroSectionProps {
 export function HeroSection({ content }: HeroSectionProps) {
   // Use content from CMS or fall back to defaults
   const title = content?.title || "The Digital Transformation Partner For Future-Ready Enterprises.";
+  const titleGradientFrom = content?.titleGradientFrom;
+  const titleGradientTo = content?.titleGradientTo;
   const subtitle = content?.subtitle || "With proven expertise across 25+ industries over the last 35+ years. Helping businesses streamline operations, grow, and stay ahead in the AI-driven world.";
   const primaryCta = content?.primaryCta || { label: "Book Free Demo", url: "/demo" };
   const secondaryCta = content?.secondaryCta || { label: "View Solutions", url: "/solutions" };
@@ -96,11 +102,22 @@ export function HeroSection({ content }: HeroSectionProps) {
 
           {/* Left Content */}
           <div className="w-full lg:w-1/2 max-w-2xl">
-            <TextReveal
-              as="h1"
-              text={title}
-              className="text-4xl md:text-5xl lg:text-[54px] font-bold leading-[1.1] text-[#4B2A63] tracking-tighter"
-            />
+            {(titleGradientFrom || titleGradientTo) && (content as any)?.enableTitleGradientAnimation !== false ? (
+              <HeroTitle
+                as="h1"
+                title={title}
+                gradientFrom={titleGradientFrom}
+                gradientTo={titleGradientTo}
+                enableAnimation={(content as any)?.enableTitleGradientAnimation}
+                className="text-4xl md:text-5xl lg:text-[54px] font-bold leading-[1.1] tracking-tighter"
+              />
+            ) : (
+              <TextReveal
+                as="h1"
+                text={title}
+                className="text-4xl md:text-5xl lg:text-[54px] font-bold leading-[1.1] text-[#4B2A63] tracking-tighter"
+              />
+            )}
 
             <MotionSection variant="fadeUp" delay={0.4}>
               <p className="mt-6 text-[18px] leading-relaxed text-slate-600 max-w-lg">

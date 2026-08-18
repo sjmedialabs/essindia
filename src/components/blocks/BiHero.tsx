@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { useCtaAction, type CtaFormType } from '@/hooks/useCtaAction';
+import { HeroTitle } from '@/components/ui/HeroTitle';
 
 interface BiHeroContent {
   gradientColor1?: string;
@@ -107,15 +108,26 @@ export function BiHero({ content }: { content?: BiHeroContent }) {
               </motion.span>
             )}
 
-            <motion.h1
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.3, duration: 0.6 }}
-              className="text-4xl sm:text-5xl lg:text-6xl font-light tracking-tight leading-[1.1] mb-6 whitespace-pre-line"
-              style={{ color: titleColor }}
-            >
-              {title}
-            </motion.h1>
+            {((content as any)?.titleGradientFrom || (content as any)?.titleGradientTo) && (content as any)?.enableTitleGradientAnimation !== false ? (
+              <HeroTitle
+                as="h1"
+                title={title}
+                gradientFrom={(content as any)?.titleGradientFrom}
+                gradientTo={(content as any)?.titleGradientTo}
+                enableAnimation={(content as any)?.enableTitleGradientAnimation}
+                className="text-4xl sm:text-5xl lg:text-6xl font-light tracking-tight leading-[1.1] mb-6 whitespace-pre-line text-left"
+              />
+            ) : (
+              <motion.h1
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.3, duration: 0.6 }}
+                className="text-4xl sm:text-5xl lg:text-6xl font-light tracking-tight leading-[1.1] mb-6 whitespace-pre-line"
+                style={{ color: titleColor }}
+              >
+                {title}
+              </motion.h1>
+            )}
 
             <motion.div
               initial={{ opacity: 0 }}

@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, ChevronUp, Search, Calendar, User, SlidersHorizontal, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useInternalNavigate } from '@/hooks/useInternalNavigate';
+import { HeroTitle } from '@/components/ui/HeroTitle';
 
 import { defaultCaseStudies, type CaseStudyPost } from '@/lib/case-studies-data';
 
@@ -144,14 +145,25 @@ export function CaseStudyListSection({ content }: CaseStudyListSectionProps) {
           >
             {badge}
           </motion.div>
-          <motion.h1
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.1 }}
-            className="text-4xl md:text-5xl lg:text-[56px] font-light text-white tracking-wide leading-tight mt-2 mb-2"
-          >
-            {heading}
-          </motion.h1>
+          {((content as any)?.titleGradientFrom || (content as any)?.titleGradientTo) && (content as any)?.enableTitleGradientAnimation !== false ? (
+            <HeroTitle
+              as="h1"
+              title={heading}
+              gradientFrom={(content as any)?.titleGradientFrom}
+              gradientTo={(content as any)?.titleGradientTo}
+              enableAnimation={(content as any)?.enableTitleGradientAnimation}
+              className="text-4xl md:text-5xl lg:text-[56px] font-light tracking-wide leading-tight mt-2 mb-2 justify-center"
+            />
+          ) : (
+            <motion.h1
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.1 }}
+              className="text-4xl md:text-5xl lg:text-[56px] font-light text-white tracking-wide leading-tight mt-2 mb-2"
+            >
+              {heading}
+            </motion.h1>
+          )}
           <motion.p
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
