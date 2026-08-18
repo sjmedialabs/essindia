@@ -23,7 +23,15 @@ interface PortfolioContent {
   heading?: string;
   subheading?: string;
   projects?: Project[];
-  viewAllCta?: { label: string; url: string };
+  buttonText?: string;
+  buttonBgColor?: string;
+  buttonHoverBgColor?: string;
+  buttonTextColor?: string;
+  buttonHoverTextColor?: string;
+  buttonUrl?: string;
+  buttonFormType?: string;
+  pdfUrl?: string;
+  viewAllCta?: { label?: string; url?: string; formType?: string; pdfUrl?: string };
 }
 
 interface PortfolioSectionProps {
@@ -55,14 +63,22 @@ const defaultPortfolios = [
 ];
 
 export function PortfolioSection({ content }: PortfolioSectionProps) {
-  const navigate = useInternalNavigate();
-  const ctaUrl = (content as any)?.ctaUrl || '';
-  const ctaFormType = ((content as any)?.ctaFormType || '') as CtaFormType;
-  const { handleClick: handleCtaClick, modalNode } = useCtaAction(ctaUrl, ctaFormType);
+  const [isBtnHovered, setIsBtnHovered] = React.useState(false);
   const heading = content?.heading || "Real Work. Real Results.";
   const subheading = content?.subheading || "Explore the ESS story, a legacy of transformation across high-end brands and verticals.";
   const projects = content?.projects || defaultPortfolios;
-  const viewAllCta = content?.viewAllCta || { label: "View All Work", url: "/portfolio" };
+
+  const btnText = content?.buttonText || content?.viewAllCta?.label || "View All Work";
+  const btnUrl = content?.buttonUrl || content?.viewAllCta?.url || "/portfolio";
+  const btnFormType = (content?.buttonFormType || content?.viewAllCta?.formType || '') as CtaFormType;
+  const pdfUrl = (content as any)?.pdfUrl || content?.viewAllCta?.pdfUrl;
+
+  const buttonBgColor = content?.buttonBgColor || '#4B2A63';
+  const buttonHoverBgColor = content?.buttonHoverBgColor || '#3B198F';
+  const buttonTextColor = content?.buttonTextColor || '#ffffff';
+  const buttonHoverTextColor = content?.buttonHoverTextColor;
+
+  const { handleClick, modalNode } = useCtaAction(btnUrl, btnFormType, pdfUrl);
 
   const scrollRef = useRef<HTMLDivElement>(null);
   const showArrows = projects.length > 3;
@@ -202,16 +218,25 @@ export function PortfolioSection({ content }: PortfolioSectionProps) {
         </div>
 
         {/* View All Button */}
-        <MotionSection variant="fadeUp" delay={0.6} className="mt-20 text-center">
-          <Button 
-            onClick={() => navigate(viewAllCta.url)}
-            className="bg-[#4B2A63] hover:bg-[#3B198F] text-white rounded-full px-12 h-[54px] text-[16px] font-bold shadow-xl transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 active:scale-95 cursor-pointer"
-          >
-            {viewAllCta.label}
-          </Button>
-        </MotionSection>
+        {btnText && (
+          <MotionSection variant="fadeUp" delay={0.6} className="mt-20 text-center">
+            <Button 
+              onClick={handleClick}
+              onMouseEnter={() => setIsBtnHovered(true)}
+              onMouseLeave={() => setIsBtnHovered(false)}
+              style={{
+                backgroundColor: isBtnHovered && buttonHoverBgColor ? buttonHoverBgColor : buttonBgColor,
+                color: isBtnHovered && buttonHoverTextColor ? buttonHoverTextColor : buttonTextColor,
+              }}
+              className="rounded-full px-12 h-[54px] text-[16px] font-bold shadow-xl transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 active:scale-95 cursor-pointer border-none"
+            >
+              {btnText}
+            </Button>
+          </MotionSection>
+        )}
 
       </div>
+      {modalNode}
     </section>
   );
 }

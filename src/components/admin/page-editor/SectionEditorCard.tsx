@@ -2574,7 +2574,7 @@ export function SectionEditorCard({
         }
       }
     });
-    
+
     // Add any remaining FormType fields that didn't have a matching URL
     finalKeys.forEach((key) => {
       if (key.endsWith('FormType') && !orderedKeys.includes(key)) {
@@ -2709,161 +2709,162 @@ export function SectionEditorCard({
         {isExpanded && (
           <motion.div
             initial={{ height: 0, opacity: 0 }}
-            animate={{ height: 'auto', opacity: 1 }}
-            exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            className="border-t border-slate-100"
+        animate={{ height: 'auto', opacity: 1 }}
+        exit={{ height: 0, opacity: 0 }}
+        transition={{ duration: 0.2 }}
+        className="border-t border-slate-100"
           >
-            <div className="p-5 space-y-4">
-              {contentKeys.length === 0 ? (
-                <div className="py-8 text-center">
-                  <p className="text-sm text-slate-400 font-medium">
-                    No content fields for this section.
-                  </p>
-                  <p className="text-xs text-slate-300 mt-1">
-                    {section.type === 'europe-case-study-slider'
-                      ? 'All the case studies will show directly in this section.'
-                      : 'This section may use default content from the template.'}
-                  </p>
-                </div>
-              ) : section.type === 'blog-detail-block' || section.type === 'testimonials-block' || section.type === 'case-study-detail' ? (
-                <div className="space-y-4">
-                  {/* Tabs Navigation */}
-                  <div className="flex border-b border-slate-100 bg-slate-50/50 rounded-t-xl shrink-0 -mx-5 -mt-5 px-3">
-                    {(() => {
-                      const tabs = section.type === 'testimonials-block'
-                        ? [
-                          { id: 'hero', label: 'Hero Banner' },
-                          { id: 'testimonials', label: 'Testimonials' },
-                        ]
-                        : section.type === 'case-study-detail'
-                          ? [
-                            { id: 'hero', label: 'Hero Section' },
-                            { id: 'overview', label: 'Overview' },
-                            { id: 'challenge', label: 'Challenge' },
-                            { id: 'ess', label: 'ESS' },
-                            { id: 'results', label: 'Results' },
-                          ]
-                          : [
-                            { id: 'hero', label: '1. Hero & Basic Details' },
-                            { id: 'author', label: '2. Author Card' },
-                            { id: 'content', label: '3. Content Segments' },
-                            { id: 'conclusion', label: '4. Conclusion & Form' },
-                          ];
-                      // Fallback tab if currently activeTab is not valid for the switch
-                      const tabsMap = section.type === 'testimonials-block'
-                        ? TESTIMONIALS_TABS
-                        : section.type === 'case-study-detail'
-                          ? CASE_STUDY_DETAIL_TABS
-                          : BLOG_DETAIL_TABS;
+        <div className="p-5 space-y-4">
+          {contentKeys.length === 0 ? (
+            <div className="py-8 text-center">
+              <p className="text-sm text-slate-400 font-medium">
+                No content fields for this section.
+              </p>
+              <p className="text-xs text-slate-300 mt-1">
+                {section.type === 'europe-case-study-slider'
+                  ? 'All the case studies will show directly in this section.'
+                  : 'This section may use default content from the template.'}
+              </p>
+            </div>
+          ) : section.type === 'blog-detail-block' || section.type === 'testimonials-block' || section.type === 'case-study-detail' ? (
+            <div className="space-y-4">
+              {/* Tabs Navigation */}
+              <div className="flex border-b border-slate-100 bg-slate-50/50 rounded-t-xl shrink-0 -mx-5 -mt-5 px-3">
+                {(() => {
+                  const tabs = section.type === 'testimonials-block'
+                    ? [
+                      { id: 'hero', label: 'Hero Banner' },
+                      { id: 'testimonials', label: 'Testimonials' },
+                    ]
+                    : section.type === 'case-study-detail'
+                      ? [
+                        { id: 'hero', label: 'Hero Section' },
+                        { id: 'overview', label: 'Overview' },
+                        { id: 'challenge', label: 'Challenge' },
+                        { id: 'ess', label: 'ESS' },
+                        { id: 'results', label: 'Results' },
+                      ]
+                      : [
+                        { id: 'hero', label: '1. Hero & Basic Details' },
+                        { id: 'author', label: '2. Author Card' },
+                        { id: 'content', label: '3. Content Segments' },
+                        { id: 'conclusion', label: '4. Conclusion & Form' },
+                      ];
+                  // Fallback tab if currently activeTab is not valid for the switch
+                  const tabsMap = section.type === 'testimonials-block'
+                    ? TESTIMONIALS_TABS
+                    : section.type === 'case-study-detail'
+                      ? CASE_STUDY_DETAIL_TABS
+                      : BLOG_DETAIL_TABS;
 
-                      const validTab = tabsMap[activeTab]
-                        ? activeTab
-                        : (section.type === 'testimonials-block' || section.type === 'case-study-detail' ? 'hero' : 'hero');
+                  const validTab = tabsMap[activeTab]
+                    ? activeTab
+                    : (section.type === 'testimonials-block' || section.type === 'case-study-detail' ? 'hero' : 'hero');
 
-                      return tabs.map((tab) => (
-                        <button
-                          key={tab.id}
-                          type="button"
-                          onClick={() => setActiveTab(tab.id)}
-                          className={cn(
-                            'px-4 py-3 text-xs font-bold border-b-2 transition-colors cursor-pointer whitespace-nowrap',
-                            validTab === tab.id
-                              ? 'border-[#4B2A63] text-[#4B2A63] border-b-[#4B2A63]'
-                              : 'border-transparent text-slate-400 hover:text-slate-600'
-                          )}
-                        >
-                          {tab.label}
-                        </button>
-                      ));
-                    })()}
-                  </div>
-
-                  {/* Tab Content Fields */}
-                  <div className="space-y-4 pt-2">
-                    {(() => {
-                      const tabsMap = section.type === 'testimonials-block'
-                        ? TESTIMONIALS_TABS
-                        : section.type === 'case-study-detail'
-                          ? CASE_STUDY_DETAIL_TABS
-                          : BLOG_DETAIL_TABS;
-
-                      const activeKeys = tabsMap[activeTab] || (section.type === 'testimonials-block' || section.type === 'case-study-detail' || section.type === 'blog-detail-block' ? tabsMap.hero : []);
-                      return activeKeys.map((key) => {
-                        if (!contentKeys.includes(key)) return null;
-                        return (
-                          <DynamicFieldRenderer
-                            key={key}
-                            keyPath={key}
-                            fieldKey={key}
-                            value={mergedContent[key] as JsonValue}
-                            onChange={(kp, val) => onContentChange(section.id, kp, val)}
-                            sectionType={section.type}
-                          />
-                        );
-                      });
-                    })()}
-                  </div>
-                </div>
-              ) : (
-                contentKeys.map((key) => (
-                  <DynamicFieldRenderer
-                    key={key}
-                    keyPath={key}
-                    fieldKey={key}
-                    value={mergedContent[key] as JsonValue}
-                    onChange={(kp, val) => onContentChange(section.id, kp, val)}
-                    sectionType={section.type}
-                  />
-                ))
-              )}
-
-              <div className="flex items-center justify-between pt-3 border-t border-slate-100">
-                <div className="flex items-center gap-2">
-                  {section.isActive ? (
-                    <span className="flex items-center gap-1 text-[10px] font-semibold text-emerald-600">
-                      <Eye className="w-3 h-3" /> Visible
-                    </span>
-                  ) : (
-                    <span className="flex items-center gap-1 text-[10px] font-semibold text-slate-400">
-                      <EyeOff className="w-3 h-3" /> Hidden
-                    </span>
-                  )}
-                </div>
-                <div className="flex items-center gap-2">
-                  {onDiscard && (
-                    <Button
-                      size="sm"
-                      variant="outline"
+                  return tabs.map((tab) => (
+                    <button
+                      key={tab.id}
                       type="button"
-                      onClick={() => onDiscard(section.id)}
-                      disabled={saving || !isSectionDirty}
-                      className="rounded-full gap-1.5 px-4 text-slate-600 border-slate-200 hover:bg-slate-100"
+                      onClick={() => setActiveTab(tab.id)}
+                      className={cn(
+                        'px-4 py-3 text-xs font-bold border-b-2 transition-colors cursor-pointer whitespace-nowrap',
+                        validTab === tab.id
+                          ? 'border-[#4B2A63] text-[#4B2A63] border-b-[#4B2A63]'
+                          : 'border-transparent text-slate-400 hover:text-slate-600'
+                      )}
                     >
-                      <RotateCcw className="w-3.5 h-3.5" />
-                      Discard
-                    </Button>
-                  )}
-                  <Button
-                    size="sm"
-                    onClick={handleSave}
-                    disabled={saving || !isSectionDirty}
-                    className="bg-[#4B2A63] text-white rounded-full gap-1.5 px-5"
-                  >
-                    {saving ? (
-                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                    ) : (
-                      <Save className="w-3.5 h-3.5" />
-                    )}
-                    {saving ? 'Saving…' : 'Save Section'}
-                  </Button>
-                </div>
+                      {tab.label}
+                    </button>
+                  ));
+                })()}
+              </div>
+
+              {/* Tab Content Fields */}
+              <div className="space-y-4 pt-2">
+                {(() => {
+                  const tabsMap = section.type === 'testimonials-block'
+                    ? TESTIMONIALS_TABS
+                    : section.type === 'case-study-detail'
+                      ? CASE_STUDY_DETAIL_TABS
+                      : BLOG_DETAIL_TABS;
+
+                  const activeKeys = tabsMap[activeTab] || (section.type === 'testimonials-block' || section.type === 'case-study-detail' || section.type === 'blog-detail-block' ? tabsMap.hero : []);
+                  return activeKeys.map((key) => {
+                    if (!contentKeys.includes(key)) return null;
+                    return (
+                      <DynamicFieldRenderer
+                        key={key}
+                        keyPath={key}
+                        fieldKey={key}
+                        value={mergedContent[key] as JsonValue}
+                        onChange={(kp, val) => onContentChange(section.id, kp, val)}
+                        sectionType={section.type}
+                      />
+                    );
+                  });
+                })()}
               </div>
             </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          ) : (
+            contentKeys.map((key) => (
+              <DynamicFieldRenderer
+                key={key}
+                keyPath={key}
+                fieldKey={key}
+                value={mergedContent[key] as JsonValue}
+                onChange={(kp, val) => onContentChange(section.id, kp, val)}
+                sectionType={section.type}
+              />
+            ))
+          )}
+
+          <div className="flex items-center justify-between pt-3 border-t border-slate-100">
+            <div className="flex items-center gap-2">
+              {section.isActive ? (
+                <span className="flex items-center gap-1 text-[10px] font-semibold text-emerald-600">
+                  <Eye className="w-3 h-3" /> Visible
+                </span>
+              ) : (
+                <span className="flex items-center gap-1 text-[10px] font-semibold text-slate-400">
+                  <EyeOff className="w-3 h-3" /> Hidden
+                </span>
+              )}
+            </div>
+            <div className="flex items-center gap-2">
+              {onDiscard && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  type="button"
+                  onClick={() => onDiscard(section.id)}
+                  disabled={saving || !isSectionDirty}
+                  className="rounded-full gap-1.5 px-4 text-slate-600 border-slate-200 hover:bg-slate-100"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  Discard
+                </Button>
+              )}
+              <Button
+                size="sm"
+                onClick={handleSave}
+                disabled={saving || !isSectionDirty}
+                className="bg-[#4B2A63] text-white rounded-full gap-1.5 px-5"
+              >
+                {saving ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                ) : (
+                  <Save className="w-3.5 h-3.5" />
+                )}
+                {saving ? 'Saving…' : 'Save Section'}
+              </Button>
+            </div>
+          </div>
+        </div>
     </motion.div>
+  )
+}
+      </AnimatePresence >
+    </motion.div >
   );
 }
 

@@ -21,16 +21,20 @@ interface BiHeroContent {
   description?: string;
   descriptionColor?: string;
   button1BgColor?: string;
+  button1HoverBgColor?: string;
   button1BorderColor?: string;
   button1Text?: string;
   button1TextColor?: string;
+  button1HoverTextColor?: string;
   button1Url?: string;
   button1FormType?: string;
   button1PdfUrl?: string;
   button2BgColor?: string;
+  button2HoverBgColor?: string;
   button2BorderColor?: string;
   button2Text?: string;
   button2TextColor?: string;
+  button2HoverTextColor?: string;
   button2Url?: string;
   button2FormType?: string;
   button2PdfUrl?: string;
@@ -38,6 +42,9 @@ interface BiHeroContent {
 }
 
 export function BiHero({ content }: { content?: BiHeroContent }) {
+  const [isBtn1Hovered, setIsBtn1Hovered] = React.useState(false);
+  const [isBtn2Hovered, setIsBtn2Hovered] = React.useState(false);
+
   const bgColor = content?.bgColor || '#f3f6fc';
   const badgeBgColor = content?.badgeBgColor || '#5e35b1';
   const badgeBorderColor = content?.badgeBorderColor || 'transparent';
@@ -50,16 +57,20 @@ export function BiHero({ content }: { content?: BiHeroContent }) {
   const descriptionColor = content?.descriptionColor || '#4b5563';
 
   const button1BgColor = content?.button1BgColor || '#ffca28';
+  const button1HoverBgColor = content?.button1HoverBgColor;
   const button1BorderColor = content?.button1BorderColor || '#ffca28';
   const button1Text = content?.button1Text || 'Book your Demo';
   const button1TextColor = content?.button1TextColor || '#000000';
+  const button1HoverTextColor = content?.button1HoverTextColor;
   const button1Url = content?.button1Url || '#';
   const button1FormType = (content?.button1FormType || '') as CtaFormType;
 
   const button2BgColor = content?.button2BgColor || '#5e35b1';
+  const button2HoverBgColor = content?.button2HoverBgColor;
   const button2BorderColor = content?.button2BorderColor || '#5e35b1';
   const button2Text = content?.button2Text || 'Case studies';
   const button2TextColor = content?.button2TextColor || '#ffffff';
+  const button2HoverTextColor = content?.button2HoverTextColor;
   const button2Url = content?.button2Url || '#';
   const button2FormType = (content?.button2FormType || '') as CtaFormType;
 
@@ -154,16 +165,28 @@ export function BiHero({ content }: { content?: BiHeroContent }) {
                   {button1FormType ? (
                     <button
                       onClick={handleBtn1Click}
+                      onMouseEnter={() => setIsBtn1Hovered(true)}
+                      onMouseLeave={() => setIsBtn1Hovered(false)}
                       className="inline-block px-6 py-3 rounded-full text-sm font-bold shadow-md hover:shadow-lg transition-all border text-center min-w-[140px] cursor-pointer"
-                      style={{ backgroundColor: button1BgColor, borderColor: button1BorderColor, color: button1TextColor }}
+                      style={{
+                        backgroundColor: isBtn1Hovered && button1HoverBgColor ? button1HoverBgColor : button1BgColor,
+                        borderColor: button1BorderColor,
+                        color: isBtn1Hovered && button1HoverTextColor ? button1HoverTextColor : button1TextColor,
+                      }}
                     >
                       {button1Text}
                     </button>
                   ) : (
                     <Link
                       href={button1Url}
-                      className="inline-block px-6 py-3 rounded-full text-sm font-bold shadow-md hover:shadow-lg transition-all border text-center min-w-[140px]"
-                      style={{ backgroundColor: button1BgColor, borderColor: button1BorderColor, color: button1TextColor }}
+                      onMouseEnter={() => setIsBtn1Hovered(true)}
+                      onMouseLeave={() => setIsBtn1Hovered(false)}
+                      className="inline-block px-6 py-3 rounded-full text-sm font-bold shadow-md hover:shadow-lg transition-all border text-center min-w-[140px] cursor-pointer"
+                      style={{
+                        backgroundColor: isBtn1Hovered && button1HoverBgColor ? button1HoverBgColor : button1BgColor,
+                        borderColor: button1BorderColor,
+                        color: isBtn1Hovered && button1HoverTextColor ? button1HoverTextColor : button1TextColor,
+                      }}
                     >
                       {button1Text}
                     </Link>
@@ -176,16 +199,28 @@ export function BiHero({ content }: { content?: BiHeroContent }) {
                   {button2FormType ? (
                     <button
                       onClick={handleBtn2Click}
+                      onMouseEnter={() => setIsBtn2Hovered(true)}
+                      onMouseLeave={() => setIsBtn2Hovered(false)}
                       className="inline-block px-6 py-3 rounded-full text-sm font-bold shadow-md hover:shadow-lg transition-all border text-center min-w-[140px] cursor-pointer"
-                      style={{ backgroundColor: button2BgColor, borderColor: button2BorderColor, color: button2TextColor }}
+                      style={{
+                        backgroundColor: isBtn2Hovered && button2HoverBgColor ? button2HoverBgColor : button2BgColor,
+                        borderColor: button2BorderColor,
+                        color: isBtn2Hovered && button2HoverTextColor ? button2HoverTextColor : button2TextColor,
+                      }}
                     >
                       {button2Text}
                     </button>
                   ) : (
                     <Link
                       href={button2Url}
-                      className="inline-block px-6 py-3 rounded-full text-sm font-bold shadow-md hover:shadow-lg transition-all border text-center min-w-[140px]"
-                      style={{ backgroundColor: button2BgColor, borderColor: button2BorderColor, color: button2TextColor }}
+                      onMouseEnter={() => setIsBtn2Hovered(true)}
+                      onMouseLeave={() => setIsBtn2Hovered(false)}
+                      className="inline-block px-6 py-3 rounded-full text-sm font-bold shadow-md hover:shadow-lg transition-all border text-center min-w-[140px] cursor-pointer"
+                      style={{
+                        backgroundColor: isBtn2Hovered && button2HoverBgColor ? button2HoverBgColor : button2BgColor,
+                        borderColor: button2BorderColor,
+                        color: isBtn2Hovered && button2HoverTextColor ? button2HoverTextColor : button2TextColor,
+                      }}
                     >
                       {button2Text}
                     </Link>

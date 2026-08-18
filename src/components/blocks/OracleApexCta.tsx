@@ -13,12 +13,15 @@ interface OracleApexCtaContent {
   descriptionColor?: string;
   buttonText?: string;
   buttonBgColor?: string;
+  buttonHoverBgColor?: string;
   buttonTextColor?: string;
+  buttonHoverTextColor?: string;
   pdfUrl?: string;
 }
 
 export function OracleApexCta({ content }: { content?: OracleApexCtaContent }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isBtnHovered, setIsBtnHovered] = useState(false);
 
   const bgColor = content?.bgColor || '#f0f2f7';
   const title = content?.title || 'Begin Your Modernization Assessment';
@@ -27,7 +30,9 @@ export function OracleApexCta({ content }: { content?: OracleApexCtaContent }) {
   const descriptionColor = content?.descriptionColor || '#374151';
   const buttonText = content?.buttonText || 'Get start Now';
   const buttonBgColor = content?.buttonBgColor || '#ffca28';
+  const buttonHoverBgColor = content?.buttonHoverBgColor;
   const buttonTextColor = content?.buttonTextColor || '#000000';
+  const buttonHoverTextColor = content?.buttonHoverTextColor;
   const pdfUrl = content?.pdfUrl;
 
   return (
@@ -73,7 +78,16 @@ export function OracleApexCta({ content }: { content?: OracleApexCtaContent }) {
               whileTap={{ scale: 0.98 }}
               className="inline-block"
             >
-              <button onClick={() => setIsModalOpen(true)} className="bg-[#4B2A63] text-white hover:bg-[#3A1F4D] px-8 py-3 rounded-full font-medium transition-colors inline-flex items-center gap-2">
+              <button
+                onClick={() => setIsModalOpen(true)}
+                onMouseEnter={() => setIsBtnHovered(true)}
+                onMouseLeave={() => setIsBtnHovered(false)}
+                style={{
+                  backgroundColor: isBtnHovered && buttonHoverBgColor ? buttonHoverBgColor : buttonBgColor,
+                  color: isBtnHovered && buttonHoverTextColor ? buttonHoverTextColor : buttonTextColor,
+                }}
+                className="px-8 py-3 rounded-full font-medium transition-colors inline-flex items-center gap-2 cursor-pointer shadow-md"
+              >
                 {buttonText}
               </button>
             </motion.div>

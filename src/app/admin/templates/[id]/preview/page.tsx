@@ -21,7 +21,12 @@ export default async function TemplatePreviewPage({ params }: PageProps) {
   let sections: any[] = [];
   let isPageMode = false;
 
-  const template = await templateRepository.findById(id);
+  let template = await templateRepository.findById(id);
+
+  if (!template && id) {
+    const decodedId = decodeURIComponent(id);
+    template = await templateRepository.findById(decodedId);
+  }
 
   if (template) {
     name = template.name;
@@ -34,8 +39,13 @@ export default async function TemplatePreviewPage({ params }: PageProps) {
         content: (s.contentJson as Record<string, unknown>) || {},
       }));
   } else {
-    // Try to load as a page preview
-    const page = await pageAdminRepository.getById(id);
+    // Try to load as a page preview by ID or route path
+    const decodedId = decodeURIComponent(id);
+    let page = await pageAdminRepository.getById(id);
+    if (!page && decodedId !== id) {
+      page = await pageAdminRepository.getById(decodedId);
+    }
+
     if (!page) {
       notFound();
     }

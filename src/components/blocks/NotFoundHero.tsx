@@ -17,15 +17,22 @@ export interface NotFoundHeroContent {
   primaryButtonText?: string;
   primaryButtonUrl?: string;
   primaryButtonBgColor?: string;
+  primaryButtonHoverBgColor?: string;
   primaryButtonTextColor?: string;
+  primaryButtonHoverTextColor?: string;
   secondaryButtonText?: string;
   secondaryButtonUrl?: string;
   secondaryButtonBgColor?: string;
+  secondaryButtonHoverBgColor?: string;
   secondaryButtonTextColor?: string;
+  secondaryButtonHoverTextColor?: string;
   bgColor?: string;
 }
 
 export function NotFoundHero({ content }: { content?: NotFoundHeroContent }) {
+  const [isPrimaryHovered, setIsPrimaryHovered] = React.useState(false);
+  const [isSecondaryHovered, setIsSecondaryHovered] = React.useState(false);
+
   const badgeText = content?.badgeText || 'Page not found';
   const badgeBgColor = content?.badgeBgColor || '#ede9fe';
   const badgeTextColor = content?.badgeTextColor || '#4B2A63';
@@ -36,14 +43,20 @@ export function NotFoundHero({ content }: { content?: NotFoundHeroContent }) {
     content?.description ||
     'The page you requested may have been moved, renamed, or no longer exists. Try heading home or exploring our solutions.';
   const descriptionColor = content?.descriptionColor || '#64748b';
+
   const primaryButtonText = content?.primaryButtonText || 'Back to Home';
   const primaryButtonUrl = content?.primaryButtonUrl || '/';
   const primaryButtonBgColor = content?.primaryButtonBgColor || '#4B2A63';
+  const primaryButtonHoverBgColor = content?.primaryButtonHoverBgColor;
   const primaryButtonTextColor = content?.primaryButtonTextColor || '#ffffff';
+  const primaryButtonHoverTextColor = content?.primaryButtonHoverTextColor;
+
   const secondaryButtonText = content?.secondaryButtonText || 'Contact Us';
   const secondaryButtonUrl = content?.secondaryButtonUrl || '/contact-us';
   const secondaryButtonBgColor = content?.secondaryButtonBgColor || '#f1f5f9';
+  const secondaryButtonHoverBgColor = content?.secondaryButtonHoverBgColor;
   const secondaryButtonTextColor = content?.secondaryButtonTextColor || '#0f172a';
+  const secondaryButtonHoverTextColor = content?.secondaryButtonHoverTextColor;
   const bgColor = content?.bgColor || '#ffffff';
 
   return (
@@ -119,8 +132,13 @@ export function NotFoundHero({ content }: { content?: NotFoundHeroContent }) {
           {primaryButtonText && (
             <Link
               href={primaryButtonUrl}
-              className="px-7 py-3 rounded-full text-sm font-bold transition-all hover:-translate-y-0.5"
-              style={{ backgroundColor: primaryButtonBgColor, color: primaryButtonTextColor }}
+              onMouseEnter={() => setIsPrimaryHovered(true)}
+              onMouseLeave={() => setIsPrimaryHovered(false)}
+              className="px-7 py-3 rounded-full text-sm font-bold transition-all hover:-translate-y-0.5 cursor-pointer"
+              style={{
+                backgroundColor: isPrimaryHovered && primaryButtonHoverBgColor ? primaryButtonHoverBgColor : primaryButtonBgColor,
+                color: isPrimaryHovered && primaryButtonHoverTextColor ? primaryButtonHoverTextColor : primaryButtonTextColor,
+              }}
             >
               {primaryButtonText}
             </Link>
@@ -128,8 +146,13 @@ export function NotFoundHero({ content }: { content?: NotFoundHeroContent }) {
           {secondaryButtonText && (
             <Link
               href={secondaryButtonUrl}
-              className="px-7 py-3 rounded-full text-sm font-bold transition-all hover:-translate-y-0.5"
-              style={{ backgroundColor: secondaryButtonBgColor, color: secondaryButtonTextColor }}
+              onMouseEnter={() => setIsSecondaryHovered(true)}
+              onMouseLeave={() => setIsSecondaryHovered(false)}
+              className="px-7 py-3 rounded-full text-sm font-bold transition-all hover:-translate-y-0.5 cursor-pointer"
+              style={{
+                backgroundColor: isSecondaryHovered && secondaryButtonHoverBgColor ? secondaryButtonHoverBgColor : secondaryButtonBgColor,
+                color: isSecondaryHovered && secondaryButtonHoverTextColor ? secondaryButtonHoverTextColor : secondaryButtonTextColor,
+              }}
             >
               {secondaryButtonText}
             </Link>

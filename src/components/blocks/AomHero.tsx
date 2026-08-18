@@ -20,21 +20,28 @@ interface AomHeroContent {
   description?: string;
   descriptionColor?: string;
   button1BgColor?: string;
+  button1HoverBgColor?: string;
   button1BorderColor?: string;
   button1Text?: string;
   button1TextColor?: string;
+  button1HoverTextColor?: string;
   button1Url?: string;
   button1FormType?: string;
   button2BgColor?: string;
+  button2HoverBgColor?: string;
   button2BorderColor?: string;
   button2Text?: string;
   button2TextColor?: string;
+  button2HoverTextColor?: string;
   button2Url?: string;
   button2FormType?: string;
   image?: string;
 }
 
 export function AomHero({ content }: { content?: AomHeroContent }) {
+  const [isBtn1Hovered, setIsBtn1Hovered] = React.useState(false);
+  const [isBtn2Hovered, setIsBtn2Hovered] = React.useState(false);
+
   const bgColor = content?.bgColor || '#0f172a';
   const badgeBgColor = content?.badgeBgColor || '#ffffff';
   const badgeBorderColor = content?.badgeBorderColor || 'transparent';
@@ -47,15 +54,19 @@ export function AomHero({ content }: { content?: AomHeroContent }) {
   const descriptionColor = content?.descriptionColor || '#cbd5e1';
 
   const button1BgColor = content?.button1BgColor || '#1a1f4e';
+  const button1HoverBgColor = content?.button1HoverBgColor;
   const button1BorderColor = content?.button1BorderColor || '#1a1f4e';
   const button1Text = content?.button1Text || 'Get started';
   const button1TextColor = content?.button1TextColor || '#ffffff';
+  const button1HoverTextColor = content?.button1HoverTextColor;
   const button1Url = content?.button1Url || '#';
 
   const button2BgColor = content?.button2BgColor || '#ffffff';
+  const button2HoverBgColor = content?.button2HoverBgColor;
   const button2BorderColor = content?.button2BorderColor || '#ffffff';
   const button2Text = content?.button2Text || 'Explore ROI Calculator';
   const button2TextColor = content?.button2TextColor || '#2a2b6a';
+  const button2HoverTextColor = content?.button2HoverTextColor;
   const button2Url = content?.button2Url || '#';
   const button1FormType = (content?.button1FormType || '') as CtaFormType;
   const button2FormType = (content?.button2FormType || '') as CtaFormType;
@@ -130,11 +141,13 @@ export function AomHero({ content }: { content?: AomHeroContent }) {
               {button1Text && (
                 <Link
                   href={button1Url} onClick={button1FormType ? (e: React.MouseEvent) => { e.preventDefault(); handleBtn1Click(); } : undefined}
-                  className="px-6 py-3 rounded-full text-sm font-bold shadow-md hover:shadow-lg transition-transform duration-300 hover:-translate-y-0.5 border text-center min-w-[140px]"
+                  onMouseEnter={() => setIsBtn1Hovered(true)}
+                  onMouseLeave={() => setIsBtn1Hovered(false)}
+                  className="px-6 py-3 rounded-full text-sm font-bold shadow-md hover:shadow-lg transition-transform duration-300 hover:-translate-y-0.5 border text-center min-w-[140px] cursor-pointer"
                   style={{
-                    backgroundColor: button1BgColor,
+                    backgroundColor: isBtn1Hovered && button1HoverBgColor ? button1HoverBgColor : button1BgColor,
                     borderColor: button1BorderColor,
-                    color: button1TextColor
+                    color: isBtn1Hovered && button1HoverTextColor ? button1HoverTextColor : button1TextColor
                   }}
                 >
                   {button1Text}
@@ -144,11 +157,13 @@ export function AomHero({ content }: { content?: AomHeroContent }) {
               {button2Text && (
                 <Link
                   href={button2Url} onClick={button2FormType ? (e: React.MouseEvent) => { e.preventDefault(); handleBtn2Click(); } : undefined}
-                  className="px-6 py-3 rounded-full text-sm font-bold border shadow-sm hover:shadow-md transition-transform duration-300 hover:-translate-y-0.5 text-center min-w-[140px]"
+                  onMouseEnter={() => setIsBtn2Hovered(true)}
+                  onMouseLeave={() => setIsBtn2Hovered(false)}
+                  className="px-6 py-3 rounded-full text-sm font-bold border shadow-sm hover:shadow-md transition-transform duration-300 hover:-translate-y-0.5 text-center min-w-[140px] cursor-pointer"
                   style={{
-                    backgroundColor: button2BgColor,
+                    backgroundColor: isBtn2Hovered && button2HoverBgColor ? button2HoverBgColor : button2BgColor,
                     borderColor: button2BorderColor,
-                    color: button2TextColor
+                    color: isBtn2Hovered && button2HoverTextColor ? button2HoverTextColor : button2TextColor
                   }}
                 >
                   {button2Text}

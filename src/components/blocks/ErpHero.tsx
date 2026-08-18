@@ -20,11 +20,15 @@ interface ErpHeroContent {
   button1Text?: string;
   button1Color?: string;
   button1BgColor?: string;
+  button1HoverBgColor?: string;
+  button1HoverTextColor?: string;
   button1Url?: string;
   button1FormType?: string;
   button2Text?: string;
   button2Color?: string;
   button2BgColor?: string;
+  button2HoverBgColor?: string;
+  button2HoverTextColor?: string;
   button2Url?: string;
   button2FormType?: string;
   image?: string;
@@ -35,6 +39,9 @@ interface ErpHeroProps {
 }
 
 export function ErpHero({ content }: ErpHeroProps) {
+  const [isBtn1Hovered, setIsBtn1Hovered] = React.useState(false);
+  const [isBtn2Hovered, setIsBtn2Hovered] = React.useState(false);
+
   const bgColor = content?.bgColor || '#fdfeff';
   const badgeBgColor = content?.badgeBgColor || '#391781';
   const badgeText = content?.badgeText || 'ERP Overview';
@@ -44,14 +51,20 @@ export function ErpHero({ content }: ErpHeroProps) {
   const titleSecondaryColor = content?.titleSecondaryColor || '#462294';
   const descriptionText = content?.descriptionText || 'Simply connect business processes, increase agility with our user-friendly and result-oriented software';
   const descriptionColor = content?.descriptionColor || '#000000';
+
   const button1Text = content?.button1Text || 'RPA PORTAL';
   const button1Color = content?.button1Color || '#ffffff';
+  const button1HoverTextColor = content?.button1HoverTextColor;
   const button1BgColor = content?.button1BgColor || '#462294';
+  const button1HoverBgColor = content?.button1HoverBgColor;
   const button1Url = content?.button1Url || '/rpa';
   const button1FormType = (content?.button1FormType || '') as CtaFormType;
+
   const button2Text = content?.button2Text || 'ERP OFFERINGS';
   const button2Color = content?.button2Color || '#ffffff';
+  const button2HoverTextColor = content?.button2HoverTextColor;
   const button2BgColor = content?.button2BgColor || '#0f172a';
+  const button2HoverBgColor = content?.button2HoverBgColor;
   const button2Url = content?.button2Url || '/erp-offerings';
   const button2FormType = (content?.button2FormType || '') as CtaFormType;
   const image = content?.image || '/BANNER-IMMAGE-LEFT.png';
@@ -138,16 +151,29 @@ export function ErpHero({ content }: ErpHeroProps) {
             >
               <Button
                 onClick={handleBtn1Click}
-                style={{ backgroundColor: button1BgColor, color: button1Color }}
-                className="hover:opacity-90 border-transparent hover:border hover:border-black rounded-full px-6 py-3 h-auto text-sm font-bold shadow-md hover:shadow-lg transition-all duration-300 active:scale-95 cursor-pointer min-w-[140px]"
+                onMouseEnter={() => setIsBtn1Hovered(true)}
+                onMouseLeave={() => setIsBtn1Hovered(false)}
+                style={{
+                  backgroundColor: isBtn1Hovered && button1HoverBgColor ? button1HoverBgColor : button1BgColor,
+                  color: isBtn1Hovered && button1HoverTextColor ? button1HoverTextColor : button1Color,
+                }}
+                className={`border-transparent ${button1HoverBgColor ? '' : 'hover:opacity-90 hover:border-black'} rounded-full px-6 py-3 h-auto text-sm font-bold shadow-md hover:shadow-lg transition-all duration-300 active:scale-95 cursor-pointer min-w-[140px]`}
               >
                 {button1Text}
               </Button>
               <Button
                 variant="outline"
                 onClick={handleBtn2Click}
-                style={{ backgroundColor: button2BgColor, color: button2Color, borderColor: button2BgColor }}
-                className="hover:opacity-90 rounded-full px-6 py-3 h-auto text-sm font-bold shadow-md transition-all duration-300 active:scale-95 cursor-pointer min-w-[140px]"
+                onMouseEnter={() => setIsBtn2Hovered(true)}
+                onMouseLeave={() => setIsBtn2Hovered(false)}
+                style={{
+                  backgroundColor: isBtn2Hovered && button2HoverBgColor ? button2HoverBgColor : button2BgColor,
+                  color: isBtn2Hovered && button2HoverTextColor ? button2HoverTextColor : button2Color,
+                  borderColor: isBtn2Hovered && button2HoverBgColor ? button2HoverBgColor : button2BgColor,
+                }}
+                className={`rounded-full px-6 py-3 h-auto text-sm font-bold shadow-md transition-all duration-300 active:scale-95 cursor-pointer min-w-[140px] ${
+                  button2HoverBgColor ? '' : 'hover:opacity-90'
+                }`}
               >
                 {button2Text}
               </Button>

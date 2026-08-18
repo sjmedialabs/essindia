@@ -10,6 +10,8 @@ interface ServiceTab {
   image: string;
   points: string[];
   buttonText?: string;
+  buttonHoverBgColor?: string;
+  buttonHoverTextColor?: string;
   buttonUrl?: string;
 }
 
@@ -20,6 +22,7 @@ interface BiIndustryServicesContent {
 }
 
 export function BiIndustryServices({ content }: { content?: BiIndustryServicesContent }) {
+  const [isCardBtnHovered, setIsCardBtnHovered] = useState(false);
   const title = content?.title || 'Tailored Services Across Industries';
   const subtitle = content?.subtitle || 'BI services deliver value across industries, but its real impact comes from how well insights are aligned with industry-specific challenges, metrics, and decision cycles. Our BI solutions built on Power BI are designed to reflect how each industry actually operates.';
 
@@ -191,11 +194,23 @@ export function BiIndustryServices({ content }: { content?: BiIndustryServicesCo
                     </ul>
                   </div>
 
-                  {/* Button CTA */}
+                  {/* Button CTA (Inside Card Only) */}
                   <div className="pt-8">
                     <a
                       href={activeTab.buttonUrl || '#'}
-                      className="inline-block bg-white hover:bg-slate-50 text-[#4c327f] font-semibold text-sm sm:text-base rounded-full px-8 py-3 w-fit shadow-md transition-all duration-300 hover:shadow-lg active:scale-[0.98] text-center"
+                      onMouseEnter={() => setIsCardBtnHovered(true)}
+                      onMouseLeave={() => setIsCardBtnHovered(false)}
+                      style={
+                        isCardBtnHovered && (activeTab.buttonHoverBgColor || activeTab.buttonHoverTextColor)
+                          ? {
+                              backgroundColor: activeTab.buttonHoverBgColor || undefined,
+                              color: activeTab.buttonHoverTextColor || undefined,
+                            }
+                          : undefined
+                      }
+                      className={`inline-block bg-white ${
+                        activeTab.buttonHoverBgColor ? '' : 'hover:bg-slate-50'
+                      } text-[#4c327f] font-semibold text-sm sm:text-base rounded-full px-8 py-3 w-fit shadow-md transition-all duration-300 hover:shadow-lg active:scale-[0.98] text-center cursor-pointer`}
                     >
                       {activeTab.buttonText || 'Case studies'}
                     </a>

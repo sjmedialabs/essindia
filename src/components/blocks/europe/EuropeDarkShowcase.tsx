@@ -26,14 +26,18 @@ export interface EuropeDarkShowcaseContent extends EuropeCommonSettings {
   descriptionColor?: string;
   primaryButtonText?: string;
   primaryButtonTextColor?: string;
+  primaryButtonHoverTextColor?: string;
   primaryButtonBgColor?: string;
+  primaryButtonHoverBgColor?: string;
   primaryButtonBorderColor?: string;
   primaryButtonUrl?: string;
   primaryButtonFormType?: string;
   primaryButtonPdfUrl?: string;
   secondaryButtonText?: string;
   secondaryButtonTextColor?: string;
+  secondaryButtonHoverTextColor?: string;
   secondaryButtonBgColor?: string;
+  secondaryButtonHoverBgColor?: string;
   secondaryButtonBorderColor?: string;
   secondaryButtonUrl?: string;
   secondaryButtonFormType?: string;
@@ -52,6 +56,9 @@ const DEFAULT_SLIDES: SlideImage[] = [
 ];
 
 export function EuropeDarkShowcase({ content }: { content?: EuropeDarkShowcaseContent }) {
+  const [isPrimaryHovered, setIsPrimaryHovered] = useState(false);
+  const [isSecondaryHovered, setIsSecondaryHovered] = useState(false);
+
   const badgeText = content?.badgeText || 'AI Services';
   const badgeBgColor = 'transparent';
   const badgeBorderColor = 'rgba(255,255,255,0.2)';
@@ -65,14 +72,18 @@ export function EuropeDarkShowcase({ content }: { content?: EuropeDarkShowcaseCo
 
   const primaryButtonText = content?.primaryButtonText || 'Case studies';
   const primaryButtonTextColor = '#111827';
+  const primaryButtonHoverTextColor = content?.primaryButtonHoverTextColor;
   const primaryButtonBgColor = '#ffffff';
+  const primaryButtonHoverBgColor = content?.primaryButtonHoverBgColor;
   const primaryButtonBorderColor = '#ffffff';
   const primaryButtonUrl = content?.primaryButtonUrl || '/contact-us';
   const primaryButtonFormType = (content?.primaryButtonFormType || '') as CtaFormType;
 
   const secondaryButtonText = content?.secondaryButtonText || 'Talk to an expert';
   const secondaryButtonTextColor = '#ffffff';
+  const secondaryButtonHoverTextColor = content?.secondaryButtonHoverTextColor;
   const secondaryButtonBgColor = 'transparent';
+  const secondaryButtonHoverBgColor = content?.secondaryButtonHoverBgColor;
   const secondaryButtonBorderColor = 'rgba(255,255,255,0.4)';
   const secondaryButtonUrl = content?.secondaryButtonUrl || '/contact-us';
   const secondaryButtonFormType = (content?.secondaryButtonFormType || '') as CtaFormType;
@@ -145,11 +156,13 @@ export function EuropeDarkShowcase({ content }: { content?: EuropeDarkShowcaseCo
             <Link
               href={primaryButtonUrl}
               onClick={primaryButtonFormType ? (e) => { e.preventDefault(); handlePrimaryClick(); } : undefined}
-              className="px-10 py-3.5 rounded-full text-sm font-semibold border transition-all hover:scale-105 duration-200"
+              onMouseEnter={() => setIsPrimaryHovered(true)}
+              onMouseLeave={() => setIsPrimaryHovered(false)}
+              className="px-10 py-3.5 rounded-full text-sm font-semibold border transition-all hover:scale-105 duration-200 cursor-pointer"
               style={{
-                backgroundColor: primaryButtonBgColor,
+                backgroundColor: isPrimaryHovered && primaryButtonHoverBgColor ? primaryButtonHoverBgColor : primaryButtonBgColor,
                 borderColor: primaryButtonBorderColor,
-                color: primaryButtonTextColor,
+                color: isPrimaryHovered && primaryButtonHoverTextColor ? primaryButtonHoverTextColor : primaryButtonTextColor,
               }}
             >
               {primaryButtonText}
@@ -159,11 +172,13 @@ export function EuropeDarkShowcase({ content }: { content?: EuropeDarkShowcaseCo
             <Link
               href={secondaryButtonUrl}
               onClick={secondaryButtonFormType ? (e) => { e.preventDefault(); handleSecondaryClick(); } : undefined}
-              className="px-10 py-3.5 rounded-full text-sm font-semibold border transition-all hover:scale-105 duration-200"
+              onMouseEnter={() => setIsSecondaryHovered(true)}
+              onMouseLeave={() => setIsSecondaryHovered(false)}
+              className="px-10 py-3.5 rounded-full text-sm font-semibold border transition-all hover:scale-105 duration-200 cursor-pointer"
               style={{
-                backgroundColor: secondaryButtonBgColor,
+                backgroundColor: isSecondaryHovered && secondaryButtonHoverBgColor ? secondaryButtonHoverBgColor : secondaryButtonBgColor,
                 borderColor: secondaryButtonBorderColor,
-                color: secondaryButtonTextColor,
+                color: isSecondaryHovered && secondaryButtonHoverTextColor ? secondaryButtonHoverTextColor : secondaryButtonTextColor,
               }}
             >
               {secondaryButtonText}

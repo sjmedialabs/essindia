@@ -21,8 +21,10 @@ interface JudicialHeroContent {
   description?: string;
   descriptionColor?: string;
   buttonBgColor?: string;
+  buttonHoverBgColor?: string;
   buttonText?: string;
   buttonTextColor?: string;
+  buttonHoverTextColor?: string;
   buttonUrl?: string;
   image?: string;
 }
@@ -32,6 +34,7 @@ interface JudicialHeroProps {
 }
 
 export function JudicialHero({ content }: JudicialHeroProps) {
+  const [isBtnHovered, setIsBtnHovered] = React.useState(false);
   const bgColor = content?.bgColor || '#9da2c9';
   const badgeBgColor = content?.badgeBgColor || '#ffffff';
   const badgeText = content?.badgeText || 'Judicial Automation';
@@ -41,8 +44,10 @@ export function JudicialHero({ content }: JudicialHeroProps) {
   const description = content?.description || 'Streamline legal operations, modernize enterprise infrastructure, and optimize business performance with secure, scalable, and technology-driven solutions from ESS.';
   const descriptionColor = content?.descriptionColor || 'rgba(255,255,255,0.9)';
   const buttonBgColor = content?.buttonBgColor || '#2a2d7c';
+  const buttonHoverBgColor = content?.buttonHoverBgColor;
   const buttonText = content?.buttonText || 'Get started';
   const buttonTextColor = content?.buttonTextColor || '#ffffff';
+  const buttonHoverTextColor = content?.buttonHoverTextColor;
   const buttonUrl = content?.buttonUrl || '#';
   const image = content?.image || '/Judicial Automation/Rectangle 196.png';
 
@@ -105,8 +110,15 @@ export function JudicialHero({ content }: JudicialHeroProps) {
             <div>
               <Link
                 href={buttonUrl}
-                className="inline-block px-6 py-3 rounded-full font-bold hover:brightness-95 transition-all shadow-md text-sm text-center min-w-[140px]"
-                style={{ backgroundColor: buttonBgColor, color: buttonTextColor }}
+                onMouseEnter={() => setIsBtnHovered(true)}
+                onMouseLeave={() => setIsBtnHovered(false)}
+                className={`inline-block px-6 py-3 rounded-full font-bold transition-all shadow-md text-sm text-center min-w-[140px] cursor-pointer ${
+                  buttonHoverBgColor ? '' : 'hover:brightness-95'
+                }`}
+                style={{
+                  backgroundColor: isBtnHovered && buttonHoverBgColor ? buttonHoverBgColor : buttonBgColor,
+                  color: isBtnHovered && buttonHoverTextColor ? buttonHoverTextColor : buttonTextColor,
+                }}
               >
                 {buttonText}
               </Link>

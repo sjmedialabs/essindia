@@ -1,12 +1,13 @@
 'use client';
 
 import { useRef, useState, useEffect, useCallback } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { TextReveal } from '@/components/animations/TextReveal';
 import { MotionSection } from '@/components/animations/MotionSection';
-import { useInternalNavigate } from '@/hooks/useInternalNavigate';
+import { useCtaAction, type CtaFormType } from '@/hooks/useCtaAction';
 
 interface Industry {
   name: string;
@@ -19,7 +20,15 @@ interface IndustryContent {
   subheading?: string;
   description?: string;
   industries?: Industry[];
-  viewAllCta?: { label: string; url: string };
+  buttonText?: string;
+  buttonBgColor?: string;
+  buttonHoverBgColor?: string;
+  buttonTextColor?: string;
+  buttonHoverTextColor?: string;
+  buttonUrl?: string;
+  buttonFormType?: string;
+  pdfUrl?: string;
+  viewAllCta?: { label?: string; url?: string; formType?: string; pdfUrl?: string };
 }
 
 interface IndustrySectionProps {
@@ -50,7 +59,7 @@ const defaultIndustries = [
 ];
 
 export function IndustrySection({ content }: IndustrySectionProps) {
-  const navigate = useInternalNavigate();
+  const [isBtnHovered, setIsBtnHovered] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
@@ -59,7 +68,18 @@ export function IndustrySection({ content }: IndustrySectionProps) {
   const subheading = content?.subheading || "Designed for the way your industry works.";
   const description = content?.description || "From manufacturing to services, ESS understands the workflows behind real business operations. We infuse our extensive industry expertise into every solution, tailoring our approach to the specific realities of each industry rather than relying on generic software thinking.";
   const industries = content?.industries || defaultIndustries;
-  const viewAllCta = content?.viewAllCta || { label: "View all INDUSTRIES", url: "/industries" };
+
+  const btnText = content?.buttonText || content?.viewAllCta?.label || "View all INDUSTRIES";
+  const btnUrl = content?.buttonUrl || content?.viewAllCta?.url || "/industries";
+  const btnFormType = (content?.buttonFormType || content?.viewAllCta?.formType || '') as CtaFormType;
+  const pdfUrl = content?.pdfUrl || content?.viewAllCta?.pdfUrl;
+
+  const buttonBgColor = content?.buttonBgColor || '#ffffff';
+  const buttonHoverBgColor = content?.buttonHoverBgColor || '#f8fafc';
+  const buttonTextColor = content?.buttonTextColor || '#462885';
+  const buttonHoverTextColor = content?.buttonHoverTextColor;
+
+  const { handleClick, modalNode } = useCtaAction(btnUrl, btnFormType, pdfUrl);
 
   const checkScroll = useCallback(() => {
     if (scrollRef.current) {
@@ -187,16 +207,25 @@ export function IndustrySection({ content }: IndustrySectionProps) {
         </div>
 
         {/* View All Button */}
-        <MotionSection variant="fadeUp" delay={0.5} className="mt-16 text-center">
-          <Button 
-            onClick={() => navigate(viewAllCta.url)}
-            className="bg-white hover:bg-slate-50 text-[#462885] rounded-full px-12 h-[54px] text-[15px] font-bold tracking-wider shadow-2xl transition-all duration-300 hover:shadow-white/20 hover:-translate-y-1 active:scale-95 cursor-pointer"
-          >
-            {viewAllCta.label}
-          </Button>
-        </MotionSection>
+        {btnText && (
+          <MotionSection variant="fadeUp" delay={0.5} className="mt-16 text-center">
+            <Button 
+              onClick={handleClick}
+              onMouseEnter={() => setIsBtnHovered(true)}
+              onMouseLeave={() => setIsBtnHovered(false)}
+              style={{
+                backgroundColor: isBtnHovered && buttonHoverBgColor ? buttonHoverBgColor : buttonBgColor,
+                color: isBtnHovered && buttonHoverTextColor ? buttonHoverTextColor : buttonTextColor,
+              }}
+              className="rounded-full px-12 h-[54px] text-[15px] font-bold tracking-wider shadow-2xl transition-all duration-300 hover:shadow-white/20 hover:-translate-y-1 active:scale-95 cursor-pointer border-none"
+            >
+              {btnText}
+            </Button>
+          </MotionSection>
+        )}
 
       </div>
+      {modalNode}
     </section>
   );
 }

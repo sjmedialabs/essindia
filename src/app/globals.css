@@ -223,6 +223,7 @@ img,
   0% {
     background-position: 200% 50%;
   }
+
   100% {
     background-position: 0% 50%;
   }
@@ -235,19 +236,33 @@ img,
 
 /* Global Section Heading <h2> Default Styling */
 section h2 {
-  font-weight: 200 !important; /* font-extralight */
-  font-size: 1.25rem; /* text-xl */
+  font-weight: 200 !important;
+  /* font-extralight */
+  font-size: 1.25rem;
+  /* text-xl */
   line-height: 1.2;
 }
 
 @media (min-width: 640px) {
   section h2 {
-    font-size: 2.25rem; /* sm:text-4xl */
+    font-size: 2.25rem;
+    /* sm:text-4xl */
   }
 }
 
 @media (min-width: 1024px) {
   section h2 {
-    font-size: 40px; /* lg:text-[40px] */
+    font-size: 40px;
   }
+}
+
+/* Global Description Paragraph & <p> Tag Default Styling (18px) - Public Site Wide */
+:not(.admin-layout, [class*="admin-"]) p,
+:not(.admin-layout, [class*="admin-"]) .prose p,
+:not(.admin-layout, [class*="admin-"]) [class*="description"],
+:not(.admin-layout, [class*="admin-"]) [class*="desc"],
+.section-description,
+.card-description {
+  font-size: 16px !important;
+  line-height: 1.6 !important;
 }

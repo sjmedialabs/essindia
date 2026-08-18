@@ -8,6 +8,8 @@ interface AboutUsCtaContent {
   title?: string;
   description?: string;
   buttonText?: string;
+  buttonHoverBgColor?: string;
+  buttonHoverTextColor?: string;
   pdfUrl?: string;
 }
 
@@ -17,6 +19,7 @@ interface AboutUsCtaProps {
 
 export function AboutUsCta({ content }: AboutUsCtaProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isBtnHovered, setIsBtnHovered] = useState(false);
 
   const title =
     content?.title || 'Schedule Your Free Demo';
@@ -28,6 +31,8 @@ export function AboutUsCta({ content }: AboutUsCtaProps) {
   const buttonText =
     content?.buttonText || 'Book a Free Demo';
 
+  const buttonHoverBgColor = content?.buttonHoverBgColor;
+  const buttonHoverTextColor = content?.buttonHoverTextColor;
   const pdfUrl = content?.pdfUrl;
 
   return (
@@ -46,9 +51,19 @@ export function AboutUsCta({ content }: AboutUsCtaProps) {
         {/* CTA */}
         <Button
           onClick={() => setIsModalOpen(true)}
-          className="
+          onMouseEnter={() => setIsBtnHovered(true)}
+          onMouseLeave={() => setIsBtnHovered(false)}
+          style={
+            isBtnHovered && (buttonHoverBgColor || buttonHoverTextColor)
+              ? {
+                  backgroundColor: buttonHoverBgColor || undefined,
+                  color: buttonHoverTextColor || undefined,
+                }
+              : undefined
+          }
+          className={`
             bg-[#0D2C84]
-            hover:bg-[#0B2570]
+            ${buttonHoverBgColor ? '' : 'hover:bg-[#0B2570]'}
             text-white
             font-semibold
             text-base
@@ -57,7 +72,8 @@ export function AboutUsCta({ content }: AboutUsCtaProps) {
             rounded-full
             border-0
             shadow-none
-          "
+            transition-colors
+          `}
         >
           {buttonText}
         </Button>

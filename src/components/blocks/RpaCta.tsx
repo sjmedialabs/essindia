@@ -7,14 +7,19 @@ import { motion } from 'framer-motion';
 interface RpaCtaContent {
   title?: string;
   buttonText?: string;
+  buttonHoverBgColor?: string;
+  buttonHoverTextColor?: string;
   pdfUrl?: string;
 }
 
 export function RpaCta({ content }: { content?: RpaCtaContent }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isBtnHovered, setIsBtnHovered] = useState(false);
 
   const title = content?.title || 'Download Our eBook - 50+ Industry Specific RPA Use Cases';
   const buttonText = content?.buttonText || 'Download Now';
+  const buttonHoverBgColor = content?.buttonHoverBgColor;
+  const buttonHoverTextColor = content?.buttonHoverTextColor;
   const pdfUrl = content?.pdfUrl;
 
   return (
@@ -39,7 +44,20 @@ export function RpaCta({ content }: { content?: RpaCtaContent }) {
             transition={{ duration: 0.4, delay: 0.2 }}
             className="pt-2"
           >
-            <button onClick={() => setIsModalOpen(true)} className="bg-[#0D2C84] text-white hover:bg-[#0B2570] px-8 py-4 rounded-full font-semibold transition-colors inline-flex items-center gap-2 text-base shadow-sm">
+            <button
+              onClick={() => setIsModalOpen(true)}
+              onMouseEnter={() => setIsBtnHovered(true)}
+              onMouseLeave={() => setIsBtnHovered(false)}
+              style={
+                isBtnHovered && (buttonHoverBgColor || buttonHoverTextColor)
+                  ? {
+                      backgroundColor: buttonHoverBgColor || undefined,
+                      color: buttonHoverTextColor || undefined,
+                    }
+                  : undefined
+              }
+              className={`bg-[#0D2C84] ${buttonHoverBgColor ? '' : 'hover:bg-[#0B2570]'} text-white px-8 py-4 rounded-full font-semibold transition-colors inline-flex items-center gap-2 text-base shadow-sm cursor-pointer`}
+            >
               {buttonText}
             </button>
           </motion.div>

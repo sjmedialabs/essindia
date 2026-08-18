@@ -8,18 +8,20 @@ interface TextRevealProps {
   className?: string;
   as?: 'h1' | 'h2' | 'h3' | 'h4' | 'p' | 'span';
   delay?: number;
+  style?: React.CSSProperties;
 }
 
 export function TextReveal({ 
   text, 
   className = '', 
   as: Component = 'h2',
-  delay = 0 
+  delay = 0,
+  style
 }: TextRevealProps) {
   const words = text.split(' ');
 
   return (
-    <Component className={`${className} flex flex-wrap gap-x-[0.2em] gap-y-[0.1em]`}>
+    <Component className={`${className} flex flex-wrap gap-x-[0.2em] gap-y-[0.1em]`} style={style}>
       {words.map((word, i) => (
         <span key={i} className="relative inline-flex overflow-hidden">
           <motion.span

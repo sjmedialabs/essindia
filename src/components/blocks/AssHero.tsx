@@ -22,21 +22,28 @@ interface AssHeroContent {
   description?: string;
   descriptionColor?: string;
   button1BgColor?: string;
+  button1HoverBgColor?: string;
   button1BorderColor?: string;
   button1Text?: string;
   button1TextColor?: string;
+  button1HoverTextColor?: string;
   button1Url?: string;
   button1FormType?: string;
   button2BgColor?: string;
+  button2HoverBgColor?: string;
   button2BorderColor?: string;
   button2Text?: string;
   button2TextColor?: string;
+  button2HoverTextColor?: string;
   button2Url?: string;
   button2FormType?: string;
   image?: string;
 }
 
 export function AssHero({ content }: { content?: AssHeroContent }) {
+  const [isBtn1Hovered, setIsBtn1Hovered] = React.useState(false);
+  const [isBtn2Hovered, setIsBtn2Hovered] = React.useState(false);
+
   const bgColor = content?.bgColor || '#161f38';
   const badgeBgColor = content?.badgeBgColor || '#ffffff';
   const badgeBorderColor = content?.badgeBorderColor || '#ffffff';
@@ -47,14 +54,18 @@ export function AssHero({ content }: { content?: AssHeroContent }) {
   const description = content?.description || 'Digitize service operations, improve field productivity, and deliver faster customer resolution with a connected after-sales platform.';
   const descriptionColor = content?.descriptionColor || '#cbd5e1';
   const button1BgColor = content?.button1BgColor || '#2a2b6a';
+  const button1HoverBgColor = content?.button1HoverBgColor;
   const button1BorderColor = content?.button1BorderColor || '#2a2b6a';
   const button1Text = content?.button1Text || 'Request Demo';
   const button1TextColor = content?.button1TextColor || '#ffffff';
+  const button1HoverTextColor = content?.button1HoverTextColor;
   const button1Url = content?.button1Url || '#contact';
   const button2BgColor = content?.button2BgColor || '#ffffff';
+  const button2HoverBgColor = content?.button2HoverBgColor;
   const button2BorderColor = content?.button2BorderColor || '#ffffff';
   const button2Text = content?.button2Text || 'Explore Features';
   const button2TextColor = content?.button2TextColor || '#2a2b6a';
+  const button2HoverTextColor = content?.button2HoverTextColor;
   const button2Url = content?.button2Url || '#features';
   const button1FormType = (content?.button1FormType || '') as CtaFormType;
   const button2FormType = (content?.button2FormType || '') as CtaFormType;
@@ -124,15 +135,27 @@ export function AssHero({ content }: { content?: AssHeroContent }) {
             <div className="flex flex-wrap gap-4">
               <Link
                 href={button1Url} onClick={button1FormType ? (e: React.MouseEvent) => { e.preventDefault(); handleBtn1Click(); } : undefined}
-                className="inline-block font-bold px-6 py-3 rounded-full border-2 hover:brightness-110 transition-all text-sm text-center min-w-[140px]"
-                style={{ backgroundColor: button1BgColor, color: button1TextColor, borderColor: button1BorderColor }}
+                onMouseEnter={() => setIsBtn1Hovered(true)}
+                onMouseLeave={() => setIsBtn1Hovered(false)}
+                className="inline-block font-bold px-6 py-3 rounded-full border-2 hover:brightness-110 transition-all text-sm text-center min-w-[140px] cursor-pointer"
+                style={{
+                  backgroundColor: isBtn1Hovered && button1HoverBgColor ? button1HoverBgColor : button1BgColor,
+                  color: isBtn1Hovered && button1HoverTextColor ? button1HoverTextColor : button1TextColor,
+                  borderColor: button1BorderColor,
+                }}
               >
                 {button1Text}
               </Link>
               <Link
                 href={button2Url} onClick={button2FormType ? (e: React.MouseEvent) => { e.preventDefault(); handleBtn2Click(); } : undefined}
-                className="inline-block font-bold px-6 py-3 rounded-full border-2 hover:brightness-110 transition-all text-sm text-center min-w-[140px]"
-                style={{ backgroundColor: button2BgColor, color: button2TextColor, borderColor: button2BorderColor }}
+                onMouseEnter={() => setIsBtn2Hovered(true)}
+                onMouseLeave={() => setIsBtn2Hovered(false)}
+                className="inline-block font-bold px-6 py-3 rounded-full border-2 hover:brightness-110 transition-all text-sm text-center min-w-[140px] cursor-pointer"
+                style={{
+                  backgroundColor: isBtn2Hovered && button2HoverBgColor ? button2HoverBgColor : button2BgColor,
+                  color: isBtn2Hovered && button2HoverTextColor ? button2HoverTextColor : button2TextColor,
+                  borderColor: button2BorderColor,
+                }}
               >
                 {button2Text}
               </Link>

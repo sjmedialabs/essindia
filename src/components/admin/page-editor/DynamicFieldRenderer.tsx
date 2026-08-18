@@ -812,6 +812,14 @@ function ArrayField({
                 objItem[k] = '';
               }
             }
+          } else if (fieldKey === 'modules') {
+            let moduleOrder = ['image', 'title', 'description', 'ctaLabel', 'ctaHoverBgColor', 'ctaHoverTextColor', 'ctaUrl', 'ctaFormType'];
+            if (sectionType === 'erp-modules') {
+              for (const k of ['ctaHoverBgColor', 'ctaHoverTextColor']) {
+                if (!(k in objItem)) objItem[k] = '';
+              }
+            }
+            sortedKeys = moduleOrder.filter(k => k in objItem);
           } else if (fieldKey.toLowerCase().includes('items')) {
             let itemOrder = ['icon', 'text', 'title', 'description', 'image', 'ctaText', 'ctaUrl'];
             if (sectionType === 'oracle-apex-approach') {
@@ -851,11 +859,17 @@ function ArrayField({
             if (sectionType === 'bi-tabs') {
               tabOrder = ['tabName', 'tabDesc', 'heading', 'subheading', 'questions', 'image'];
             } else if (sectionType === 'fmcg-use-cases') {
-              tabOrder = ['tabName', 'tag', 'heading', 'points', 'buttonText', 'buttonUrl', 'image'];
+              tabOrder = ['tabName', 'tag', 'heading', 'points', 'buttonText', 'buttonHoverBgColor', 'buttonHoverTextColor', 'buttonUrl', 'image'];
+              for (const k of ['buttonHoverBgColor', 'buttonHoverTextColor']) {
+                if (!(k in objItem)) objItem[k] = '';
+              }
             } else if (sectionType === 'aom-workspace') {
               tabOrder = ['label', 'desc', 'icon', 'contentTitle', 'contentDescription', 'contentImage', 'benefits', 'ctaText', 'ctaUrl'];
             } else if (sectionType === 'bi-industry-services') {
-              tabOrder = ['tabName', 'tabTitle', 'points', 'buttonText', 'buttonUrl', 'image'];
+              tabOrder = ['tabName', 'tabTitle', 'points', 'buttonText', 'buttonHoverBgColor', 'buttonHoverTextColor', 'buttonUrl', 'image'];
+              for (const k of ['buttonHoverBgColor', 'buttonHoverTextColor']) {
+                if (!(k in objItem)) objItem[k] = '';
+              }
             } else if (sectionType === 'oracle-apex-approach') {
               tabOrder = ['tabName', 'items'];
             } else if (sectionType === 'uganda-insights') {
@@ -892,6 +906,14 @@ function ArrayField({
               statOrder = ['value', 'title'];
             }
             sortedKeys = statOrder.filter(k => k in objItem);
+          } else if (fieldKey === 'employees') {
+            let employeeOrder = ['name', 'subtitle', 'description', 'quote', 'image', 'nameColor', 'buttonHoverBgColor', 'buttonHoverTextColor', 'stats', 'pills'];
+            if (sectionType === 'employee-spotlight-cards') {
+              for (const k of ['buttonHoverBgColor', 'buttonHoverTextColor']) {
+                if (!(k in objItem)) objItem[k] = '';
+              }
+            }
+            sortedKeys = employeeOrder.filter(k => k in objItem);
           } else if (fieldKey === 'slides') {
             let slideOrder = ['image', 'logo', 'title', 'stats', 'ctaText', 'ctaUrl'];
             if (sectionType === 'landing2-carousel') {

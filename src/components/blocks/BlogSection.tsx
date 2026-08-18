@@ -23,7 +23,15 @@ interface BlogContent {
   heading?: string;
   subheading?: string;
   blogs?: Blog[];
-  viewAllCta?: { label: string; url: string };
+  buttonText?: string;
+  buttonBgColor?: string;
+  buttonHoverBgColor?: string;
+  buttonTextColor?: string;
+  buttonHoverTextColor?: string;
+  buttonUrl?: string;
+  buttonFormType?: string;
+  pdfUrl?: string;
+  viewAllCta?: { label?: string; url?: string; formType?: string; pdfUrl?: string };
 }
 
 interface BlogSectionProps {
@@ -61,13 +69,21 @@ const defaultBlogs = [
 ];
 
 export function BlogSection({ content }: BlogSectionProps) {
-  const navigate = useInternalNavigate();
-  const ctaUrl = (content as any)?.ctaUrl || '';
-  const ctaFormType = ((content as any)?.ctaFormType || '') as CtaFormType;
-  const { handleClick: handleCtaClick, modalNode } = useCtaAction(ctaUrl, ctaFormType);
+  const [isBtnHovered, setIsBtnHovered] = useState(false);
   const heading = content?.heading || "News, Launches & Product Thinking";
   const subheading = content?.subheading || "Stay updated on what we're building, learning, and launching.";
-  const viewAllCta = content?.viewAllCta || { label: "Explore More", url: "/blogs" };
+
+  const btnText = content?.buttonText || content?.viewAllCta?.label || "Explore More";
+  const btnUrl = content?.buttonUrl || content?.viewAllCta?.url || "/blogs";
+  const btnFormType = (content?.buttonFormType || content?.viewAllCta?.formType || '') as CtaFormType;
+  const pdfUrl = content?.pdfUrl || content?.viewAllCta?.pdfUrl;
+
+  const buttonBgColor = content?.buttonBgColor || '#4B2A63';
+  const buttonHoverBgColor = content?.buttonHoverBgColor || '#3B198F';
+  const buttonTextColor = content?.buttonTextColor || '#ffffff';
+  const buttonHoverTextColor = content?.buttonHoverTextColor;
+
+  const { handleClick, modalNode } = useCtaAction(btnUrl, btnFormType, pdfUrl);
 
   const [blogs, setBlogs] = useState<Blog[]>(content?.blogs || defaultBlogs);
 
@@ -126,7 +142,7 @@ export function BlogSection({ content }: BlogSectionProps) {
               }}
               whileHover={{ y: -8, transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] } }}
               className="flex flex-col group cursor-pointer"
-              onClick={() => blog.ctaUrl && blog.ctaUrl !== '#' && navigate(blog.ctaUrl)}
+              onClick={() => blog.ctaUrl && blog.ctaUrl !== '#' && (window.location.href = blog.ctaUrl)}
             >
               {/* Image */}
               <div className="rounded-[32px] overflow-hidden bg-slate-200 aspect-[16/10] mb-6 shadow-sm relative">
@@ -174,7 +190,7 @@ export function BlogSection({ content }: BlogSectionProps) {
                   onClick={(e) => {
                     e.stopPropagation();
                     if (blog.ctaUrl && blog.ctaUrl !== '#') {
-                      navigate(blog.ctaUrl);
+                      window.location.href = blog.ctaUrl;
                     }
                   }}
                   className="flex items-center"
@@ -188,16 +204,25 @@ export function BlogSection({ content }: BlogSectionProps) {
         </StaggerContainer>
 
         {/* View All Button */}
-        <MotionSection variant="fadeUp" delay={0.6} className="mt-16 text-center">
-          <Button 
-            onClick={() => navigate(viewAllCta.url)}
-            className="bg-[#4B2A63] hover:bg-[#3B198F] text-white rounded-full px-12 h-[54px] text-[16px] font-bold shadow-xl transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 active:scale-95 cursor-pointer"
-          >
-            {viewAllCta.label}
-          </Button>
-        </MotionSection>
+        {btnText && (
+          <MotionSection variant="fadeUp" delay={0.6} className="mt-16 text-center">
+            <Button 
+              onClick={handleClick}
+              onMouseEnter={() => setIsBtnHovered(true)}
+              onMouseLeave={() => setIsBtnHovered(false)}
+              style={{
+                backgroundColor: isBtnHovered && buttonHoverBgColor ? buttonHoverBgColor : buttonBgColor,
+                color: isBtnHovered && buttonHoverTextColor ? buttonHoverTextColor : buttonTextColor,
+              }}
+              className="rounded-full px-12 h-[54px] text-[16px] font-bold shadow-xl transition-all duration-300 hover:shadow-2xl hover:-translate-y-1 active:scale-95 cursor-pointer border-none"
+            >
+              {btnText}
+            </Button>
+          </MotionSection>
+        )}
 
       </div>
+      {modalNode}
     </section>
   );
 }

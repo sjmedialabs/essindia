@@ -264,6 +264,9 @@ export function BlogDetailSection({ content }: BlogDetailSectionProps) {
     'Detailed Timeline Breakdown in 24h',
     'Estimated Cost Range Included'
   ];
+  const formButtonHoverBgColor = (content as any)?.formButtonHoverBgColor;
+  const formButtonHoverTextColor = (content as any)?.formButtonHoverTextColor;
+  const [isFormBtnHovered, setIsFormBtnHovered] = React.useState(false);
 
   // Dynamic Left Sidebar TOC Items
   const tocItems = React.useMemo(() => {
@@ -720,6 +723,17 @@ export function BlogDetailSection({ content }: BlogDetailSectionProps) {
                 <button
                   type="submit"
                   disabled={!formData.agreeTerms || isSubmitting}
+                  onMouseEnter={() => setIsFormBtnHovered(true)}
+                  onMouseLeave={() => setIsFormBtnHovered(false)}
+                  style={
+                    isFormBtnHovered && (formButtonHoverBgColor || formButtonHoverTextColor)
+                      ? {
+                          backgroundColor: formButtonHoverBgColor || undefined,
+                          backgroundImage: formButtonHoverBgColor ? 'none' : undefined,
+                          color: formButtonHoverTextColor || undefined,
+                        }
+                      : undefined
+                  }
                   className={`w-full py-3 rounded-xl font-bold text-xs transition-all duration-200 shadow-lg flex items-center justify-center gap-2 mt-2 ${
                     !formData.agreeTerms || isSubmitting
                       ? 'bg-slate-800 text-slate-500 cursor-not-allowed opacity-60'

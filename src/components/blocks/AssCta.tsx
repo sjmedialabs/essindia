@@ -13,11 +13,14 @@ interface AssCtaContent {
   buttonText?: string;
   pdfUrl?: string;
   buttonBgColor?: string;
+  buttonHoverBgColor?: string;
   buttonTextColor?: string;
+  buttonHoverTextColor?: string;
 }
 
 export function AssCta({ content }: { content?: AssCtaContent }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isBtnHovered, setIsBtnHovered] = useState(false);
 
   const bgColor = content?.bgColor || '#eff3f8';
   const title = content?.title || 'Future-Ready Oracle Database Strategy';
@@ -27,7 +30,9 @@ export function AssCta({ content }: { content?: AssCtaContent }) {
   const buttonText = content?.buttonText || 'Explore Your Upgrade Roadmap';
   const pdfUrl = content?.pdfUrl;
   const buttonBgColor = content?.buttonBgColor || '#fcc42c';
+  const buttonHoverBgColor = content?.buttonHoverBgColor;
   const buttonTextColor = content?.buttonTextColor || '#000000';
+  const buttonHoverTextColor = content?.buttonHoverTextColor;
 
   return (
     <section
@@ -59,8 +64,13 @@ export function AssCta({ content }: { content?: AssCtaContent }) {
 
         <button
           onClick={() => setIsModalOpen(true)}
-          className="px-8 py-3 rounded-full font-bold transition-all hover:-translate-y-0.5 hover:shadow-lg inline-flex items-center gap-2"
-          style={{ backgroundColor: buttonBgColor, color: buttonTextColor }}
+          onMouseEnter={() => setIsBtnHovered(true)}
+          onMouseLeave={() => setIsBtnHovered(false)}
+          className="px-8 py-3 rounded-full font-bold transition-all hover:-translate-y-0.5 hover:shadow-lg inline-flex items-center gap-2 cursor-pointer"
+          style={{
+            backgroundColor: isBtnHovered && buttonHoverBgColor ? buttonHoverBgColor : buttonBgColor,
+            color: isBtnHovered && buttonHoverTextColor ? buttonHoverTextColor : buttonTextColor,
+          }}
         >
           {buttonText}
         </button>

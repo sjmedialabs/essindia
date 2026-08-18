@@ -22,16 +22,20 @@ interface RoiHeroContent {
   description?: string;
   descriptionColor?: string;
   button1BgColor?: string;
+  button1HoverBgColor?: string;
   button1BorderColor?: string;
   button1Text?: string;
   button1TextColor?: string;
+  button1HoverTextColor?: string;
   button1Url?: string;
   button1FormType?: string;
   button1PdfUrl?: string;
   button2BgColor?: string;
+  button2HoverBgColor?: string;
   button2BorderColor?: string;
   button2Text?: string;
   button2TextColor?: string;
+  button2HoverTextColor?: string;
   button2Url?: string;
   button2FormType?: string;
   button2PdfUrl?: string;
@@ -39,6 +43,9 @@ interface RoiHeroContent {
 }
 
 export function RoiHero({ content }: { content?: RoiHeroContent }) {
+  const [isBtn1Hovered, setIsBtn1Hovered] = React.useState(false);
+  const [isBtn2Hovered, setIsBtn2Hovered] = React.useState(false);
+
   const bgColor = content?.bgColor || '#13444f';
   const badgeBgColor = content?.badgeBgColor || '#ffffff';
   const badgeBorderColor = content?.badgeBorderColor || 'transparent';
@@ -51,15 +58,19 @@ export function RoiHero({ content }: { content?: RoiHeroContent }) {
   const descriptionColor = content?.descriptionColor || '#ffffff';
 
   const button1BgColor = content?.button1BgColor || '#ffffff';
+  const button1HoverBgColor = content?.button1HoverBgColor;
   const button1BorderColor = content?.button1BorderColor || '#ffffff';
   const button1Text = content?.button1Text || 'Find an advisor';
   const button1TextColor = content?.button1TextColor || '#2b2a6c';
+  const button1HoverTextColor = content?.button1HoverTextColor;
   const button1Url = content?.button1Url || '#';
 
   const button2BgColor = content?.button2BgColor || '#ffffff';
+  const button2HoverBgColor = content?.button2HoverBgColor;
   const button2BorderColor = content?.button2BorderColor || '#ffffff';
   const button2Text = content?.button2Text || 'ROI calculator';
   const button2TextColor = content?.button2TextColor || '#2b2a6c';
+  const button2HoverTextColor = content?.button2HoverTextColor;
   const button2Url = content?.button2Url || '#';
 
   const button1FormType = (content?.button1FormType || '') as CtaFormType;
@@ -145,11 +156,13 @@ export function RoiHero({ content }: { content?: RoiHeroContent }) {
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.98 }}>
                   <Link
                     href={button1Url} onClick={button1FormType ? (e: React.MouseEvent) => { e.preventDefault(); handleBtn1Click(); } : undefined}
-                    className="inline-block px-6 py-3 rounded-full text-sm font-bold shadow-md hover:shadow-lg transition-colors border text-center min-w-[140px]"
+                    onMouseEnter={() => setIsBtn1Hovered(true)}
+                    onMouseLeave={() => setIsBtn1Hovered(false)}
+                    className="inline-block px-6 py-3 rounded-full text-sm font-bold shadow-md hover:shadow-lg transition-colors border text-center min-w-[140px] cursor-pointer"
                     style={{
-                      backgroundColor: button1BgColor,
+                      backgroundColor: isBtn1Hovered && button1HoverBgColor ? button1HoverBgColor : button1BgColor,
                       borderColor: button1BorderColor,
-                      color: button1TextColor,
+                      color: isBtn1Hovered && button1HoverTextColor ? button1HoverTextColor : button1TextColor,
                     }}
                   >
                     {button1Text}
@@ -160,11 +173,13 @@ export function RoiHero({ content }: { content?: RoiHeroContent }) {
                 <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.98 }}>
                   <Link
                     href={button2Url} onClick={button2FormType ? (e: React.MouseEvent) => { e.preventDefault(); handleBtn2Click(); } : undefined}
-                    className="inline-block px-6 py-3 rounded-full text-sm font-bold border shadow-sm hover:shadow-md transition-colors border text-center min-w-[140px]"
+                    onMouseEnter={() => setIsBtn2Hovered(true)}
+                    onMouseLeave={() => setIsBtn2Hovered(false)}
+                    className="inline-block px-6 py-3 rounded-full text-sm font-bold border shadow-sm hover:shadow-md transition-colors border text-center min-w-[140px] cursor-pointer"
                     style={{
-                      backgroundColor: button2BgColor,
+                      backgroundColor: isBtn2Hovered && button2HoverBgColor ? button2HoverBgColor : button2BgColor,
                       borderColor: button2BorderColor,
-                      color: button2TextColor,
+                      color: isBtn2Hovered && button2HoverTextColor ? button2HoverTextColor : button2TextColor,
                     }}
                   >
                     {button2Text}
