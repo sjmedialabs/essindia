@@ -18,14 +18,23 @@ export interface ThankYouHeroContent {
   primaryButtonText?: string;
   primaryButtonUrl?: string;
   primaryButtonBgColor?: string;
+  primaryButtonHoverBgColor?: string;
   primaryButtonTextColor?: string;
+  primaryButtonHoverTextColor?: string;
   secondaryButtonText?: string;
   secondaryButtonUrl?: string;
+  secondaryButtonBgColor?: string;
+  secondaryButtonHoverBgColor?: string;
+  secondaryButtonTextColor?: string;
+  secondaryButtonHoverTextColor?: string;
   pdfNotice?: string;
   bgColor?: string;
 }
 
 export function ThankYouHero({ content }: { content?: ThankYouHeroContent }) {
+  const [isPrimaryHovered, setIsPrimaryHovered] = React.useState(false);
+  const [isSecondaryHovered, setIsSecondaryHovered] = React.useState(false);
+
   const badgeText = content?.badgeText || 'Success';
   const badgeBgColor = content?.badgeBgColor || '#dcfce7';
   const badgeTextColor = content?.badgeTextColor || '#166534';
@@ -38,9 +47,15 @@ export function ThankYouHero({ content }: { content?: ThankYouHeroContent }) {
   const primaryButtonText = content?.primaryButtonText || 'Back to Home';
   const primaryButtonUrl = content?.primaryButtonUrl || '/';
   const primaryButtonBgColor = content?.primaryButtonBgColor || '#4B2A63';
+  const primaryButtonHoverBgColor = content?.primaryButtonHoverBgColor;
   const primaryButtonTextColor = content?.primaryButtonTextColor || '#ffffff';
+  const primaryButtonHoverTextColor = content?.primaryButtonHoverTextColor;
   const secondaryButtonText = content?.secondaryButtonText || 'Explore Solutions';
   const secondaryButtonUrl = content?.secondaryButtonUrl || '/solutions';
+  const secondaryButtonBgColor = content?.secondaryButtonBgColor || '#f1f5f9';
+  const secondaryButtonHoverBgColor = content?.secondaryButtonHoverBgColor;
+  const secondaryButtonTextColor = content?.secondaryButtonTextColor || '#1e293b';
+  const secondaryButtonHoverTextColor = content?.secondaryButtonHoverTextColor;
   const pdfNotice =
     content?.pdfNotice ||
     'If a document was requested, it will open in a new tab in a few seconds.';
@@ -103,8 +118,13 @@ export function ThankYouHero({ content }: { content?: ThankYouHeroContent }) {
           {primaryButtonText && (
             <Link
               href={primaryButtonUrl}
-              className="px-7 py-3 rounded-full text-sm font-bold transition-all hover:-translate-y-0.5"
-              style={{ backgroundColor: primaryButtonBgColor, color: primaryButtonTextColor }}
+              onMouseEnter={() => setIsPrimaryHovered(true)}
+              onMouseLeave={() => setIsPrimaryHovered(false)}
+              className="px-7 py-3 rounded-full text-sm font-bold transition-all hover:-translate-y-0.5 cursor-pointer"
+              style={{
+                backgroundColor: isPrimaryHovered && primaryButtonHoverBgColor ? primaryButtonHoverBgColor : primaryButtonBgColor,
+                color: isPrimaryHovered && primaryButtonHoverTextColor ? primaryButtonHoverTextColor : primaryButtonTextColor,
+              }}
             >
               {primaryButtonText}
             </Link>
@@ -112,7 +132,13 @@ export function ThankYouHero({ content }: { content?: ThankYouHeroContent }) {
           {secondaryButtonText && (
             <Link
               href={secondaryButtonUrl}
-              className="px-7 py-3 rounded-full text-sm font-bold bg-slate-100 text-slate-800 transition-all hover:-translate-y-0.5"
+              onMouseEnter={() => setIsSecondaryHovered(true)}
+              onMouseLeave={() => setIsSecondaryHovered(false)}
+              className="px-7 py-3 rounded-full text-sm font-bold transition-all hover:-translate-y-0.5 cursor-pointer"
+              style={{
+                backgroundColor: isSecondaryHovered && secondaryButtonHoverBgColor ? secondaryButtonHoverBgColor : secondaryButtonBgColor,
+                color: isSecondaryHovered && secondaryButtonHoverTextColor ? secondaryButtonHoverTextColor : secondaryButtonTextColor,
+              }}
             >
               {secondaryButtonText}
             </Link>

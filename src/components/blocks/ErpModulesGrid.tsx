@@ -10,6 +10,8 @@ interface ErpModule {
   title?: string;
   description?: string;
   ctaLabel?: string;
+  ctaHoverBgColor?: string;
+  ctaHoverTextColor?: string;
   ctaUrl?: string;
   ctaFormType?: string;
 }
@@ -25,6 +27,7 @@ interface ErpModulesGridProps {
 }
 
 export function ErpModulesGrid({ content }: ErpModulesGridProps) {
+  const [hoveredCardIdx, setHoveredCardIdx] = React.useState<number | null>(null);
   const ctaUrl = (content as any)?.ctaUrl || '';
   const ctaFormType = ((content as any)?.ctaFormType || '') as CtaFormType;
   const { handleClick: handleCtaClick, modalNode } = useCtaAction(ctaUrl, ctaFormType);
@@ -90,6 +93,7 @@ export function ErpModulesGrid({ content }: ErpModulesGridProps) {
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
         >
           {modules.map((module, idx) => {
+            const isBtnHovered = hoveredCardIdx === idx;
             return (
               <motion.div
                 key={idx}
@@ -125,7 +129,20 @@ export function ErpModulesGrid({ content }: ErpModulesGridProps) {
                 {/* Read More dynamic CTA */}
                 <button 
                   type="button" 
-                  className="text-[10px] mt-4 font-semibold text-black bg-white hover:bg-[#452191] hover:text-white hover:border-[#452191] rounded-full h-7 px-4 border border-gray-300 transition-colors duration-300 cursor-pointer" 
+                  onMouseEnter={() => setHoveredCardIdx(idx)}
+                  onMouseLeave={() => setHoveredCardIdx(null)}
+                  style={
+                    isBtnHovered && (module.ctaHoverBgColor || module.ctaHoverTextColor)
+                      ? {
+                          backgroundColor: module.ctaHoverBgColor || undefined,
+                          color: module.ctaHoverTextColor || undefined,
+                          borderColor: module.ctaHoverBgColor || undefined,
+                        }
+                      : undefined
+                  }
+                  className={`text-[10px] mt-4 font-semibold text-black bg-white ${
+                    module.ctaHoverBgColor ? '' : 'hover:bg-[#452191] hover:text-white hover:border-[#452191]'
+                  } rounded-full h-7 px-4 border border-gray-300 transition-colors duration-300 cursor-pointer`} 
                   onClick={(e) => {
                     e.stopPropagation();
                     window.open(module.ctaUrl || '#', '_blank');

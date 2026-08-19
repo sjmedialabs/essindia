@@ -3,11 +3,15 @@
 import React from 'react';
 import Link from 'next/link';
 import { useCtaAction, type CtaFormType } from '@/hooks/useCtaAction';
+import { FormattedText } from '@/components/ui/FormattedText';
+import { safeImageUrl } from '@/lib/utils';
 
 export interface SuiteModuleItem {
-  name: string;
-  desc: string;
-  image: string;
+  name?: string;
+  title?: string;
+  desc?: string;
+  description?: string;
+  image?: string;
   highlighted?: boolean;
 }
 
@@ -74,48 +78,50 @@ export function Landing1Suite({ content }: { content?: Landing1SuiteContent }) {
           {data.badge && (
             <span className="inline-flex items-center gap-1.5 px-4 py-1 rounded-full text-xs font-semibold tracking-wider text-[#5D38F0] bg-[#EFEAFE] uppercase">
               <span className="w-1.5 h-1.5 rounded-full bg-[#5D38F0]" />
-              {data.badge}
+              <FormattedText content={data.badge} as="span" />
             </span>
           )}
 
           {data.title && (
-            <h2 className="text-3xl md:text-5xl font-bold text-slate-900 tracking-tight leading-tight">
-              {data.title}
-            </h2>
+            <FormattedText content={data.title} as="h2" className="text-3xl md:text-5xl font-bold text-slate-900 tracking-tight leading-tight" />
           )}
 
           {data.description && (
-            <p className="text-slate-500 text-sm md:text-base leading-relaxed">
-              {data.description}
-            </p>
+            <FormattedText content={data.description} className="text-slate-500 text-sm md:text-base leading-relaxed" />
           )}
         </div>
 
         {/* 4 Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {data.modules?.map((item, idx) => {
+            const moduleName = item.name || item.title || '';
+            const moduleDesc = item.desc || item.description || '';
+            const imageUrl = safeImageUrl(item.image);
+
             return (
               <div
                 key={idx}
                 className="bg-white rounded-2xl border border-slate-100 overflow-hidden shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col group"
               >
                 {/* Image Graphic Box */}
-                <div className="h-44 w-full bg-[#F6F4FC] relative flex items-center justify-center p-6 border-b border-slate-100/60 overflow-hidden">
-                  <img
-                    src={item.image}
-                    alt={item.name}
-                    className="max-h-full max-w-full object-contain drop-shadow-md group-hover:scale-105 transition-transform duration-300"
-                  />
-                </div>
+                {imageUrl && (
+                  <div className="h-44 w-full bg-[#F6F4FC] relative flex items-center justify-center p-6 border-b border-slate-100/60 overflow-hidden">
+                    <img
+                      src={imageUrl}
+                      alt={moduleName || 'Module image'}
+                      className="max-h-full max-w-full object-contain drop-shadow-md group-hover:scale-105 transition-transform duration-300"
+                    />
+                  </div>
+                )}
                 
                 {/* Text Content */}
                 <div className="p-6 flex flex-col flex-grow space-y-3">
-                  <h4 className="text-lg font-bold text-slate-900 tracking-wide">
-                    {item.name}
-                  </h4>
-                  <p className="text-slate-500 text-xs md:text-sm leading-relaxed flex-grow">
-                    {item.desc}
-                  </p>
+                  {moduleName && (
+                    <FormattedText content={moduleName} as="h4" className="text-lg font-bold text-slate-900 tracking-wide" />
+                  )}
+                  {moduleDesc && (
+                    <FormattedText content={moduleDesc} className="text-slate-500 text-xs md:text-sm leading-relaxed flex-grow" />
+                  )}
                 </div>
               </div>
             );
@@ -130,7 +136,7 @@ export function Landing1Suite({ content }: { content?: Landing1SuiteContent }) {
               onClick={ctaFormType ? (e) => { e.preventDefault(); handleClick(); } : undefined}
               className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full text-sm font-semibold text-white bg-[#5D38F0] hover:bg-[#4B2A63] transition-all shadow-md hover:shadow-lg shadow-indigo-600/10 hover:shadow-indigo-600/20 cursor-pointer"
             >
-              <span>{data.ctaText}</span>
+              <FormattedText content={data.ctaText} as="span" />
               <span>→</span>
             </a>
           </div>

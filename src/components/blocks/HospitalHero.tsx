@@ -22,11 +22,15 @@ interface HospitalHeroContent {
   primaryButtonText?: string;
   primaryButtonUrl?: string;
   primaryButtonBgColor?: string;
+  primaryButtonHoverBgColor?: string;
   primaryButtonTextColor?: string;
+  primaryButtonHoverTextColor?: string;
   secondaryButtonText?: string;
   secondaryButtonUrl?: string;
   secondaryButtonBgColor?: string;
+  secondaryButtonHoverBgColor?: string;
   secondaryButtonTextColor?: string;
+  secondaryButtonHoverTextColor?: string;
   image?: string;
 }
 
@@ -35,6 +39,9 @@ interface HospitalHeroProps {
 }
 
 export function HospitalHero({ content }: HospitalHeroProps) {
+  const [isPrimaryHovered, setIsPrimaryHovered] = React.useState(false);
+  const [isSecondaryHovered, setIsSecondaryHovered] = React.useState(false);
+
   const bgColor = content?.bgColor || '#320965';
   const badgeText = content?.badgeText || 'Hospital Management';
   const badgeBgColor = content?.badgeBgColor || '#ffffff';
@@ -46,11 +53,16 @@ export function HospitalHero({ content }: HospitalHeroProps) {
   const primaryButtonText = content?.primaryButtonText || 'Get started';
   const primaryButtonUrl = content?.primaryButtonUrl || '#';
   const primaryButtonBgColor = content?.primaryButtonBgColor || '#ffffff';
+  const primaryButtonHoverBgColor = content?.primaryButtonHoverBgColor;
   const primaryButtonTextColor = content?.primaryButtonTextColor || '#2a2d7c';
+  const primaryButtonHoverTextColor = content?.primaryButtonHoverTextColor;
+
   const secondaryButtonText = content?.secondaryButtonText || 'Explore features';
   const secondaryButtonUrl = content?.secondaryButtonUrl || '#';
   const secondaryButtonBgColor = content?.secondaryButtonBgColor || 'transparent';
+  const secondaryButtonHoverBgColor = content?.secondaryButtonHoverBgColor;
   const secondaryButtonTextColor = content?.secondaryButtonTextColor || '#ffffff';
+  const secondaryButtonHoverTextColor = content?.secondaryButtonHoverTextColor;
   const image = content?.image || '/Hospital Management/Rectangle 197.png';
 
   
@@ -111,15 +123,30 @@ export function HospitalHero({ content }: HospitalHeroProps) {
             <div className="flex flex-wrap items-center gap-4">
               <Link
                 href={primaryButtonUrl}
-                className="inline-block px-6 py-3 rounded-full font-bold hover:brightness-90 transition-all shadow-md text-sm text-center min-w-[140px]"
-                style={{ backgroundColor: primaryButtonBgColor, color: primaryButtonTextColor }}
+                onMouseEnter={() => setIsPrimaryHovered(true)}
+                onMouseLeave={() => setIsPrimaryHovered(false)}
+                className={`inline-block px-6 py-3 rounded-full font-bold transition-all shadow-md text-sm text-center min-w-[140px] ${
+                  primaryButtonHoverBgColor ? '' : 'hover:brightness-90'
+                }`}
+                style={{
+                  backgroundColor: isPrimaryHovered && primaryButtonHoverBgColor ? primaryButtonHoverBgColor : primaryButtonBgColor,
+                  color: isPrimaryHovered && primaryButtonHoverTextColor ? primaryButtonHoverTextColor : primaryButtonTextColor,
+                }}
               >
                 {primaryButtonText}
               </Link>
               <Link
                 href={secondaryButtonUrl}
-                className="inline-block border px-6 py-3 rounded-full font-bold hover:bg-white/10 transition-colors text-sm text-center min-w-[140px]"
-                style={{ backgroundColor: secondaryButtonBgColor, color: secondaryButtonTextColor, borderColor: secondaryButtonTextColor }}
+                onMouseEnter={() => setIsSecondaryHovered(true)}
+                onMouseLeave={() => setIsSecondaryHovered(false)}
+                className={`inline-block border px-6 py-3 rounded-full font-bold transition-colors text-sm text-center min-w-[140px] ${
+                  secondaryButtonHoverBgColor ? '' : 'hover:bg-white/10'
+                }`}
+                style={{
+                  backgroundColor: isSecondaryHovered && secondaryButtonHoverBgColor ? secondaryButtonHoverBgColor : secondaryButtonBgColor,
+                  color: isSecondaryHovered && secondaryButtonHoverTextColor ? secondaryButtonHoverTextColor : secondaryButtonTextColor,
+                  borderColor: secondaryButtonTextColor,
+                }}
               >
                 {secondaryButtonText}
               </Link>

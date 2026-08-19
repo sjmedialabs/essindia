@@ -1,12 +1,13 @@
 'use client';
 
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, ChevronUp } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FormattedText } from '@/components/ui/FormattedText';
 
 interface FaqItem {
-  question: string;
-  answer: string;
+  question?: string;
+  answer?: string;
 }
 
 interface RpaFaqContent {
@@ -17,15 +18,21 @@ interface RpaFaqContent {
 
 export function RpaFaq({ content }: { content?: RpaFaqContent }) {
   const title = content?.title || 'Frequently Asked Questions';
-  const subtitle = content?.subtitle || 'Got questions? We have answers.';
-  
+  const subtitle = content?.subtitle || 'Find answers to common questions about our RPA services.';
+
   const defaultFaqs: FaqItem[] = [
-    { question: 'What is Robotic Process Automation (RPA)?', answer: 'Robotic Process Automation (RPA) is a technology that uses software robots or "bots" to automate repetitive, rules-based tasks typically performed by humans.' },
-    { question: 'What processes are best suited for RPA?', answer: 'Processes that are repetitive, rules-based, high-volume, and use structured data are excellent candidates for RPA. Examples include data entry, invoice processing, claim validation, reconciliation, and automated reporting.' },
-    { question: 'Does RPA replace our existing ERP or CRM systems?', answer: 'No, RPA bots interact with your existing systems just like a human user would, typing entries and clicking buttons. It does not replace your ERP/CRM but rather integrates them together.' }
+    {
+      question: 'What processes are best suited for RPA?',
+      answer: 'Rule-based, repetitive, high-volume tasks like data entry, invoice processing, and report generation are ideal candidates for RPA automation.'
+    },
+    {
+      question: 'How long does it take to implement RPA?',
+      answer: 'Initial bot deployment can take anywhere from 2 to 6 weeks, depending on process complexity and integration requirements.'
+    }
   ];
 
   const faqs = content?.faqs && content.faqs.length > 0 ? content.faqs : defaultFaqs;
+
   const [openIdx, setOpenIdx] = useState<number | null>(0);
 
   const toggleIdx = (idx: number) => {
@@ -39,14 +46,10 @@ export function RpaFaq({ content }: { content?: RpaFaqContent }) {
         {/* Header */}
         <div className="text-center space-y-3 mb-12">
           {title && (
-            <h2 className="text-3xl sm:text-4xl font-bold text-[#27256b] tracking-tight">
-              {title}
-            </h2>
+            <FormattedText content={title} as="h2" className="text-3xl sm:text-4xl font-bold text-[#27256b] tracking-tight" />
           )}
           {subtitle && (
-            <p className="text-slate-500 font-light text-base sm:text-lg">
-              {subtitle}
-            </p>
+            <FormattedText content={subtitle} className="text-slate-500 font-light text-base sm:text-lg" />
           )}
         </div>
 
@@ -67,9 +70,11 @@ export function RpaFaq({ content }: { content?: RpaFaqContent }) {
                   onClick={() => toggleIdx(idx)}
                   className="w-full flex items-center justify-between p-5 text-left font-bold text-slate-800 hover:text-[#27256b] transition-colors focus:outline-none"
                 >
-                  <span className="text-base sm:text-lg font-bold pr-4">
-                    {faq.question || (faq as any).quotation}
-                  </span>
+                  <FormattedText
+                    content={faq.question || (faq as any).quotation}
+                    as="span"
+                    className="text-base sm:text-lg font-bold pr-4"
+                  />
                   {isOpen ? (
                     <ChevronUp className="w-5 h-5 text-[#27256b] shrink-0" />
                   ) : (
@@ -86,9 +91,10 @@ export function RpaFaq({ content }: { content?: RpaFaqContent }) {
                       exit={{ height: 0, opacity: 0 }}
                       transition={{ duration: 0.2 }}
                     >
-                      <div className="px-5 pb-5 pt-0 text-sm sm:text-base text-slate-500 font-light leading-relaxed border-t border-slate-100/50">
-                        {faq.answer}
-                      </div>
+                      <FormattedText
+                        content={faq.answer}
+                        className="px-5 pb-5 pt-0 text-sm sm:text-base text-slate-500 font-light leading-relaxed border-t border-slate-100/50"
+                      />
                     </motion.div>
                   )}
                 </AnimatePresence>

@@ -667,7 +667,7 @@ export class PageAdminRepository {
     const [section] = await db
       .insert(pageSections)
       .values({
-        pageId,
+        pageId: page.id,
         type: data.type,
         variant: data.variant || 'default',
         name: data.name,
@@ -677,7 +677,7 @@ export class PageAdminRepository {
       })
       .returning();
 
-    await this.saveRevision(pageId);
+    await this.saveRevision(page.id);
     await this.invalidateCache(page.fullPath);
     return section;
   }

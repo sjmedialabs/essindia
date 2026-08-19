@@ -14,11 +14,14 @@ export interface EuropeAiMonitorContent extends EuropeCommonSettings {
   title?: string;
   description?: string;
   buttonText?: string;
+  buttonHoverBgColor?: string;
+  buttonHoverTextColor?: string;
   buttonUrl?: string;
   buttonFormType?: string;
 }
 
 export function EuropeAiMonitor({ content }: { content?: EuropeAiMonitorContent }) {
+  const [isBtnHovered, setIsBtnHovered] = React.useState(false);
   const image = content?.image || '/About-Europe/image 144.png';
   const badgeText = content?.badgeText || 'ESS AI';
   const title = content?.title || 'Monitor everything, so your brand is prepared for anything';
@@ -26,6 +29,8 @@ export function EuropeAiMonitor({ content }: { content?: EuropeAiMonitorContent 
     content?.description ||
     'Stay ahead of trends, safeguard your brand health, and uncover what your audience really cares about. Talkwalker by Hootsuite tracks billions of conversations and turns them into your competitive edge.';
   const buttonText = content?.buttonText || 'Meet our team';
+  const buttonHoverBgColor = content?.buttonHoverBgColor;
+  const buttonHoverTextColor = content?.buttonHoverTextColor;
   const buttonUrl = content?.buttonUrl || '/contact-us';
   const buttonFormType = (content?.buttonFormType || '') as CtaFormType;
 
@@ -54,7 +59,19 @@ export function EuropeAiMonitor({ content }: { content?: EuropeAiMonitorContent 
             <Link
               href={buttonUrl}
               onClick={buttonFormType ? (e) => { e.preventDefault(); handleBtnClick(); } : undefined}
-              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-lg text-sm font-medium text-white bg-[#231f61] hover:bg-[#1a174d] transition-all shadow-md w-fit cursor-pointer"
+              onMouseEnter={() => setIsBtnHovered(true)}
+              onMouseLeave={() => setIsBtnHovered(false)}
+              style={
+                isBtnHovered && (buttonHoverBgColor || buttonHoverTextColor)
+                  ? {
+                      backgroundColor: buttonHoverBgColor || undefined,
+                      color: buttonHoverTextColor || undefined,
+                    }
+                  : undefined
+              }
+              className={`inline-flex items-center gap-2 px-8 py-3.5 rounded-lg text-sm font-medium text-white bg-[#231f61] ${
+                buttonHoverBgColor ? '' : 'hover:bg-[#1a174d]'
+              } transition-all shadow-md w-fit cursor-pointer`}
             >
               {buttonText}
               <ArrowRight className="w-4 h-4" aria-hidden="true" />

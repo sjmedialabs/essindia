@@ -2,6 +2,8 @@
 
 import React from 'react';
 import Image from 'next/image';
+import { safeImageUrl } from '@/lib/utils';
+import { FormattedText } from '@/components/ui/FormattedText';
 
 interface SolutionItem {
   icon?: string;
@@ -19,7 +21,7 @@ interface AomSolutionsContent {
 export function AomSolutions({ content }: { content?: AomSolutionsContent }) {
   const title = content?.title || 'Enterprise Mobility Solutions';
   const description = content?.description || 'Modern businesses rely on Enterprise Mobility Solutions to empower teams with real-time access, seamless collaboration, and efficient business operations from anywhere. At ESS Mobile Apps, we build intelligent, workflow-driven mobile applications using modern PWA technology, delivering seamless experiences across iOS, Android, and Windows platforms.';
-  const leftImage = content?.image || '/App- App over view (mobile app)/image 78.png';
+  const leftImage = safeImageUrl(content?.image, '/App- App over view (mobile app)/image 78.png');
   
   const defaultItems: SolutionItem[] = [
     {
@@ -46,7 +48,7 @@ export function AomSolutions({ content }: { content?: AomSolutionsContent }) {
             <div className="flex-1 w-full max-w-md lg:max-w-lg relative aspect-square lg:aspect-auto lg:h-[450px]">
               <Image
                 src={leftImage}
-                alt={title}
+                alt={title || ''}
                 fill
                 className="object-contain"
               />
@@ -55,41 +57,36 @@ export function AomSolutions({ content }: { content?: AomSolutionsContent }) {
 
           {/* Right Column (Content) */}
           <div className="flex-grow space-y-6 lg:max-w-2xl text-left">
-            <h2 className="text-[#0a1128] text-3xl md:text-4xl font-extrabold tracking-tight leading-tight">
-              {title}
-            </h2>
+            <FormattedText content={title} as="h2" className="text-[#0a1128] text-3xl md:text-4xl font-extrabold tracking-tight leading-tight" />
 
-            <p className="text-slate-500 text-sm md:text-base leading-relaxed font-medium">
-              {description}
-            </p>
+            <FormattedText content={description} className="text-slate-500 text-sm md:text-base leading-relaxed font-medium" />
 
             {/* Solutions List Cards */}
             <div className="space-y-4 pt-2">
-              {items.map((item, idx) => (
-                <div 
-                  key={idx}
-                  className="bg-white border border-slate-100 rounded-2xl p-5 md:p-6 flex items-start gap-5 shadow-sm hover:shadow-md transition-shadow duration-300"
-                >
-                  {item.icon && (
-                    <div className="w-12 h-12 relative flex-shrink-0 bg-slate-50 rounded-xl flex items-center justify-center p-2 border border-slate-100">
-                      <Image
-                        src={item.icon}
-                        alt={item.title || ''}
-                        fill
-                        className="object-contain p-2"
-                      />
+              {items.map((item, idx) => {
+                const validIcon = safeImageUrl(item.icon);
+                return (
+                  <div 
+                    key={idx}
+                    className="bg-white border border-slate-100 rounded-2xl p-5 md:p-6 flex items-start gap-5 shadow-sm hover:shadow-md transition-shadow duration-300"
+                  >
+                    {validIcon && (
+                      <div className="w-12 h-12 relative flex-shrink-0 bg-slate-50 rounded-xl flex items-center justify-center p-2 border border-slate-100">
+                        <Image
+                          src={validIcon}
+                          alt={item.title || ''}
+                          fill
+                          className="object-contain p-2"
+                        />
+                      </div>
+                    )}
+                    <div>
+                      <FormattedText content={item.title} as="h3" className="text-[#0a1128] text-base md:text-lg font-bold mb-1" />
+                      <FormattedText content={item.description} className="text-slate-500 text-xs md:text-sm leading-relaxed" />
                     </div>
-                  )}
-                  <div>
-                    <h3 className="text-[#0a1128] text-base md:text-lg font-bold mb-1">
-                      {item.title}
-                    </h3>
-                    <p className="text-slate-500 text-xs md:text-sm leading-relaxed">
-                      {item.description}
-                    </p>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
 
           </div>

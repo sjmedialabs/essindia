@@ -20,6 +20,8 @@ const DIAL_CODES = (countryCodesList.customArray({
   index === self.findIndex((t) => t.dialCode === c.dialCode)
 );
 
+import { FormattedText } from '@/components/ui/FormattedText';
+
 export interface ContactFaq {
   question?: string;
   qutation?: string;
@@ -30,14 +32,19 @@ export interface ContactFaq {
 export interface ContactFormFaqContent {
   formTitle?: string;
   formDescription?: string;
+  buttonHoverBgColor?: string;
+  buttonHoverTextColor?: string;
   disclaimerText?: string;
   faqTitle?: string;
   faqs?: ContactFaq[];
 }
 
 export function ContactFormFaq({ content }: { content?: ContactFormFaqContent }) {
+  const [isBtnHovered, setIsBtnHovered] = useState(false);
   const formTitle = content?.formTitle || "Send us a Message";
   const formDescription = content?.formDescription || "Fill out the form below and our team will get back to you within 24 hours. For urgent security matters, please use our emergency support line.";
+  const buttonHoverBgColor = content?.buttonHoverBgColor;
+  const buttonHoverTextColor = content?.buttonHoverTextColor;
   const disclaimerText = content?.disclaimerText || "Disclaimer: This information will not be shared with anybody, it will be used for internal purposes only.";
   const faqTitle = content?.faqTitle || "Common Questions";
   
@@ -299,7 +306,23 @@ export function ContactFormFaq({ content }: { content?: ContactFormFaqContent })
               </div>
               <p className="text-xs text-gray-500 pl-7">{disclaimerText}</p>
 
-              <button disabled={isSubmitting} type="submit" className="w-full bg-[#2A2B6E] hover:bg-[#1a1b4e] text-white font-medium py-4 rounded-xl transition-colors duration-300 mt-4 disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed">
+              <button
+                disabled={isSubmitting}
+                type="submit"
+                onMouseEnter={() => setIsBtnHovered(true)}
+                onMouseLeave={() => setIsBtnHovered(false)}
+                style={
+                  isBtnHovered && (buttonHoverBgColor || buttonHoverTextColor)
+                    ? {
+                        backgroundColor: buttonHoverBgColor || undefined,
+                        color: buttonHoverTextColor || undefined,
+                      }
+                    : undefined
+                }
+                className={`w-full bg-[#2A2B6E] ${
+                  buttonHoverBgColor ? '' : 'hover:bg-[#1a1b4e]'
+                } text-white font-medium py-4 rounded-xl transition-colors duration-300 mt-4 disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed`}
+              >
                 {isSubmitting ? 'Sending...' : 'Send Message'}
               </button>
             </form>
@@ -309,17 +332,22 @@ export function ContactFormFaq({ content }: { content?: ContactFormFaqContent })
         {/* Right Side - FAQ */}
         <div className="w-full lg:w-1/2 lg:pl-12 pt-8 lg:pt-0">
           <div className="bg-white rounded-3xl p-6 border border-gray-200 shadow-md h-full">
-            <h2 className="text-3xl font-bold text-[#27256B] mb-4">{faqTitle}</h2>
+            <FormattedText content={faqTitle} as="h2" className="text-3xl font-bold text-[#27256B] mb-4" />
 
             <div className="space-y-3">
               {displayFaqs.map((faq, index) => (
                 <div key={index} className="border-b border-gray-100 last:border-0 pb-6 last:pb-0">
                   <div className="w-full flex justify-between items-center text-left">
-                    <h3 className="text-lg font-bold text-gray-900 pr-8">{faq.quotation || faq.qutation || faq.question}</h3>
+                    <FormattedText
+                      content={faq.quotation || faq.qutation || faq.question}
+                      as="h3"
+                      className="text-lg font-bold text-gray-900 pr-8"
+                    />
                   </div>
-                  <div className="mt-1 text-sm text-gray-500 leading-relaxed">
-                    {faq.answer}
-                  </div>
+                  <FormattedText
+                    content={faq.answer}
+                    className="mt-1 text-sm text-gray-500 leading-relaxed"
+                  />
                 </div>
               ))}
             </div>

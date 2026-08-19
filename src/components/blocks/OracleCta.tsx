@@ -9,15 +9,20 @@ interface OracleCtaContent {
   title?: string;
   description?: string;
   buttonText?: string;
+  buttonHoverBgColor?: string;
+  buttonHoverTextColor?: string;
   pdfUrl?: string;
 }
 
 export function OracleCta({ content }: { content?: OracleCtaContent }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isBtnHovered, setIsBtnHovered] = useState(false);
 
   const title = content?.title || 'Future-Ready Oracle Database Strategy';
   const description = content?.description || 'Database upgrades often serve as a foundation for modernization initiatives, including migration to Oracle APEX or cloud infrastructure. We help define that roadmap strategically.';
   const buttonText = content?.buttonText || 'Explore Your Upgrade Roadmap';
+  const buttonHoverBgColor = content?.buttonHoverBgColor;
+  const buttonHoverTextColor = content?.buttonHoverTextColor;
   const pdfUrl = content?.pdfUrl;
 
   return (
@@ -57,7 +62,20 @@ export function OracleCta({ content }: { content?: OracleCtaContent }) {
               whileTap={{ scale: 0.98 }}
               className="inline-block"
             >
-              <button onClick={() => setIsModalOpen(true)} className="bg-[#4B2A63] text-white hover:bg-[#3A1F4D] px-8 py-3 rounded-full font-medium transition-colors inline-flex items-center gap-2">
+              <button
+                onClick={() => setIsModalOpen(true)}
+                onMouseEnter={() => setIsBtnHovered(true)}
+                onMouseLeave={() => setIsBtnHovered(false)}
+                style={
+                  isBtnHovered && (buttonHoverBgColor || buttonHoverTextColor)
+                    ? {
+                        backgroundColor: buttonHoverBgColor || undefined,
+                        color: buttonHoverTextColor || undefined,
+                      }
+                    : undefined
+                }
+                className={`bg-[#4B2A63] ${buttonHoverBgColor ? '' : 'hover:bg-[#3A1F4D]'} text-white px-8 py-3 rounded-full font-medium transition-colors inline-flex items-center gap-2 cursor-pointer`}
+              >
                 {buttonText}
               </button>
             </motion.div>

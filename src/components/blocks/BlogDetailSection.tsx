@@ -264,6 +264,9 @@ export function BlogDetailSection({ content }: BlogDetailSectionProps) {
     'Detailed Timeline Breakdown in 24h',
     'Estimated Cost Range Included'
   ];
+  const formButtonHoverBgColor = (content as any)?.formButtonHoverBgColor;
+  const formButtonHoverTextColor = (content as any)?.formButtonHoverTextColor;
+  const [isFormBtnHovered, setIsFormBtnHovered] = React.useState(false);
 
   // Dynamic Left Sidebar TOC Items
   const tocItems = React.useMemo(() => {
@@ -541,7 +544,11 @@ export function BlogDetailSection({ content }: BlogDetailSectionProps) {
                     {seg.descriptions && seg.descriptions.length > 0 && (
                       <div className="space-y-4 text-sm sm:text-base text-slate-600 leading-relaxed font-normal">
                         {seg.descriptions.map((desc, dIdx) => (
-                          <p key={dIdx}>{desc}</p>
+                          typeof desc === 'string' && (desc.includes('<p>') || desc.includes('<')) ? (
+                            <div key={dIdx} dangerouslySetInnerHTML={{ __html: desc }} />
+                          ) : (
+                            <p key={dIdx}>{desc}</p>
+                          )
                         ))}
                       </div>
                     )}
@@ -560,7 +567,11 @@ export function BlogDetailSection({ content }: BlogDetailSectionProps) {
                         {item.descriptions && item.descriptions.length > 0 && (
                           <div className="space-y-4 text-sm sm:text-base text-slate-600 leading-relaxed font-normal">
                             {item.descriptions.map((dText, dIdx) => (
-                              <p key={dIdx}>{dText}</p>
+                              typeof dText === 'string' && (dText.includes('<p>') || dText.includes('<')) ? (
+                                <div key={dIdx} dangerouslySetInnerHTML={{ __html: dText }} />
+                              ) : (
+                                <p key={dIdx}>{dText}</p>
+                              )
                             ))}
                           </div>
                         )}
@@ -634,7 +645,11 @@ export function BlogDetailSection({ content }: BlogDetailSectionProps) {
                 <h2 className="text-xl sm:text-2xl font-bold text-slate-900">Conclusion</h2>
                 <div className="space-y-4 text-sm sm:text-base text-slate-600 leading-relaxed font-normal">
                   {conclusionParagraphs.map((para, cIdx) => (
-                    <p key={cIdx}>{para}</p>
+                    typeof para === 'string' && (para.includes('<p>') || para.includes('<')) ? (
+                      <div key={cIdx} dangerouslySetInnerHTML={{ __html: para }} />
+                    ) : (
+                      <p key={cIdx}>{para}</p>
+                    )
                   ))}
                 </div>
               </div>
@@ -720,6 +735,17 @@ export function BlogDetailSection({ content }: BlogDetailSectionProps) {
                 <button
                   type="submit"
                   disabled={!formData.agreeTerms || isSubmitting}
+                  onMouseEnter={() => setIsFormBtnHovered(true)}
+                  onMouseLeave={() => setIsFormBtnHovered(false)}
+                  style={
+                    isFormBtnHovered && (formButtonHoverBgColor || formButtonHoverTextColor)
+                      ? {
+                          backgroundColor: formButtonHoverBgColor || undefined,
+                          backgroundImage: formButtonHoverBgColor ? 'none' : undefined,
+                          color: formButtonHoverTextColor || undefined,
+                        }
+                      : undefined
+                  }
                   className={`w-full py-3 rounded-xl font-bold text-xs transition-all duration-200 shadow-lg flex items-center justify-center gap-2 mt-2 ${
                     !formData.agreeTerms || isSubmitting
                       ? 'bg-slate-800 text-slate-500 cursor-not-allowed opacity-60'

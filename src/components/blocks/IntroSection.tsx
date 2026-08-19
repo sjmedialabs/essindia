@@ -1,15 +1,24 @@
 'use client';
 
+import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { TextReveal } from '@/components/animations/TextReveal';
 import { MotionSection } from '@/components/animations/MotionSection';
-import { useInternalNavigate } from '@/hooks/useInternalNavigate';
+import { useCtaAction, type CtaFormType } from '@/hooks/useCtaAction';
 
 interface IntroContent {
   heading?: string;
   subheading?: string;
-  cta?: { label: string; url: string };
+  buttonText?: string;
+  buttonBgColor?: string;
+  buttonHoverBgColor?: string;
+  buttonTextColor?: string;
+  buttonHoverTextColor?: string;
+  buttonUrl?: string;
+  buttonFormType?: string;
+  pdfUrl?: string;
+  cta?: { label?: string; url?: string; formType?: string; pdfUrl?: string };
 }
 
 interface IntroSectionProps {
@@ -17,10 +26,22 @@ interface IntroSectionProps {
 }
 
 export function IntroSection({ content }: IntroSectionProps) {
-  const navigate = useInternalNavigate();
+  const [isHovered, setIsHovered] = useState(false);
+
   const heading = content?.heading || "We help organizations run, scale, and transform with digital solutions built for real business needs.";
   const subheading = content?.subheading || "Smarter Operations | AI-driven Growth | Stronger Solutions";
-  const cta = content?.cta || { label: "Explore More", url: "/about" };
+  
+  const label = content?.buttonText || content?.cta?.label || "Explore More";
+  const url = content?.buttonUrl || content?.cta?.url || "/about";
+  const formType = (content?.buttonFormType || content?.cta?.formType || '') as CtaFormType;
+  const pdfUrl = content?.pdfUrl || content?.cta?.pdfUrl;
+
+  const buttonBgColor = content?.buttonBgColor || '#4B2A63';
+  const buttonHoverBgColor = content?.buttonHoverBgColor || '#3B198F';
+  const buttonTextColor = content?.buttonTextColor || '#ffffff';
+  const buttonHoverTextColor = content?.buttonHoverTextColor;
+
+  const { handleClick, modalNode } = useCtaAction(url, formType, pdfUrl);
 
   return (
     <section className="py-14 bg-[#F8F9FA] text-center border-y border-slate-100 overflow-hidden">
@@ -38,16 +59,25 @@ export function IntroSection({ content }: IntroSectionProps) {
           </h3>
         </MotionSection>
 
-        <MotionSection variant="fadeUp" delay={0.6} className="mt-12">
-          <Button 
-            onClick={() => navigate(cta.url)}
-            className="bg-[#4B2A63] hover:bg-[#3B198F] text-white rounded-full px-12 h-[54px] text-[16px] font-semibold transition-all duration-300 hover:shadow-[0_20px_40px_-10px_rgba(75,42,99,0.3)] hover:-translate-y-1 active:scale-95 cursor-pointer"
-          >
-            {cta.label}
-          </Button>
-        </MotionSection>
+        {label && (
+          <MotionSection variant="fadeUp" delay={0.6} className="mt-12">
+            <Button 
+              onClick={handleClick}
+              onMouseEnter={() => setIsHovered(true)}
+              onMouseLeave={() => setIsHovered(false)}
+              style={{
+                backgroundColor: isHovered && buttonHoverBgColor ? buttonHoverBgColor : buttonBgColor,
+                color: isHovered && buttonHoverTextColor ? buttonHoverTextColor : buttonTextColor,
+              }}
+              className="rounded-full px-12 h-[54px] text-[16px] font-semibold transition-all duration-300 hover:shadow-[0_20px_40px_-10px_rgba(75,42,99,0.3)] hover:-translate-y-1 active:scale-95 cursor-pointer border-none"
+            >
+              {label}
+            </Button>
+          </MotionSection>
+        )}
         </div>
       </div>
+      {modalNode}
     </section>
   );
 }

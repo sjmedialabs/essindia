@@ -118,7 +118,7 @@ function CardItem({ card, index }: { card: ServiceCard; index: number }) {
 
       {/* Action CTA */}
       {card.ctaText && (
-        <div className=" flex justify-start pl-1">
+        <div className="mt-2 flex justify-start pl-1">
           <Link
             href={card.ctaUrl || '/contact-us'}
             onClick={card.ctaFormType ? (e) => { e.preventDefault(); handleClick(); } : undefined}

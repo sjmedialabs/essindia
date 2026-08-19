@@ -1,6 +1,6 @@
 import { db } from '@/lib/db';
 import { templates, templateSections, pages, pageSections } from '@/lib/db/schema';
-import { and, asc, desc, eq, isNotNull, ne, sql } from 'drizzle-orm';
+import { and, asc, desc, eq, isNotNull, ne, or, sql } from 'drizzle-orm';
 import { slugify } from '@/lib/cms/utils';
 
 export class TemplateRepository {
@@ -35,7 +35,7 @@ export class TemplateRepository {
 
   async findById(id: string) {
     return db.query.templates.findFirst({
-      where: eq(templates.id, id),
+      where: or(eq(templates.id, id), eq(templates.slug, id)),
       with: {
         templateSections: {
           orderBy: [asc(templateSections.orderIndex)],

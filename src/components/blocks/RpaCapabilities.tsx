@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
+import { FormattedText } from '@/components/ui/FormattedText';
 
 interface CapabilityItem {
   title: string;
@@ -21,6 +22,9 @@ export interface RpaCapabilitiesContent {
 
 function renderFormattedTitle(titleText: string, primaryColor: string, secondaryColor: string) {
   if (!titleText) return null;
+  if (typeof titleText === 'string' && (titleText.includes('<') && titleText.includes('>'))) {
+    return <span dangerouslySetInnerHTML={{ __html: titleText }} />;
+  }
   const words = titleText.trim().split(/\s+/);
   if (words.length <= 1) {
     return <span style={{ color: primaryColor }}>{titleText}</span>;
@@ -109,15 +113,15 @@ export function RpaCapabilities({ content }: { content?: RpaCapabilitiesContent 
             </motion.h2>
           )}
           {description && (
-            <motion.p
+            <motion.div
               initial={{ opacity: 0, y: 12 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: 0.1 }}
               className="text-slate-500 font-normal text-xs sm:text-sm md:text-base leading-relaxed max-w-2xl mx-auto"
             >
-              {description}
-            </motion.p>
+              <FormattedText content={description} />
+            </motion.div>
           )}
         </div>
 
@@ -257,9 +261,7 @@ function OrbitalCard({ item, index }: { item: CapabilityItem; index: number }) {
         <h4 className="text-sm font-extrabold text-slate-900 leading-snug line-clamp-1">
           {item.title}
         </h4>
-        <p className="text-xs text-slate-500 font-normal leading-relaxed line-clamp-3">
-          {item.description}
-        </p>
+        <FormattedText content={item.description} className="text-xs text-slate-500 font-normal leading-relaxed line-clamp-3" />
       </div>
 
       {/* Absolute Bottom Purple Gradient Accent Line */}

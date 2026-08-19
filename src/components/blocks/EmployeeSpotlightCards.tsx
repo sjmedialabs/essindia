@@ -75,6 +75,7 @@ const EMPLOYEES = [
 export function EmployeeSpotlightCards({ content }: { content?: any }) {
   const employees = content?.employees || EMPLOYEES;
   const [selectedEmp, setSelectedEmp] = useState<any | null>(null);
+  const [hoveredEmpIdx, setHoveredEmpIdx] = useState<number | null>(null);
   const [activeIndex, setActiveIndex] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = useState(false);
@@ -162,6 +163,7 @@ export function EmployeeSpotlightCards({ content }: { content?: any }) {
           >
             {employees.map((emp: any, index: number) => {
               const isSelected = selectedEmp?.id === emp.id || selectedEmp?.name === emp.name;
+              const isBtnHovered = hoveredEmpIdx === index;
               return (
                 <motion.div
                   key={emp.id || index}
@@ -188,7 +190,20 @@ export function EmployeeSpotlightCards({ content }: { content?: any }) {
                     <div className="pt-1">
                       <button
                         onClick={() => setSelectedEmp(isSelected ? null : emp)}
-                        className="inline-flex items-center gap-0.5 border border-purple-300 text-purple-800 hover:bg-purple-50 text-[8px] font-medium leading-none px-1.5 py-[2px] rounded-sm transition-all duration-200 cursor-pointer tracking-tight"
+                        onMouseEnter={() => setHoveredEmpIdx(index)}
+                        onMouseLeave={() => setHoveredEmpIdx(null)}
+                        style={
+                          isBtnHovered && (emp.buttonHoverBgColor || emp.buttonHoverTextColor)
+                            ? {
+                                backgroundColor: emp.buttonHoverBgColor || undefined,
+                                color: emp.buttonHoverTextColor || undefined,
+                                borderColor: emp.buttonHoverBgColor || undefined,
+                              }
+                            : undefined
+                        }
+                        className={`inline-flex items-center gap-0.5 border border-purple-300 text-purple-800 ${
+                          emp.buttonHoverBgColor ? '' : 'hover:bg-purple-50'
+                        } text-[8px] font-medium leading-none px-1.5 py-[2px] rounded-sm transition-all duration-200 cursor-pointer tracking-tight`}
                       >
                         <span>{isSelected ? 'Collapse' : 'Expand to see more'}</span>
                         <ArrowRight className={`w-1.5 h-1.5 transition-transform duration-200 ${isSelected ? 'rotate-90' : ''}`} />

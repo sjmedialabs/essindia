@@ -50,3 +50,21 @@ export function getHeroBackgroundStyles(
     ...((defaultStyles && 'color' in defaultStyles) ? { color: defaultStyles.color } : {})
   };
 }
+
+export function safeImageUrl(url?: string | null, fallback = ''): string {
+  if (!url || typeof url !== 'string') return fallback;
+  const cleaned = url.replace(/[\u200B-\u200D\uFEFF]/g, '').trim();
+  if (!cleaned) return fallback;
+  if (cleaned.startsWith('/') || cleaned.startsWith('http://') || cleaned.startsWith('https://') || cleaned.startsWith('data:')) {
+    if (cleaned.startsWith('http://') || cleaned.startsWith('https://')) {
+      try {
+        new URL(cleaned);
+        return cleaned;
+      } catch {
+        return fallback;
+      }
+    }
+    return cleaned;
+  }
+  return fallback;
+}

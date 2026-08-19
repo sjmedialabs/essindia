@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { ChevronRight } from 'lucide-react';
+import { FormattedText } from '@/components/ui/FormattedText';
 
 export interface FaqItem {
   question: string;
@@ -37,51 +38,51 @@ const DEFAULT_FAQS: FaqItem[] = [
     answer: 'Yes! We offer rich REST APIs and pre-built connectors for popular tools like Salesforce, HubSpot, QuickBooks, Tally, Gmail, Slack, and various logistics APIs.'
   },
   {
-    question: 'Can we start with a few modules and add more later?',
-    answer: 'Absolutely. You can start with core modules like Inventory and CRM, and easily scale up to Production Planning, HRMS, and advanced analytics as your business grows.'
+    question: "What is ebizframe ERP?",
+    answer: "ebizframe is a Next-Gen ERP suite that empowers organizations with real-time operational visibility, AI-driven insights, and seamless workflow automation across finance, supply chain, HCM, and manufacturing."
   },
   {
-    question: 'Do you provide training and support?',
-    answer: 'Yes, we provide comprehensive role-based training (on-site and remote), 24x7 support coverage, regular system updates, and a dedicated account manager.'
+    question: "How long does implementation take?",
+    answer: "Implementation timelines vary by organization size and complexity. With our pre-configured rapid deployment methodologies, typical rollouts range between 6 to 16 weeks."
+  },
+  {
+    question: "Is ebizframe available on Cloud?",
+    answer: "Yes, ebizframe offers complete deployment flexibility including Multi-Tenant Cloud, Private Cloud, and On-Premise models with robust enterprise security."
   }
 ];
 
 const DEFAULT_CONTENT: Landing1FaqContent = {
   badge: "FAQ'S",
-  title: 'Frequently Asked Questions',
-  description: 'Get the information you need with our frequently asked questions.',
+  title: "Frequently Asked Questions",
+  description: "Find clarity on how our Next-Gen ERP solutions transform operations.",
   faqs: DEFAULT_FAQS
 };
 
 export function Landing1Faq({ content }: { content?: Landing1FaqContent }) {
-  const data = { ...DEFAULT_CONTENT, ...content };
-  const [openIdx, setOpenIdx] = useState<number | null>(null);
+  const [openIdx, setOpenIdx] = useState<number | null>(0);
+  const data = content || DEFAULT_CONTENT;
 
   const toggle = (idx: number) => {
     setOpenIdx(openIdx === idx ? null : idx);
   };
 
   return (
-    <section className="py-20 bg-slate-50/50 text-slate-900 font-sans select-none border-b border-slate-200">
-      <div className="container mx-auto px-6 max-w-4xl">
+    <section className="py-20 md:py-28 bg-[#FAFAFC] relative overflow-hidden border-b border-slate-100">
+      <div className="container mx-auto max-w-4xl px-4 relative z-10">
         
         {/* Header */}
-        <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
+        <div className="text-center space-y-4 mb-16">
           {data.badge && (
             <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold tracking-wider text-indigo-600 bg-indigo-50 border border-indigo-100 uppercase">
               <span className="w-1.5 h-1.5 rounded-full bg-indigo-600 animate-pulse" />
-              {data.badge}
+              <FormattedText content={data.badge} as="span" />
             </span>
           )}
           {data.title && (
-            <h2 className="text-3xl md:text-[40px] font-extrabold tracking-tight text-slate-900 leading-tight">
-              {data.title}
-            </h2>
+            <FormattedText content={data.title} as="h2" className="text-3xl md:text-[40px] font-extrabold tracking-tight text-slate-900 leading-tight" />
           )}
           {data.description && (
-            <p className="text-slate-500 text-sm md:text-base max-w-2xl mx-auto leading-relaxed">
-              {data.description}
-            </p>
+            <FormattedText content={data.description} className="text-slate-500 text-sm md:text-base max-w-2xl mx-auto leading-relaxed" />
           )}
         </div>
 
@@ -98,18 +99,21 @@ export function Landing1Faq({ content }: { content?: Landing1FaqContent }) {
                   onClick={() => toggle(idx)}
                   className="w-full flex items-center justify-between p-6 text-left group cursor-pointer"
                 >
-                  <span className="font-extrabold text-[#0F172A] text-sm md:text-base leading-snug pr-4">
-                    {faq.question || (faq as any).quotation}
-                  </span>
+                  <FormattedText
+                    content={faq.question || (faq as any).quotation}
+                    as="span"
+                    className="font-extrabold text-[#0F172A] text-sm md:text-base leading-snug pr-4"
+                  />
                   <div className={`w-8 h-8 rounded-full border border-slate-200 flex items-center justify-center text-slate-400 group-hover:text-indigo-600 group-hover:border-indigo-600 transition-all duration-300 shrink-0 ${isOpen ? 'rotate-90 text-indigo-600 border-indigo-600 bg-indigo-50/50' : ''}`}>
                     <ChevronRight className="w-4 h-4" />
                   </div>
                 </button>
                 
                 {isOpen && faq.answer && (
-                  <div className="px-6 pb-6 text-sm text-slate-500 leading-relaxed font-medium border-t border-slate-50 pt-4">
-                    {faq.answer}
-                  </div>
+                  <FormattedText
+                    content={faq.answer}
+                    className="px-6 pb-6 text-sm text-slate-500 leading-relaxed font-medium border-t border-slate-50 pt-4"
+                  />
                 )}
               </div>
             );

@@ -21,14 +21,17 @@ export interface RetailHeroContent {
   description?: string;
   descriptionColor?: string;
   buttonBgColor?: string;
+  buttonHoverBgColor?: string;
   buttonText?: string;
   buttonTextColor?: string;
+  buttonHoverTextColor?: string;
   buttonUrl?: string;
   buttonFormType?: string;
   image?: string;
 }
 
 export function RetailHero({ content }: { content: RetailHeroContent }) {
+  const [isBtnHovered, setIsBtnHovered] = React.useState(false);
   const bgColor = content?.bgColor || '#f3f5ff';
   const badgeText = content?.badgeText || 'Lorem Ipsum';
   const badgeBgColor = content?.badgeBgColor || '#61459a';
@@ -41,7 +44,9 @@ export function RetailHero({ content }: { content: RetailHeroContent }) {
   const buttonUrl = content?.buttonUrl || '#';
   const buttonFormType = (content?.buttonFormType || '') as CtaFormType;
   const { handleClick: handleBtnClick, modalNode } = useCtaAction(buttonUrl, buttonFormType);  const buttonBgColor = content?.buttonBgColor || '#fbbf24';
+  const buttonHoverBgColor = content?.buttonHoverBgColor;
   const buttonTextColor = content?.buttonTextColor || '#472393';
+  const buttonHoverTextColor = content?.buttonHoverTextColor;
   const image = content?.image || '/industry-solution-Retail/banner-image.png';
 
   
@@ -106,9 +111,15 @@ export function RetailHero({ content }: { content: RetailHeroContent }) {
             )}
 
             <Link
-              href={buttonUrl} onClick={buttonFormType ? (e: React.MouseEvent) => { e.preventDefault(); handleBtnClick(); } : undefined}
+              href={buttonUrl}
+              onClick={buttonFormType ? (e: React.MouseEvent) => { e.preventDefault(); handleBtnClick(); } : undefined}
+              onMouseEnter={() => setIsBtnHovered(true)}
+              onMouseLeave={() => setIsBtnHovered(false)}
               className="group text-sm inline-flex items-center justify-center space-x-2 font-bold py-3 px-6 rounded-full transition-all duration-300 shadow-md hover:shadow-lg transform hover:-translate-y-1 min-w-[140px]"
-              style={{ backgroundColor: buttonBgColor, color: buttonTextColor }}
+              style={{
+                backgroundColor: isBtnHovered && buttonHoverBgColor ? buttonHoverBgColor : buttonBgColor,
+                color: isBtnHovered && buttonHoverTextColor ? buttonHoverTextColor : buttonTextColor,
+              }}
             >
               <span>{buttonText}</span>
             </Link>

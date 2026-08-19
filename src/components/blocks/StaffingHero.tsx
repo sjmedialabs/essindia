@@ -22,8 +22,10 @@ interface StaffingHeroContent {
   description?: string;
   descriptionColor?: string;
   buttonBgColor?: string;
+  buttonHoverBgColor?: string;
   buttonText?: string;
   buttonTextColor?: string;
+  buttonHoverTextColor?: string;
   buttonUrl?: string;
   image?: string;
 }
@@ -33,6 +35,7 @@ interface StaffingHeroProps {
 }
 
 export function StaffingHero({ content }: StaffingHeroProps) {
+  const [isBtnHovered, setIsBtnHovered] = React.useState(false);
   const bgColor = content?.bgColor || '#bac7d5';
   const badgeBgColor = content?.badgeBgColor || '#ffffff';
   const badgeBorderColor = content?.badgeBorderColor || '#2a2d7c';
@@ -43,8 +46,10 @@ export function StaffingHero({ content }: StaffingHeroProps) {
   const description = content?.description || 'Streamline healthcare operations with an intelligent Hospital Management System designed to improve patient care, automate workflows, enhance clinical efficiency, and deliver real-time access across the healthcare ecosystem.';
   const descriptionColor = content?.descriptionColor || '#ffffff';
   const buttonBgColor = content?.buttonBgColor || '#ffffff';
+  const buttonHoverBgColor = content?.buttonHoverBgColor;
   const buttonText = content?.buttonText || 'Talk to our IT Professionals';
   const buttonTextColor = content?.buttonTextColor || '#2a2d7c';
+  const buttonHoverTextColor = content?.buttonHoverTextColor;
   const buttonUrl = content?.buttonUrl || '#contact';
   const image = content?.image || '/Staffing Services/image 54.png';
 
@@ -109,8 +114,13 @@ export function StaffingHero({ content }: StaffingHeroProps) {
             <div>
               <Link
                 href={buttonUrl}
-                className="inline-block font-bold px-6 py-3 rounded-full hover:brightness-95 transition-all shadow-md text-sm text-center min-w-[140px]"
-                style={{ backgroundColor: buttonBgColor, color: buttonTextColor }}
+                onMouseEnter={() => setIsBtnHovered(true)}
+                onMouseLeave={() => setIsBtnHovered(false)}
+                className="inline-block font-bold px-6 py-3 rounded-full hover:brightness-95 transition-all shadow-md text-sm text-center min-w-[140px] cursor-pointer"
+                style={{
+                  backgroundColor: isBtnHovered && buttonHoverBgColor ? buttonHoverBgColor : buttonBgColor,
+                  color: isBtnHovered && buttonHoverTextColor ? buttonHoverTextColor : buttonTextColor,
+                }}
               >
                 {buttonText}
               </Link>

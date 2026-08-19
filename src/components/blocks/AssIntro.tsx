@@ -22,12 +22,13 @@ export function AssIntro({ content }: { content?: AssIntroContent }) {
         </h2>
         <div className="space-y-4">
           {paragraphs.map((para: string, idx: number) => (
-            <p key={idx} className="text-[15px] md:text-base text-slate-600 leading-relaxed font-light">
-              {typeof para === 'string' && para.includes('<p>')
-                ? <span dangerouslySetInnerHTML={{ __html: para }} />
-                : para
-              }
-            </p>
+            typeof para === 'string' && (para.includes('<p>') || para.includes('<')) ? (
+              <div key={idx} className="text-[15px] md:text-base text-slate-600 leading-relaxed font-light" dangerouslySetInnerHTML={{ __html: para }} />
+            ) : (
+              <p key={idx} className="text-[15px] md:text-base text-slate-600 leading-relaxed font-light">
+                {para}
+              </p>
+            )
           ))}
         </div>
       </div>

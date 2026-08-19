@@ -22,15 +22,18 @@ interface FmcgHeroContent {
   description?: string;
   descriptionColor?: string;
   buttonBgColor?: string;
+  buttonHoverBgColor?: string;
   buttonBorderColor?: string;
   buttonText?: string;
   buttonTextColor?: string;
+  buttonHoverTextColor?: string;
   buttonUrl?: string;
   buttonFormType?: string;
   image?: string;
 }
 
 export function FmcgHero({ content }: { content?: FmcgHeroContent }) {
+  const [isBtnHovered, setIsBtnHovered] = React.useState(false);
   const bgColor = content?.bgColor || '#4b4685';
   const badgeBgColor = content?.badgeBgColor || '#7142D7';
   const badgeBorderColor = content?.badgeBorderColor || '#7167be';
@@ -43,18 +46,30 @@ export function FmcgHero({ content }: { content?: FmcgHeroContent }) {
   const descriptionColor = content?.descriptionColor || '#ffffff';
 
   const buttonBgColor = content?.buttonBgColor || '#fcc42c';
+  const buttonHoverBgColor = content?.buttonHoverBgColor;
   const buttonBorderColor = content?.buttonBorderColor || '#fcc42c';
   const buttonText = content?.buttonText || 'Book your Demo';
   const buttonTextColor = content?.buttonTextColor || '#2b2a6c';
+  const buttonHoverTextColor = content?.buttonHoverTextColor;
   const buttonUrl = content?.buttonUrl || '#';
   const buttonFormType = (content?.buttonFormType || '') as CtaFormType;
   const { handleClick: handleBtnClick, modalNode } = useCtaAction(buttonUrl, buttonFormType);
   const rightImage = content?.image || '/BI-industy solution-FMGC/2b58cf43-2428-4667-ac1c-680abeb784a1 1.png';
 
-  const hasCustomBg = content?.bgColor && content.bgColor !== '#4b4685';
-  const bgStyles = hasCustomBg
-    ? { backgroundColor: bgColor }
-    : { backgroundImage: 'linear-gradient(135deg, #4b4685 0%, #3e3a75 100%)' };
+  const isGradient = bgColor.includes('gradient') || bgColor.includes('rgba') || bgColor.startsWith('linear') || bgColor.startsWith('radial');
+
+  const bgStyles = getHeroBackgroundStyles(
+    {
+      gradientColor1: content?.gradientColor1,
+      gradientColor2: content?.gradientColor2,
+      gradientColor3: content?.gradientColor3,
+    },
+    isGradient
+      ? { backgroundImage: bgColor }
+      : content?.bgColor
+      ? { backgroundColor: bgColor }
+      : { backgroundImage: 'linear-gradient(135deg, #4b4685 0%, #3e3a75 100%)' }
+  );
 
   return (
     <section
@@ -111,12 +126,17 @@ export function FmcgHero({ content }: { content?: FmcgHeroContent }) {
             <div className="flex flex-wrap gap-4">
               {buttonText && (
                 <Link
-                  href={buttonUrl} onClick={buttonFormType ? (e: React.MouseEvent) => { e.preventDefault(); handleBtnClick(); } : undefined}
-                  className="px-6 py-3 rounded-full text-sm font-bold shadow-md hover:shadow-lg transition-all duration-300 hover:scale-105 border active:scale-95 text-center min-w-[140px]"
+                  href={buttonUrl}
+                  onClick={buttonFormType ? (e: React.MouseEvent) => { e.preventDefault(); handleBtnClick(); } : undefined}
+                  onMouseEnter={() => setIsBtnHovered(true)}
+                  onMouseLeave={() => setIsBtnHovered(false)}
+                  className={`px-6 py-3 rounded-full text-sm font-bold shadow-md transition-all duration-300 border text-center min-w-[140px] cursor-pointer ${
+                    buttonHoverBgColor ? '' : 'hover:shadow-lg hover:scale-105 active:scale-95'
+                  }`}
                   style={{
-                    backgroundColor: buttonBgColor,
+                    backgroundColor: isBtnHovered && buttonHoverBgColor ? buttonHoverBgColor : buttonBgColor,
                     borderColor: buttonBorderColor,
-                    color: buttonTextColor,
+                    color: isBtnHovered && buttonHoverTextColor ? buttonHoverTextColor : buttonTextColor,
                   }}
                 >
                   {buttonText}

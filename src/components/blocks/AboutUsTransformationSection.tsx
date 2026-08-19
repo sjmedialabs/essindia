@@ -3,6 +3,7 @@
 import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { StaggerContainer } from '@/components/animations/MotionSection';
+import { FormattedText } from '@/components/ui/FormattedText';
 
 interface TransformItem {
   image?: string;
@@ -59,9 +60,7 @@ export function AboutUsTransformationSection({
       <div className="max-w-7xl mx-auto px-4">
         {/* Heading */}
         <div className="max-w-4xl mx-auto text-center mb-8 md:mb-20">
-          <h2 className="text-3xl md:text-5xl font-bold text-[#24365C] leading-[1.1]">
-            {title}
-          </h2>
+          <FormattedText content={title} as="h2" className="text-3xl md:text-5xl font-bold text-[#24365C] leading-[1.1]" />
         </div>
 
         {/* Grid */}
@@ -99,13 +98,8 @@ export function AboutUsTransformationSection({
                 {/* Content */}
                 <div className="flex items-center">
                   <div>
-                    <h3 className="text-lg font-bold uppercase text-black">
-                      {item.title}
-                    </h3>
-
-                    <p className="text-[#6B7280] text-base">
-                      {item.description}
-                    </p>
+                    <FormattedText content={item.title} as="h3" className="text-lg font-bold uppercase text-black" />
+                    <FormattedText content={item.description} className="text-[#6B7280] text-base" />
                   </div>
                 </div>
               </div>

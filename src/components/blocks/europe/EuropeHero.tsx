@@ -26,13 +26,17 @@ export interface EuropeHeroContent extends EuropeCommonSettings {
   descriptionColor?: string;
   primaryButtonText?: string;
   primaryButtonTextColor?: string;
+  primaryButtonHoverTextColor?: string;
   primaryButtonBgColor?: string;
+  primaryButtonHoverBgColor?: string;
   primaryButtonBorderColor?: string;
   primaryButtonUrl?: string;
   primaryButtonFormType?: string;
   secondaryButtonText?: string;
   secondaryButtonTextColor?: string;
+  secondaryButtonHoverTextColor?: string;
   secondaryButtonBgColor?: string;
+  secondaryButtonHoverBgColor?: string;
   secondaryButtonBorderColor?: string;
   secondaryButtonUrl?: string;
   secondaryButtonFormType?: string;
@@ -44,6 +48,9 @@ export interface EuropeHeroContent extends EuropeCommonSettings {
 }
 
 export function EuropeHero({ content }: { content?: EuropeHeroContent }) {
+  const [isPrimaryHovered, setIsPrimaryHovered] = React.useState(false);
+  const [isSecondaryHovered, setIsSecondaryHovered] = React.useState(false);
+
   const badgeBgColor = content?.badgeBgColor || '#ffffff';
   const badgeBorderColor = content?.badgeBorderColor || '#8b5cf6';
   const badgeText = content?.badgeText || 'ebizframe ERP for Europe';
@@ -59,14 +66,18 @@ export function EuropeHero({ content }: { content?: EuropeHeroContent }) {
 
   const primaryButtonText = content?.primaryButtonText || 'Try for free';
   const primaryButtonTextColor = content?.primaryButtonTextColor || '#ffffff';
+  const primaryButtonHoverTextColor = content?.primaryButtonHoverTextColor;
   const primaryButtonBgColor = content?.primaryButtonBgColor || '#231f61';
+  const primaryButtonHoverBgColor = content?.primaryButtonHoverBgColor;
   const primaryButtonBorderColor = content?.primaryButtonBorderColor || '#231f61';
   const primaryButtonUrl = content?.primaryButtonUrl || '/contact-us';
   const primaryButtonFormType = (content?.primaryButtonFormType || '') as CtaFormType;
 
   const secondaryButtonText = content?.secondaryButtonText || 'Talk to an expert';
   const secondaryButtonTextColor = content?.secondaryButtonTextColor || '#231f61';
+  const secondaryButtonHoverTextColor = content?.secondaryButtonHoverTextColor;
   const secondaryButtonBgColor = content?.secondaryButtonBgColor || '#f5c234';
+  const secondaryButtonHoverBgColor = content?.secondaryButtonHoverBgColor;
   const secondaryButtonBorderColor = content?.secondaryButtonBorderColor || '#f5c234';
   const secondaryButtonUrl = content?.secondaryButtonUrl || '/contact-us';
   const secondaryButtonFormType = (content?.secondaryButtonFormType || '') as CtaFormType;
@@ -163,11 +174,13 @@ export function EuropeHero({ content }: { content?: EuropeHeroContent }) {
               <Link
                 href={primaryButtonUrl}
                 onClick={primaryButtonFormType ? (e) => { e.preventDefault(); handlePrimaryClick(); } : undefined}
-                className="px-10 py-3.5 rounded-full text-sm font-semibold border transition-all hover:scale-105 hover:shadow-md duration-200"
+                onMouseEnter={() => setIsPrimaryHovered(true)}
+                onMouseLeave={() => setIsPrimaryHovered(false)}
+                className="px-10 py-3.5 rounded-full text-sm font-semibold border transition-all hover:scale-105 hover:shadow-md duration-200 cursor-pointer"
                 style={{
-                  backgroundColor: primaryButtonBgColor,
+                  backgroundColor: isPrimaryHovered && primaryButtonHoverBgColor ? primaryButtonHoverBgColor : primaryButtonBgColor,
                   borderColor: primaryButtonBorderColor,
-                  color: primaryButtonTextColor,
+                  color: isPrimaryHovered && primaryButtonHoverTextColor ? primaryButtonHoverTextColor : primaryButtonTextColor,
                 }}
               >
                 {primaryButtonText}
@@ -177,11 +190,13 @@ export function EuropeHero({ content }: { content?: EuropeHeroContent }) {
               <Link
                 href={secondaryButtonUrl}
                 onClick={secondaryButtonFormType ? (e) => { e.preventDefault(); handleSecondaryClick(); } : undefined}
-                className="px-10 py-3.5 rounded-full text-sm font-semibold border transition-all hover:scale-105 hover:shadow-md duration-200"
+                onMouseEnter={() => setIsSecondaryHovered(true)}
+                onMouseLeave={() => setIsSecondaryHovered(false)}
+                className="px-10 py-3.5 rounded-full text-sm font-semibold border transition-all hover:scale-105 hover:shadow-md duration-200 cursor-pointer"
                 style={{
-                  backgroundColor: secondaryButtonBgColor,
+                  backgroundColor: isSecondaryHovered && secondaryButtonHoverBgColor ? secondaryButtonHoverBgColor : secondaryButtonBgColor,
                   borderColor: secondaryButtonBorderColor,
-                  color: secondaryButtonTextColor,
+                  color: isSecondaryHovered && secondaryButtonHoverTextColor ? secondaryButtonHoverTextColor : secondaryButtonTextColor,
                 }}
               >
                 {secondaryButtonText}

@@ -8,18 +8,39 @@ interface TextRevealProps {
   className?: string;
   as?: 'h1' | 'h2' | 'h3' | 'h4' | 'p' | 'span';
   delay?: number;
+  style?: React.CSSProperties;
 }
 
 export function TextReveal({ 
   text, 
   className = '', 
   as: Component = 'h2',
-  delay = 0 
+  delay = 0,
+  style
 }: TextRevealProps) {
-  const words = text.split(' ');
+  if (!text) return null;
+
+  // Unescape HTML entities & strip HTML tags for character/word reveal, or render HTML directly if styled
+  let cleanText = text;
+  if (cleanText.includes('&lt;') && cleanText.includes('&gt;')) {
+    cleanText = cleanText
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&amp;/g, '&');
+  }
+
+  const isHtml = cleanText.includes('<') && cleanText.includes('>');
+  if (isHtml) {
+    // If text contains HTML tags (e.g. <p><strong>Heading</strong></p>), strip tag boundaries for word splitting or render dangerously
+    const stripped = cleanText.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+    if (!stripped) return null;
+    cleanText = stripped;
+  }
+
+  const words = cleanText.split(' ');
 
   return (
-    <Component className={`${className} flex flex-wrap gap-x-[0.2em] gap-y-[0.1em]`}>
+    <Component className={`${className} flex flex-wrap gap-x-[0.2em] gap-y-[0.1em]`} style={style}>
       {words.map((word, i) => (
         <span key={i} className="relative inline-flex overflow-hidden">
           <motion.span

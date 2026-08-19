@@ -7,14 +7,19 @@ import Link from 'next/link';
 interface FmcgCtaContent {
   title?: string;
   buttonText?: string;
+  buttonHoverBgColor?: string;
+  buttonHoverTextColor?: string;
   pdfUrl?: string;
 }
 
 export function FmcgCta({ content }: { content?: FmcgCtaContent }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isBtnHovered, setIsBtnHovered] = useState(false);
 
   const title = content?.title || 'Enable Digital Transformation of Your Business with Our Wide Range of IT Services';
   const buttonText = content?.buttonText || 'TALK TO OUR EXPERTS';
+  const buttonHoverBgColor = content?.buttonHoverBgColor;
+  const buttonHoverTextColor = content?.buttonHoverTextColor;
   const pdfUrl = content?.pdfUrl;
 
   return (
@@ -28,7 +33,20 @@ export function FmcgCta({ content }: { content?: FmcgCtaContent }) {
 
         {/* Action Button */}
         <div>
-          <button onClick={() => setIsModalOpen(true)} className="bg-[#4B2A63] text-white hover:bg-[#3A1F4D] px-8 py-3 rounded-full font-medium transition-colors inline-flex items-center gap-2">
+          <button
+            onClick={() => setIsModalOpen(true)}
+            onMouseEnter={() => setIsBtnHovered(true)}
+            onMouseLeave={() => setIsBtnHovered(false)}
+            style={
+              isBtnHovered && (buttonHoverBgColor || buttonHoverTextColor)
+                ? {
+                    backgroundColor: buttonHoverBgColor || undefined,
+                    color: buttonHoverTextColor || undefined,
+                  }
+                : undefined
+            }
+            className={`bg-[#4B2A63] ${buttonHoverBgColor ? '' : 'hover:bg-[#3A1F4D]'} text-white px-8 py-3 rounded-full font-medium transition-colors inline-flex items-center gap-2 cursor-pointer`}
+          >
             {buttonText}
           </button>
         </div>

@@ -11,6 +11,8 @@ interface UseCaseTab {
   heading: string;
   points: string[];
   buttonText: string;
+  buttonHoverBgColor?: string;
+  buttonHoverTextColor?: string;
   buttonUrl: string;
 }
 
@@ -21,6 +23,7 @@ interface FmcgUseCasesContent {
 }
 
 export function FmcgUseCases({ content }: { content?: FmcgUseCasesContent }) {
+  const [isCardBtnHovered, setIsCardBtnHovered] = useState(false);
   const title = content?.title || 'Business Intelligence Use Cases Across FMCG Operations';
   const subtitle = content?.subtitle || 'BI services deliver value across industries, but its real impact comes from how well insights are aligned with industry-specific challenges, metrics, and decision cycles. Our BI solutions built on Power BI are designed to reflect how each industry actually operates.';
 
@@ -144,7 +147,10 @@ export function FmcgUseCases({ content }: { content?: FmcgUseCasesContent }) {
               <button
                 key={idx}
                 type="button"
-                onClick={() => setActiveTabIdx(idx)}
+                onClick={() => {
+                    setActiveTabIdx(idx);
+                    setIsCardBtnHovered(false);
+                }}
                 className={`px-5 py-2.5 rounded-full text-xs sm:text-sm font-bold border transition-all duration-300 shrink-0 whitespace-nowrap ${isActive
                     ? 'bg-slate-900 text-white border-slate-900'
                     : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
@@ -209,7 +215,19 @@ export function FmcgUseCases({ content }: { content?: FmcgUseCasesContent }) {
                 <div className="pt-4">
                   <Link
                     href={activeTab.buttonUrl || '#'}
-                    className="inline-block px-8 py-3.5 rounded-full text-sm font-bold bg-[#fcc42c] text-slate-900 shadow-md hover:scale-105 transition-all duration-300 hover:bg-[#f3bf2a] active:scale-95"
+                    onMouseEnter={() => setIsCardBtnHovered(true)}
+                    onMouseLeave={() => setIsCardBtnHovered(false)}
+                    style={
+                      isCardBtnHovered && (activeTab.buttonHoverBgColor || activeTab.buttonHoverTextColor)
+                        ? {
+                            backgroundColor: activeTab.buttonHoverBgColor || undefined,
+                            color: activeTab.buttonHoverTextColor || undefined,
+                          }
+                        : undefined
+                    }
+                    className={`inline-block px-8 py-3.5 rounded-full text-sm font-bold bg-[#fcc42c] ${
+                      activeTab.buttonHoverBgColor ? '' : 'hover:bg-[#f3bf2a]'
+                    } text-slate-900 shadow-md transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer`}
                   >
                     {activeTab.buttonText}
                   </Link>

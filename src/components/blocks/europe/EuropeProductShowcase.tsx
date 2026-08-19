@@ -22,6 +22,8 @@ export interface EuropeProductShowcaseContent extends EuropeCommonSettings {
   title?: string;
   description?: string;
   buttonText?: string;
+  buttonHoverBgColor?: string;
+  buttonHoverTextColor?: string;
   buttonUrl?: string;
   buttonFormType?: string;
   cards?: CardItem[];
@@ -35,6 +37,7 @@ const DEFAULT_CARDS: CardItem[] = [
 ];
 
 export function EuropeProductShowcase({ content }: { content?: EuropeProductShowcaseContent }) {
+  const [isBtnHovered, setIsBtnHovered] = React.useState(false);
   const deviceImage = content?.deviceImage || '/About-Europe/rcs-carousel-benefits-highlight%201.png';
   const badgeText = content?.badgeText || 'RCS FOR BUSINESS';
   const title = content?.title || 'Getting started with Albino is easier than ever';
@@ -42,6 +45,8 @@ export function EuropeProductShowcase({ content }: { content?: EuropeProductShow
     content?.description ||
     'With lots of unique blocks, you can easily build a page without coding. Build your next landing page so quickly with Albino.';
   const buttonText = content?.buttonText || 'Meet our team';
+  const buttonHoverBgColor = content?.buttonHoverBgColor;
+  const buttonHoverTextColor = content?.buttonHoverTextColor;
   const buttonUrl = content?.buttonUrl || '/contact-us';
   const buttonFormType = (content?.buttonFormType || '') as CtaFormType;
   const cards = (content?.cards?.length ? content.cards : DEFAULT_CARDS).slice(0, 4);
@@ -92,7 +97,19 @@ export function EuropeProductShowcase({ content }: { content?: EuropeProductShow
             <Link
               href={buttonUrl}
               onClick={buttonFormType ? (e) => { e.preventDefault(); handleBtnClick(); } : undefined}
-              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-lg text-sm font-medium text-white bg-[#231f61] hover:bg-[#1a174d] transition-all shadow-md w-fit cursor-pointer"
+              onMouseEnter={() => setIsBtnHovered(true)}
+              onMouseLeave={() => setIsBtnHovered(false)}
+              style={
+                isBtnHovered && (buttonHoverBgColor || buttonHoverTextColor)
+                  ? {
+                      backgroundColor: buttonHoverBgColor || undefined,
+                      color: buttonHoverTextColor || undefined,
+                    }
+                  : undefined
+              }
+              className={`inline-flex items-center gap-2 px-8 py-3.5 rounded-lg text-sm font-medium text-white bg-[#231f61] ${
+                buttonHoverBgColor ? '' : 'hover:bg-[#1a174d]'
+              } transition-all shadow-md w-fit cursor-pointer`}
             >
               {buttonText}
               <ArrowRight className="w-4 h-4" aria-hidden="true" />

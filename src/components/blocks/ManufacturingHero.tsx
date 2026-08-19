@@ -1,11 +1,15 @@
 'use client';
 
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { getHeroBackgroundStyles } from '@/lib/utils';
 import { motion } from 'framer-motion';
 import { HeroTitle } from '@/components/ui/HeroTitle';
 
 export default function ManufacturingHero({ content }: { content?: any }) {
+  const [isPrimaryHovered, setIsPrimaryHovered] = React.useState(false);
+  const [isSecondaryHovered, setIsSecondaryHovered] = React.useState(false);
+
   const bgColor = content?.bgColor || '#27256b';
   const badgeBgColor = content?.badgeBgColor || '#391781';
   const badgeText = content?.badgeText || 'Lorem ipsum ERP';
@@ -15,12 +19,16 @@ export default function ManufacturingHero({ content }: { content?: any }) {
   const description = content?.description || 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam.';
   const descriptionColor = content?.descriptionColor || 'rgba(255,255,255,0.8)';
   const primaryButtonBgColor = content?.primaryButtonBgColor || '#FFD600';
+  const primaryButtonHoverBgColor = content?.primaryButtonHoverBgColor;
   const primaryButtonText = content?.primaryButtonText || 'Lorem ipsum';
   const primaryButtonTextColor = content?.primaryButtonTextColor || '#29245C';
+  const primaryButtonHoverTextColor = content?.primaryButtonHoverTextColor;
   const primaryButtonUrl = content?.primaryButtonUrl || '/about';
   const secondaryButtonBgColor = content?.secondaryButtonBgColor || '#ffffff';
+  const secondaryButtonHoverBgColor = content?.secondaryButtonHoverBgColor;
   const secondaryButtonText = content?.secondaryButtonText || 'Lorem ipsum';
   const secondaryButtonTextColor = content?.secondaryButtonTextColor || '#29245C';
+  const secondaryButtonHoverTextColor = content?.secondaryButtonHoverTextColor;
   const secondaryButtonUrl = content?.secondaryButtonUrl || '/contact';
   const image = content?.image || '/Modules-manufacturing/Banner-image.png';
 
@@ -90,15 +98,25 @@ export default function ManufacturingHero({ content }: { content?: any }) {
             <div className="flex flex-wrap items-center gap-4">
               <Link 
                 href={primaryButtonUrl} 
+                onMouseEnter={() => setIsPrimaryHovered(true)}
+                onMouseLeave={() => setIsPrimaryHovered(false)}
                 className="px-6 py-3 cursor-pointer rounded-full text-sm font-bold transition-all shadow-md inline-block text-center hover:brightness-95 min-w-[140px]"
-                style={{ backgroundColor: primaryButtonBgColor, color: primaryButtonTextColor }}
+                style={{
+                  backgroundColor: isPrimaryHovered && primaryButtonHoverBgColor ? primaryButtonHoverBgColor : primaryButtonBgColor,
+                  color: isPrimaryHovered && primaryButtonHoverTextColor ? primaryButtonHoverTextColor : primaryButtonTextColor,
+                }}
               >
                 {primaryButtonText}
               </Link>
               <Link 
                 href={secondaryButtonUrl} 
+                onMouseEnter={() => setIsSecondaryHovered(true)}
+                onMouseLeave={() => setIsSecondaryHovered(false)}
                 className="px-6 py-3 cursor-pointer rounded-full text-sm font-bold transition-all inline-block text-center hover:brightness-95 min-w-[140px]"
-                style={{ backgroundColor: secondaryButtonBgColor, color: secondaryButtonTextColor }}
+                style={{
+                  backgroundColor: isSecondaryHovered && secondaryButtonHoverBgColor ? secondaryButtonHoverBgColor : secondaryButtonBgColor,
+                  color: isSecondaryHovered && secondaryButtonHoverTextColor ? secondaryButtonHoverTextColor : secondaryButtonTextColor,
+                }}
               >
                 {secondaryButtonText}
               </Link>

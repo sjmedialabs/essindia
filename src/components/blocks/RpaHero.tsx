@@ -21,15 +21,19 @@ interface RpaHeroContent {
   description?: string;
   descriptionColor?: string;
   button1BgColor?: string;
+  button1HoverBgColor?: string;
   button1Text?: string;
   button1TextColor?: string;
+  button1HoverTextColor?: string;
   button1Url?: string;
   button1FormType?: string;
   button1PdfUrl?: string;
   button2BgColor?: string;
+  button2HoverBgColor?: string;
   button2BorderColor?: string;
   button2Text?: string;
   button2TextColor?: string;
+  button2HoverTextColor?: string;
   button2Url?: string;
   button2FormType?: string;
   button2PdfUrl?: string;
@@ -37,6 +41,9 @@ interface RpaHeroContent {
 }
 
 export function RpaHero({ content }: { content?: RpaHeroContent }) {
+  const [isBtn1Hovered, setIsBtn1Hovered] = React.useState(false);
+  const [isBtn2Hovered, setIsBtn2Hovered] = React.useState(false);
+
   const bgColor = content?.bgColor || 'linear-gradient(135deg, #a2b6cb 0%, #6e849d 100%)';
   const badgeBgColor = content?.badgeBgColor || '#ffffff';
   const badgeTextColor = content?.badgeTextColor || '#27256b';
@@ -48,15 +55,19 @@ export function RpaHero({ content }: { content?: RpaHeroContent }) {
   const descriptionColor = content?.descriptionColor || '#f1f5f9';
 
   const button1BgColor = content?.button1BgColor || '#27256b';
+  const button1HoverBgColor = content?.button1HoverBgColor;
   const button1Text = content?.button1Text || 'Book your Demo';
   const button1TextColor = content?.button1TextColor || '#ffffff';
+  const button1HoverTextColor = content?.button1HoverTextColor;
   const button1Url = content?.button1Url || '#';
   const button1FormType = (content?.button1FormType || '') as CtaFormType;
 
   const button2BgColor = content?.button2BgColor || '#ffffff';
+  const button2HoverBgColor = content?.button2HoverBgColor;
   const button2BorderColor = content?.button2BorderColor || '#ffffff';
   const button2Text = content?.button2Text || 'Case studies';
   const button2TextColor = content?.button2TextColor || '#27256b';
+  const button2HoverTextColor = content?.button2HoverTextColor;
   const button2Url = content?.button2Url || '#';
   const button2FormType = (content?.button2FormType || '') as CtaFormType;
 
@@ -138,15 +149,19 @@ export function RpaHero({ content }: { content?: RpaHeroContent }) {
 
             {/* Description */}
             {description && (
-              <motion.p
+              <motion.div
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: 0.2 }}
                 className="text-base sm:text-lg leading-relaxed font-light mb-8 max-w-xl"
                 style={{ color: descriptionColor }}
               >
-                {description}
-              </motion.p>
+                {typeof description === 'string' && (description.includes('<p>') || description.includes('<')) ? (
+                  <div dangerouslySetInnerHTML={{ __html: description }} />
+                ) : (
+                  <p>{description}</p>
+                )}
+              </motion.div>
             )}
 
             {/* CTAs */}
@@ -160,16 +175,26 @@ export function RpaHero({ content }: { content?: RpaHeroContent }) {
                 button1FormType ? (
                   <button
                     onClick={handleBtn1Click}
-                    className="px-6 py-3 rounded-full text-sm font-bold shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5 duration-200 block text-center min-w-[140px] cursor-pointer"
-                    style={{ backgroundColor: button1BgColor, color: button1TextColor }}
+                    onMouseEnter={() => setIsBtn1Hovered(true)}
+                    onMouseLeave={() => setIsBtn1Hovered(false)}
+                    className="px-6 py-3 rounded-full text-sm font-bold shadow-md transition-all duration-200 block text-center min-w-[140px] cursor-pointer"
+                    style={{
+                      backgroundColor: isBtn1Hovered && button1HoverBgColor ? button1HoverBgColor : button1BgColor,
+                      color: isBtn1Hovered && button1HoverTextColor ? button1HoverTextColor : button1TextColor,
+                    }}
                   >
                     {button1Text}
                   </button>
                 ) : (
                   <a
                     href={button1Url}
-                    className="px-6 py-3 rounded-full text-sm font-bold shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5 duration-200 block text-center min-w-[140px]"
-                    style={{ backgroundColor: button1BgColor, color: button1TextColor }}
+                    onMouseEnter={() => setIsBtn1Hovered(true)}
+                    onMouseLeave={() => setIsBtn1Hovered(false)}
+                    className="px-6 py-3 rounded-full text-sm font-bold shadow-md transition-all duration-200 block text-center min-w-[140px] cursor-pointer"
+                    style={{
+                      backgroundColor: isBtn1Hovered && button1HoverBgColor ? button1HoverBgColor : button1BgColor,
+                      color: isBtn1Hovered && button1HoverTextColor ? button1HoverTextColor : button1TextColor,
+                    }}
                   >
                     {button1Text}
                   </a>
@@ -179,16 +204,28 @@ export function RpaHero({ content }: { content?: RpaHeroContent }) {
                 button2FormType ? (
                   <button
                     onClick={handleBtn2Click}
-                    className="px-6 py-3 rounded-full text-sm font-bold border shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5 duration-200 block text-center min-w-[140px] cursor-pointer"
-                    style={{ backgroundColor: button2BgColor, color: button2TextColor, borderColor: button2BorderColor }}
+                    onMouseEnter={() => setIsBtn2Hovered(true)}
+                    onMouseLeave={() => setIsBtn2Hovered(false)}
+                    className="px-6 py-3 rounded-full text-sm font-bold border shadow-sm transition-all duration-200 block text-center min-w-[140px] cursor-pointer"
+                    style={{
+                      backgroundColor: isBtn2Hovered && button2HoverBgColor ? button2HoverBgColor : button2BgColor,
+                      color: isBtn2Hovered && button2HoverTextColor ? button2HoverTextColor : button2TextColor,
+                      borderColor: button2BorderColor,
+                    }}
                   >
                     {button2Text}
                   </button>
                 ) : (
                   <a
                     href={button2Url}
-                    className="px-6 py-3 rounded-full text-sm font-bold border shadow-sm hover:shadow-md transition-all hover:-translate-y-0.5 duration-200 block text-center min-w-[140px]"
-                    style={{ backgroundColor: button2BgColor, color: button2TextColor, borderColor: button2BorderColor }}
+                    onMouseEnter={() => setIsBtn2Hovered(true)}
+                    onMouseLeave={() => setIsBtn2Hovered(false)}
+                    className="px-6 py-3 rounded-full text-sm font-bold border shadow-sm transition-all duration-200 block text-center min-w-[140px] cursor-pointer"
+                    style={{
+                      backgroundColor: isBtn2Hovered && button2HoverBgColor ? button2HoverBgColor : button2BgColor,
+                      color: isBtn2Hovered && button2HoverTextColor ? button2HoverTextColor : button2TextColor,
+                      borderColor: button2BorderColor,
+                    }}
                   >
                     {button2Text}
                   </a>

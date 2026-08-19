@@ -8,11 +8,14 @@ interface OracleApexIntroContent {
   title?: string;
   paragraphs?: string[];
   buttonText?: string;
+  buttonHoverBgColor?: string;
+  buttonHoverTextColor?: string;
   buttonUrl?: string;
   buttonFormType?: string;
 }
 
 export function OracleApexIntro({ content }: { content?: OracleApexIntroContent }) {
+  const [isBtnHovered, setIsBtnHovered] = React.useState(false);
   const title = content?.title || 'Strategic Modernization for Enterprise Critical Systems';
   const defaultParagraphs = [
     'Many enterprises across France, Europe, the United States, and India continue to run business-critical operations on legacy Oracle Forms environments. While stable, these systems limit scalability, integration capability, user experience, and cloud readiness.',
@@ -21,6 +24,8 @@ export function OracleApexIntro({ content }: { content?: OracleApexIntroContent 
   ];
   const paragraphs = content?.paragraphs && content.paragraphs.length > 0 ? content.paragraphs : defaultParagraphs;
   const buttonText = content?.buttonText || 'Plan Your Migration';
+  const buttonHoverBgColor = content?.buttonHoverBgColor;
+  const buttonHoverTextColor = content?.buttonHoverTextColor;
   const buttonUrl = content?.buttonUrl || '#';
   const buttonFormType = (content?.buttonFormType || '') as CtaFormType;
   const { handleClick: handleBtnClick, modalNode } = useCtaAction(buttonUrl, buttonFormType);
@@ -72,7 +77,20 @@ export function OracleApexIntro({ content }: { content?: OracleApexIntroContent 
           >
             <a
               href={buttonUrl}
-              className="inline-block bg-[#2D1A70] hover:bg-[#3e2794] text-white px-8 py-3.5 rounded-full text-base font-bold shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5 duration-200"
+              onClick={buttonFormType ? (e: React.MouseEvent) => { e.preventDefault(); handleBtnClick(); } : undefined}
+              onMouseEnter={() => setIsBtnHovered(true)}
+              onMouseLeave={() => setIsBtnHovered(false)}
+              className={`inline-block bg-[#2D1A70] ${
+                buttonHoverBgColor ? '' : 'hover:bg-[#3e2794]'
+              } text-white px-8 py-3.5 rounded-full text-base font-bold shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5 duration-200 cursor-pointer`}
+              style={
+                isBtnHovered && (buttonHoverBgColor || buttonHoverTextColor)
+                  ? {
+                      backgroundColor: buttonHoverBgColor || undefined,
+                      color: buttonHoverTextColor || undefined,
+                    }
+                  : undefined
+              }
             >
               {buttonText}
             </a>

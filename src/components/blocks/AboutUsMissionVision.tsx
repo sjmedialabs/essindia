@@ -186,6 +186,9 @@ export function AboutUsMissionVision({ content }: AboutUsMissionVisionProps) {
 
 function renderFormattedTitle(titleText: string, primaryColor: string, secondaryColor: string) {
   if (!titleText) return null;
+  if (typeof titleText === 'string' && (titleText.includes('<') && titleText.includes('>'))) {
+    return <span dangerouslySetInnerHTML={{ __html: titleText }} />;
+  }
   if (titleText.toLowerCase().includes('transforms')) {
     const regex = /(transforms)/i;
     const parts = titleText.split(regex);

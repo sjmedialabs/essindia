@@ -22,14 +22,18 @@ export interface UgandaHeroContent {
   descriptionColor?: string;
   primaryButtonText?: string;
   primaryButtonBgColor?: string;
+  primaryButtonHoverBgColor?: string;
   primaryButtonTextColor?: string;
+  primaryButtonHoverTextColor?: string;
   primaryButtonBorderColor?: string;
   primaryButtonUrl?: string;
   primaryButtonFormType?: string;
   primaryButtonPdfUrl?: string;
   secondaryButtonText?: string;
   secondaryButtonBgColor?: string;
+  secondaryButtonHoverBgColor?: string;
   secondaryButtonTextColor?: string;
+  secondaryButtonHoverTextColor?: string;
   secondaryButtonBorderColor?: string;
   secondaryButtonUrl?: string;
   secondaryButtonFormType?: string;
@@ -37,6 +41,9 @@ export interface UgandaHeroContent {
 }
 
 export function UgandaHero({ content }: { content?: UgandaHeroContent }) {
+  const [isPrimaryHovered, setIsPrimaryHovered] = React.useState(false);
+  const [isSecondaryHovered, setIsSecondaryHovered] = React.useState(false);
+
   const backgroundGradient = content?.backgroundGradient || '#7c95b7';
   const badgeBorderColor = content?.badgeBorderColor || '#8b5cf6';
   const badgeBgColor = content?.badgeBgColor || '#ffffff';
@@ -49,14 +56,18 @@ export function UgandaHero({ content }: { content?: UgandaHeroContent }) {
 
   const primaryButtonText = content?.primaryButtonText || 'Book a Consultation';
   const primaryButtonBgColor = content?.primaryButtonBgColor || '#1d1b4b';
+  const primaryButtonHoverBgColor = content?.primaryButtonHoverBgColor;
   const primaryButtonTextColor = content?.primaryButtonTextColor || '#ffffff';
+  const primaryButtonHoverTextColor = content?.primaryButtonHoverTextColor;
   const primaryButtonBorderColor = content?.primaryButtonBorderColor || '#1d1b4b';
   const primaryButtonUrl = content?.primaryButtonUrl || '/contact-us';
   const primaryButtonFormType = (content?.primaryButtonFormType || '') as CtaFormType;
 
   const secondaryButtonText = content?.secondaryButtonText || 'Explore Capabilities';
   const secondaryButtonBgColor = content?.secondaryButtonBgColor || '#ffffff';
+  const secondaryButtonHoverBgColor = content?.secondaryButtonHoverBgColor;
   const secondaryButtonTextColor = content?.secondaryButtonTextColor || '#2b2657';
+  const secondaryButtonHoverTextColor = content?.secondaryButtonHoverTextColor;
   const secondaryButtonBorderColor = content?.secondaryButtonBorderColor || '#ffffff';
   const secondaryButtonUrl = content?.secondaryButtonUrl || '/contact-us';
   const secondaryButtonFormType = (content?.secondaryButtonFormType || '') as CtaFormType;
@@ -129,11 +140,13 @@ export function UgandaHero({ content }: { content?: UgandaHeroContent }) {
               <Link
                 href={primaryButtonUrl}
                 onClick={primaryButtonFormType ? (e) => { e.preventDefault(); handlePrimaryClick(); } : undefined}
+                onMouseEnter={() => setIsPrimaryHovered(true)}
+                onMouseLeave={() => setIsPrimaryHovered(false)}
                 className="inline-flex px-8 py-3.5 rounded-full text-sm font-bold border transition-all hover:scale-[1.02] shadow-md hover:shadow-lg cursor-pointer"
                 style={{
-                  backgroundColor: primaryButtonBgColor,
+                  backgroundColor: isPrimaryHovered && primaryButtonHoverBgColor ? primaryButtonHoverBgColor : primaryButtonBgColor,
                   borderColor: primaryButtonBorderColor,
-                  color: primaryButtonTextColor
+                  color: isPrimaryHovered && primaryButtonHoverTextColor ? primaryButtonHoverTextColor : primaryButtonTextColor
                 }}
               >
                 {primaryButtonText}
@@ -144,11 +157,13 @@ export function UgandaHero({ content }: { content?: UgandaHeroContent }) {
               <Link
                 href={secondaryButtonUrl}
                 onClick={secondaryButtonFormType ? (e) => { e.preventDefault(); handleSecondaryClick(); } : undefined}
+                onMouseEnter={() => setIsSecondaryHovered(true)}
+                onMouseLeave={() => setIsSecondaryHovered(false)}
                 className="inline-flex px-8 py-3.5 rounded-full text-sm font-bold border transition-all hover:scale-[1.02] shadow-md hover:shadow-lg cursor-pointer"
                 style={{
-                  backgroundColor: secondaryButtonBgColor,
+                  backgroundColor: isSecondaryHovered && secondaryButtonHoverBgColor ? secondaryButtonHoverBgColor : secondaryButtonBgColor,
                   borderColor: secondaryButtonBorderColor,
-                  color: secondaryButtonTextColor
+                  color: isSecondaryHovered && secondaryButtonHoverTextColor ? secondaryButtonHoverTextColor : secondaryButtonTextColor
                 }}
               >
                 {secondaryButtonText}

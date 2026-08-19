@@ -3,6 +3,7 @@
 import React from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
+import { FormattedText } from '@/components/ui/FormattedText';
 
 interface LimitationItem {
   text: string;
@@ -148,17 +149,19 @@ export function RoiUsage({ content }: { content?: RoiUsageContent }) {
           transition={{ duration: 0.6 }}
           className="space-y-6 text-left max-w-5xl pt-4"
         >
-          <h2 className="text-3xl md:text-4xl font-bold text-[#2b2a6c] tracking-tight">
-            {faqTitle}
-          </h2>
+          <FormattedText content={faqTitle} as="h2" className="text-3xl md:text-4xl font-bold text-[#2b2a6c] tracking-tight" />
 
           <div className="space-y-4 text-slate-600 text-sm sm:text-base leading-relaxed whitespace-pre-line">
             {faqs.map((faq, idx) => (
               <div key={idx} className="space-y-3">
                 {(faq.question || (faq as any).quotation) && (
-                  <h4 className="font-bold text-slate-800 text-base">{faq.question || (faq as any).quotation}</h4>
+                  <FormattedText
+                    content={faq.question || (faq as any).quotation}
+                    as="h4"
+                    className="font-bold text-slate-800 text-base"
+                  />
                 )}
-                <p>{faq.answer}</p>
+                <FormattedText content={faq.answer} />
               </div>
             ))}
           </div>
