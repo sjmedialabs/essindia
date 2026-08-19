@@ -137,7 +137,7 @@ export function AomWorkspace({ content }: { content?: AomWorkspaceContent }) {
 
   // Track active tab selection
   const [activeCategoryIdx, setActiveCategoryIdx] = useState(0);
-  const [activeTabIdx, setActiveTabIdx] = useState(1); // Default to CRM in SALES OPERATIONS
+  const [activeTabIdx, setActiveTabIdx] = useState(0); // Default to first tab (SFA) in SALES OPERATIONS
 
   const toggleCategory = (idx: number) => {
     setExpandedCategories(prev => ({
@@ -248,7 +248,11 @@ export function AomWorkspace({ content }: { content?: AomWorkspaceContent }) {
             {/* Left side content inside card */}
             <div className="flex-1 space-y-6 text-left w-full">
               <div>
-                <FormattedText content={currentTab.contentTitle} as="h3" className="text-[#0a1128] text-2xl font-extrabold mb-3" />
+                <FormattedText
+                  content={currentTab.contentTitle}
+                  as="h3"
+                  className="text-[#0a1128] text-2xl font-extrabold mb-3 [&_*]:text-2xl [&_*]:font-extrabold [&_*]:inline"
+                />
                 <FormattedText content={currentTab.contentDescription} className="text-slate-500 text-sm leading-relaxed font-medium" />
               </div>
 
@@ -264,7 +268,7 @@ export function AomWorkspace({ content }: { content?: AomWorkspaceContent }) {
                         key={bIdx}
                         className="px-3.5 py-1.5 text-xs font-bold text-slate-600 bg-slate-50 border border-slate-200/80 rounded-full hover:bg-slate-100 transition-colors"
                       >
-                        {benefit}
+                        <FormattedText content={benefit} as="span" />
                       </span>
                     ))}
                   </div>
