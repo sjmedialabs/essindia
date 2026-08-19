@@ -544,7 +544,11 @@ export function BlogDetailSection({ content }: BlogDetailSectionProps) {
                     {seg.descriptions && seg.descriptions.length > 0 && (
                       <div className="space-y-4 text-sm sm:text-base text-slate-600 leading-relaxed font-normal">
                         {seg.descriptions.map((desc, dIdx) => (
-                          <p key={dIdx}>{desc}</p>
+                          typeof desc === 'string' && (desc.includes('<p>') || desc.includes('<')) ? (
+                            <div key={dIdx} dangerouslySetInnerHTML={{ __html: desc }} />
+                          ) : (
+                            <p key={dIdx}>{desc}</p>
+                          )
                         ))}
                       </div>
                     )}
@@ -563,7 +567,11 @@ export function BlogDetailSection({ content }: BlogDetailSectionProps) {
                         {item.descriptions && item.descriptions.length > 0 && (
                           <div className="space-y-4 text-sm sm:text-base text-slate-600 leading-relaxed font-normal">
                             {item.descriptions.map((dText, dIdx) => (
-                              <p key={dIdx}>{dText}</p>
+                              typeof dText === 'string' && (dText.includes('<p>') || dText.includes('<')) ? (
+                                <div key={dIdx} dangerouslySetInnerHTML={{ __html: dText }} />
+                              ) : (
+                                <p key={dIdx}>{dText}</p>
+                              )
                             ))}
                           </div>
                         )}
@@ -637,7 +645,11 @@ export function BlogDetailSection({ content }: BlogDetailSectionProps) {
                 <h2 className="text-xl sm:text-2xl font-bold text-slate-900">Conclusion</h2>
                 <div className="space-y-4 text-sm sm:text-base text-slate-600 leading-relaxed font-normal">
                   {conclusionParagraphs.map((para, cIdx) => (
-                    <p key={cIdx}>{para}</p>
+                    typeof para === 'string' && (para.includes('<p>') || para.includes('<')) ? (
+                      <div key={cIdx} dangerouslySetInnerHTML={{ __html: para }} />
+                    ) : (
+                      <p key={cIdx}>{para}</p>
+                    )
                   ))}
                 </div>
               </div>

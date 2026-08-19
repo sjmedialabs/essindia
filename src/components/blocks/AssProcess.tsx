@@ -2,6 +2,8 @@
 
 import React from 'react';
 import Image from 'next/image';
+import { safeImageUrl } from '@/lib/utils';
+import { FormattedText } from '@/components/ui/FormattedText';
 
 interface ProcessStep {
   image?: string;
@@ -28,9 +30,7 @@ export function AssProcess({ content }: { content?: AssProcessContent }) {
     <section className="p-14 px-6 bg-[#ffffff]">
       <div className="container mx-auto max-w-7xl">
         {/* Title */}
-        <h2 className="text-3xl md:text-4xl lg:text-[40px] font-bold text-[#0a1128] text-center mb-6 leading-tight">
-          {title}
-        </h2>
+        <FormattedText content={title} as="h2" className="text-3xl md:text-4xl lg:text-[40px] font-bold text-[#0a1128] text-center mb-6 leading-tight" />
 
         {/* Process Flow */}
         <div className="relative">
@@ -64,34 +64,33 @@ export function AssProcess({ content }: { content?: AssProcessContent }) {
 
           {/* Cards Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
-            {steps.map((step: ProcessStep, idx: number) => (
-              <div key={idx} className="flex flex-col items-center bg-white rounded-2xl border border-slate-200 pt-3 pb-6 shadow-[0_4px_25px_rgba(0,0,0,0.015)] transition-all hover:shadow-md hover:border-slate-200">
-                {/* Mobile/Tablet step number (hidden on desktop) */}
-                <div className="lg:hidden relative flex items-center justify-center w-14 h-14 mb-4">
-                  <div className="absolute inset-0 rounded-full border border-dashed border-[#27256b]/40" />
-                  <div className="w-10 h-10 rounded-full bg-[#0a1128] text-white font-bold text-sm flex items-center justify-center shadow-sm">
-                    {String(idx + 1).padStart(2, '0')}
+            {steps.map((step: ProcessStep, idx: number) => {
+              const validImg = safeImageUrl(step.image);
+              return (
+                <div key={idx} className="flex flex-col items-center bg-white rounded-2xl border border-slate-200 pt-3 pb-6 shadow-[0_4px_25px_rgba(0,0,0,0.015)] transition-all hover:shadow-md hover:border-slate-200">
+                  {/* Mobile/Tablet step number (hidden on desktop) */}
+                  <div className="lg:hidden relative flex items-center justify-center w-14 h-14 mb-4">
+                    <div className="absolute inset-0 rounded-full border border-dashed border-[#27256b]/40" />
+                    <div className="w-10 h-10 rounded-full bg-[#0a1128] text-white font-bold text-sm flex items-center justify-center shadow-sm">
+                      {String(idx + 1).padStart(2, '0')}
+                    </div>
                   </div>
+
+                  {/* Step Image */}
+                  <div className="relative w-full aspect-square max-w-[150px] mb-6 flex items-center justify-center">
+                    {validImg && (
+                      <Image src={validImg} alt={step.title || ''} fill className="object-contain" />
+                    )}
+                  </div>
+
+                  {/* Title */}
+                  <FormattedText content={step.title} as="h3" className="text-[17px] font-bold text-[#0a1128] text-center mb-2.5 leading-snug" />
+
+                  {/* Description */}
+                  <FormattedText content={step.description} className="text-xs text-slate-500 text-center leading-relaxed font-normal" />
                 </div>
-
-                {/* Step Image */}
-                <div className="relative w-full aspect-square max-w-[150px] mb-6 flex items-center justify-center">
-                  {step.image && (
-                    <Image src={step.image} alt={step.title || ''} fill className="object-contain" />
-                  )}
-                </div>
-
-                {/* Title */}
-                <h3 className="text-[17px] font-bold text-[#0a1128] text-center mb-2.5 leading-snug">
-                  {step.title}
-                </h3>
-
-                {/* Description */}
-                <p className="text-xs text-slate-500 text-center leading-relaxed font-normal">
-                  {step.description}
-                </p>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>

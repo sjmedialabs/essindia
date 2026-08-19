@@ -2189,6 +2189,37 @@ const DEFAULT_THANK_YOU_HERO_CONTENT: Record<string, any> = {
   bgColor: '#ffffff',
 };
 
+const DEFAULT_LANDING1_SUITE_CONTENT: Record<string, any> = {
+  badge: 'COMPLETE BUSINESS SUITE',
+  title: 'One Platform. Infinite Possibilities.',
+  description: 'Every tool your growing enterprise needs to operate, analyze, and scale — deeply connected out of the box.',
+  modules: [
+    {
+      name: 'Finance',
+      desc: 'Capture leads, manage opportunities, and track every customer interaction in one place. Build stronger relationships and close deals with confidence.',
+      image: '/Landing page1/assets/Clip path group.png'
+    },
+    {
+      name: 'CRM',
+      desc: 'Capture leads, manage opportunities, and track every customer interaction in one place. Build stronger relationships and close deals with confidence.',
+      image: '/Landing page1/assets/Group.png',
+      highlighted: true
+    },
+    {
+      name: 'Sales',
+      desc: 'Create quotations, process sales orders, manage pricing, and track deliveries effortlessly. Streamline your complete sales cycle from inquiry to invoice.',
+      image: '/Landing page1/assets/Frame 1618872982.png'
+    },
+    {
+      name: 'Manufacturing',
+      desc: 'Plan production, manage BOMs, track work orders, and control shop-floor operations. Ensure optimal capacity utilization and timely delivery.',
+      image: '/Landing page1/assets/Frame 1618872983.png'
+    }
+  ],
+  ctaText: 'Explore All Modules',
+  ctaUrl: '/contact-us'
+};
+
 interface SectionEditorCardProps {
   section: PageSection;
   schema?: Record<string, unknown> | null;
@@ -2257,6 +2288,8 @@ export function SectionEditorCard({
         baseSchema = DEFAULT_AOM_SOLUTIONS_CONTENT as Record<string, JsonValue>;
       } else if (section.type === 'aom-workspace') {
         baseSchema = DEFAULT_AOM_WORKSPACE_CONTENT as Record<string, JsonValue>;
+      } else if (section.type === 'landing1-suite') {
+        baseSchema = DEFAULT_LANDING1_SUITE_CONTENT as Record<string, JsonValue>;
       } else if (section.type === 'fmcg-hero') {
         baseSchema = DEFAULT_FMCG_HERO_CONTENT as Record<string, JsonValue>;
       } else if (section.type === 'fmcg-logos') {

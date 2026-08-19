@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
+import { FormattedText } from '@/components/ui/FormattedText';
 
 interface FaqItem {
   question: string;
@@ -77,14 +78,10 @@ export function FmcgFaq({ content }: { content?: FmcgFaqContent }) {
         {(title || subtitle) && (
           <div className="space-y-2 max-w-2xl mx-auto">
             {title && (
-              <h2 className="text-3xl sm:text-4xl font-extrabold text-[#2a2b6a] leading-tight">
-                {title}
-              </h2>
+              <FormattedText content={title} as="h2" className="text-3xl sm:text-4xl font-extrabold text-[#2a2b6a] leading-tight" />
             )}
             {subtitle && (
-              <p className="text-slate-500 text-sm sm:text-base leading-relaxed">
-                {subtitle}
-              </p>
+              <FormattedText content={subtitle} className="text-slate-500 text-sm sm:text-base leading-relaxed" />
             )}
           </div>
         )}
@@ -105,9 +102,11 @@ export function FmcgFaq({ content }: { content?: FmcgFaqContent }) {
                   onClick={() => toggleFaq(idx)}
                   className="w-full py-5 px-6 sm:px-8 flex items-center justify-between text-[#2a2b6a] hover:bg-slate-50/50 transition-colors text-left"
                 >
-                  <span className="text-sm sm:text-base font-bold pr-4">
-                    {faq.question || (faq as any).quotation}
-                  </span>
+                  <FormattedText
+                    content={faq.question || (faq as any).quotation}
+                    as="span"
+                    className="text-sm sm:text-base font-bold pr-4"
+                  />
 
                   {/* Arrow Icon */}
                   {arrowSrc && arrowSrc.trim() !== '' && (
@@ -127,9 +126,10 @@ export function FmcgFaq({ content }: { content?: FmcgFaqContent }) {
                   className={`transition-all duration-300 ease-in-out overflow-hidden ${isOpen ? 'max-h-[500px] border-t border-slate-100' : 'max-h-0'
                     }`}
                 >
-                  <div className="p-6 sm:p-8 text-slate-500 text-xs sm:text-sm leading-relaxed">
-                    {faq.answer}
-                  </div>
+                  <FormattedText
+                    content={faq.answer}
+                    className="p-6 sm:p-8 text-slate-500 text-xs sm:text-sm leading-relaxed"
+                  />
                 </div>
               </div>
             );

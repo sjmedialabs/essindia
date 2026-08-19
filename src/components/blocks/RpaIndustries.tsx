@@ -3,6 +3,7 @@
 import React from 'react';
 import Image from 'next/image';
 import { motion } from 'framer-motion';
+import { FormattedText } from '@/components/ui/FormattedText';
 
 interface IndustryItem {
   title: string;
@@ -103,15 +104,15 @@ export function RpaIndustries({ content }: { content?: RpaIndustriesContent }) {
             </motion.h2>
           )}
           {description && (
-            <motion.p
+            <motion.div
               initial={{ opacity: 0, y: 10 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: 0.1 }}
               className="text-slate-500 font-light text-base sm:text-lg leading-relaxed max-w-3xl mx-auto"
             >
-              {description}
-            </motion.p>
+              <FormattedText content={description} />
+            </motion.div>
           )}
         </div>
 
@@ -143,9 +144,7 @@ export function RpaIndustries({ content }: { content?: RpaIndustriesContent }) {
                 <h4 className="text-lg font-bold text-[#343274] transition-colors duration-300">
                   {item.title}
                 </h4>
-                <p className="text-sm text-slate-500 font-light leading-relaxed">
-                  {item.description}
-                </p>
+                <FormattedText content={item.description} className="text-sm text-slate-500 font-light leading-relaxed" />
               </div>
             </motion.div>
           ))}

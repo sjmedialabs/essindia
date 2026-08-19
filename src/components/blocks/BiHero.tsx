@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { useCtaAction, type CtaFormType } from '@/hooks/useCtaAction';
 import { HeroTitle } from '@/components/ui/HeroTitle';
+import { getHeroBackgroundStyles } from '@/lib/utils';
 
 interface BiHeroContent {
   gradientColor1?: string;
@@ -79,10 +80,20 @@ export function BiHero({ content }: { content?: BiHeroContent }) {
   const { handleClick: handleBtn1Click, modalNode: modal1 } = useCtaAction(button1Url, button1FormType, content?.button1PdfUrl);
   const { handleClick: handleBtn2Click, modalNode: modal2 } = useCtaAction(button2Url, button2FormType, content?.button2PdfUrl);
 
-  const hasCustomBg = content?.bgColor && content.bgColor !== '#f3f6fc';
-  const bgStyles = hasCustomBg
-    ? { backgroundColor: bgColor }
-    : { backgroundImage: 'linear-gradient(135deg, #f3f6fc 0%, #eef3fc 100%)' };
+  const isGradient = bgColor.includes('gradient') || bgColor.includes('rgba') || bgColor.startsWith('linear') || bgColor.startsWith('radial');
+
+  const bgStyles = getHeroBackgroundStyles(
+    {
+      gradientColor1: content?.gradientColor1,
+      gradientColor2: content?.gradientColor2,
+      gradientColor3: content?.gradientColor3,
+    },
+    isGradient
+      ? { backgroundImage: bgColor }
+      : content?.bgColor
+      ? { backgroundColor: bgColor }
+      : { backgroundImage: 'linear-gradient(135deg, #f3f6fc 0%, #eef3fc 100%)' }
+  );
 
   return (
     <section

@@ -5,6 +5,7 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useCtaAction, type CtaFormType } from '@/hooks/useCtaAction';
+import { FormattedText } from '@/components/ui/FormattedText';
 
 interface WorkspaceTab {
   label: string;
@@ -166,9 +167,7 @@ export function AomWorkspace({ content }: { content?: AomWorkspaceContent }) {
       <div className="container mx-auto max-w-7xl">
         
         {/* Title */}
-        <h2 className="text-[#0a1128] text-2xl sm:text-3xl lg:text-4xl font-extrabold max-w-3xl mx-auto mb-12 text-center leading-tight tracking-tight">
-          {title}
-        </h2>
+        <FormattedText content={title} as="h2" className="text-[#0a1128] text-2xl sm:text-3xl lg:text-4xl font-extrabold max-w-3xl mx-auto mb-12 text-center leading-tight tracking-tight" />
 
         <div className="flex flex-col lg:flex-row gap-8 items-start">
           
@@ -190,7 +189,7 @@ export function AomWorkspace({ content }: { content?: AomWorkspaceContent }) {
                     onClick={() => toggleCategory(catIdx)}
                     className="w-full flex items-center justify-between py-2 text-[#0a1128] font-black text-[13px] tracking-wider uppercase text-left group hover:text-indigo-600 transition-colors"
                   >
-                    <span>{category.name}</span>
+                    <FormattedText content={category.name} as="span" />
                     <div className="w-5 h-5 relative shrink-0">
                       <Image
                         src={arrowIcon}
@@ -230,8 +229,8 @@ export function AomWorkspace({ content }: { content?: AomWorkspaceContent }) {
                               </div>
                             )}
                             <div>
-                              <div className="text-xs font-bold">{tab.label}</div>
-                              <div className="text-[10px] text-slate-400 font-medium leading-tight mt-0.5">{tab.desc}</div>
+                              <FormattedText content={tab.label} className="text-xs font-bold" />
+                              <FormattedText content={tab.desc} className="text-[10px] text-slate-400 font-medium leading-tight mt-0.5" />
                             </div>
                           </button>
                         );
@@ -249,12 +248,8 @@ export function AomWorkspace({ content }: { content?: AomWorkspaceContent }) {
             {/* Left side content inside card */}
             <div className="flex-1 space-y-6 text-left w-full">
               <div>
-                <h3 className="text-[#0a1128] text-2xl font-extrabold mb-3">
-                  {currentTab.contentTitle}
-                </h3>
-                <p className="text-slate-500 text-sm leading-relaxed font-medium">
-                  {currentTab.contentDescription}
-                </p>
+                <FormattedText content={currentTab.contentTitle} as="h3" className="text-[#0a1128] text-2xl font-extrabold mb-3" />
+                <FormattedText content={currentTab.contentDescription} className="text-slate-500 text-sm leading-relaxed font-medium" />
               </div>
 
               {/* Benefits badge chips */}

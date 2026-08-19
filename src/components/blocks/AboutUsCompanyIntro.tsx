@@ -11,6 +11,7 @@ import {
   Zap,
   Globe,
 } from 'lucide-react';
+import { FormattedText } from '@/components/ui/FormattedText';
 
 interface HighlightItem {
   title?: string;
@@ -114,12 +115,8 @@ export function AboutUsCompanyIntro({
 
             <MotionSection variant="fadeUp">
 
-              <h3 className="text-3xl lg:text-5xl font-bold text-black leading-tight">
-                {subtitle}
-              </h3>
-              <h2 className="text-3xl lg:text-5xl font-bold text-black leading-tight">
-                {title}
-              </h2>
+              <FormattedText content={subtitle} as="h3" className="text-3xl lg:text-5xl font-bold text-black leading-tight" />
+              <FormattedText content={title} as="h2" className="text-3xl lg:text-5xl font-bold text-black leading-tight" />
 
               <div className="space-y-2">
                 <div className="text-[#71717A] text-base">

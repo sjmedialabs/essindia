@@ -2203,6 +2203,7 @@ export default function PageEditor() {
     const libSec = librarySections.find(
       (s) => s.type === type && (s.variant === 'default' || !s.variant)
     ) || librarySections.find((s) => s.type === type);
+    const isValidUuid = libSec?.id && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(libSec.id);
 
     const res = await fetch(`/api/admin/pages/${pageId}/sections`, {
       method: 'POST',
@@ -2210,7 +2211,7 @@ export default function PageEditor() {
       body: JSON.stringify({
         type,
         orderIndex: afterIndex !== undefined ? afterIndex + 1 : undefined,
-        sectionLibraryId: libSec?.id || null,
+        sectionLibraryId: isValidUuid ? libSec.id : undefined,
         content: libSec?.contentJson || {},
       }),
     });

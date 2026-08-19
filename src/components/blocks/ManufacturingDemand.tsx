@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
+import { FormattedText } from '@/components/ui/FormattedText';
 
 export default function ManufacturingDemand({ content }: { content?: any }) {
   const title = content?.title || 'Lorem demand, Lorem,<br />ipsum, incididunt ,<br />commodo ,  adipiscing.';
@@ -18,7 +19,7 @@ export default function ManufacturingDemand({ content }: { content?: any }) {
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <h2 className="text-3xl md:text-[40px] font-bold text-[#27256b] leading-[1.3] tracking-tight" dangerouslySetInnerHTML={{ __html: title }} />
+            <FormattedText content={title} as="h2" className="text-3xl md:text-[40px] font-bold text-[#27256b] leading-[1.3] tracking-tight" />
           </motion.div>
 
           <motion.div
@@ -28,12 +29,8 @@ export default function ManufacturingDemand({ content }: { content?: any }) {
             transition={{ duration: 0.6, delay: 0.2 }}
             className="space-y-6 text-slate-500 text-[14px] leading-relaxed border-l-0 md:border-l-[1.5px] border-slate-200 pl-0 md:pl-12 py-2"
           >
-            <p>
-              {paragraph1}
-            </p>
-            <p>
-              {paragraph2}
-            </p>
+            <FormattedText content={paragraph1} />
+            <FormattedText content={paragraph2} />
           </motion.div>
         </div>
       </div>

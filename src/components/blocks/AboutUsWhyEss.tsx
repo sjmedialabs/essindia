@@ -170,6 +170,9 @@ export function AboutUsWhyEss({ content }: AboutUsWhyEssProps) {
 
 function renderFormattedTitle(titleText: string, primaryColor?: string, secondaryColor?: string) {
   if (!titleText) return null;
+  if (typeof titleText === 'string' && (titleText.includes('<') && titleText.includes('>'))) {
+    return <span dangerouslySetInnerHTML={{ __html: titleText }} />;
+  }
   const pColor = primaryColor || '#FFFFFF';
   const sColor = secondaryColor || '#C084FC';
 

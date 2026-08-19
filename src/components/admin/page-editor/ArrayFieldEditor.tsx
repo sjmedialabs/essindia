@@ -95,7 +95,11 @@ export function ArrayFieldEditor({
           buttonUrl: '/case-studies'
         };
       } else if (lowerKey === 'modules') {
-        defaultObj = { image: '', title: '', description: '', ctaLabel: 'READ MORE', ctaUrl: '#' };
+        if (sectionType === 'landing1-suite') {
+          defaultObj = { name: '', desc: '', image: '', highlighted: false };
+        } else {
+          defaultObj = { image: '', title: '', description: '', ctaLabel: 'READ MORE', ctaUrl: '#' };
+        }
       } else if (lowerKey === 'values') {
         defaultObj = { image: '', title: '', description: '' };
       } else if (lowerKey === 'faqs') {

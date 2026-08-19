@@ -813,8 +813,13 @@ function ArrayField({
               }
             }
           } else if (fieldKey === 'modules') {
-            let moduleOrder = ['image', 'title', 'description', 'ctaLabel', 'ctaHoverBgColor', 'ctaHoverTextColor', 'ctaUrl', 'ctaFormType'];
-            if (sectionType === 'erp-modules') {
+            let moduleOrder = ['image', 'name', 'title', 'desc', 'description', 'ctaLabel', 'ctaHoverBgColor', 'ctaHoverTextColor', 'ctaUrl', 'ctaFormType'];
+            if (sectionType === 'landing1-suite') {
+              moduleOrder = ['name', 'desc', 'image'];
+              for (const k of ['name', 'desc', 'image']) {
+                if (!(k in objItem)) objItem[k] = '';
+              }
+            } else if (sectionType === 'erp-modules') {
               for (const k of ['ctaHoverBgColor', 'ctaHoverTextColor']) {
                 if (!(k in objItem)) objItem[k] = '';
               }

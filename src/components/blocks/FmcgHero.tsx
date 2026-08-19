@@ -56,10 +56,20 @@ export function FmcgHero({ content }: { content?: FmcgHeroContent }) {
   const { handleClick: handleBtnClick, modalNode } = useCtaAction(buttonUrl, buttonFormType);
   const rightImage = content?.image || '/BI-industy solution-FMGC/2b58cf43-2428-4667-ac1c-680abeb784a1 1.png';
 
-  const hasCustomBg = content?.bgColor && content.bgColor !== '#4b4685';
-  const bgStyles = hasCustomBg
-    ? { backgroundColor: bgColor }
-    : { backgroundImage: 'linear-gradient(135deg, #4b4685 0%, #3e3a75 100%)' };
+  const isGradient = bgColor.includes('gradient') || bgColor.includes('rgba') || bgColor.startsWith('linear') || bgColor.startsWith('radial');
+
+  const bgStyles = getHeroBackgroundStyles(
+    {
+      gradientColor1: content?.gradientColor1,
+      gradientColor2: content?.gradientColor2,
+      gradientColor3: content?.gradientColor3,
+    },
+    isGradient
+      ? { backgroundImage: bgColor }
+      : content?.bgColor
+      ? { backgroundColor: bgColor }
+      : { backgroundImage: 'linear-gradient(135deg, #4b4685 0%, #3e3a75 100%)' }
+  );
 
   return (
     <section

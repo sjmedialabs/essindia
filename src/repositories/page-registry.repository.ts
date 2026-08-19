@@ -154,7 +154,7 @@ export class PageRegistryRepository {
 
     const navLabels = await this.resolveNavLabels(allPages);
 
-    return allPages.map((page) => {
+    const cmsPageRows: PageRegistryRow[] = allPages.map((page) => {
       const labels = navLabels.get(page.id);
       return {
         id: page.id,
@@ -180,6 +180,46 @@ export class PageRegistryRepository {
         isLinked: true,
       };
     });
+
+    // Also include static/filesystem registry entries that haven't been linked to a CMS page yet
+    let staticRegistryRows: PageRegistryRow[] = [];
+    try {
+      const registryEntries = await db.query.pageRegistry.findMany({
+        where: isNull(pageRegistry.pageId),
+      });
+
+      const existingPaths = new Set(cmsPageRows.map((r) => r.routePath));
+
+      staticRegistryRows = registryEntries
+        .filter((reg) => !existingPaths.has(reg.routePath))
+        .map((reg) => ({
+          id: reg.id,
+          pageId: null,
+          routePath: reg.routePath,
+          title: reg.title || 'Untitled Page',
+          slug: reg.routePath.split('/').filter(Boolean).pop() || 'index',
+          pageType: reg.pageType || 'standard',
+          status: 'published',
+          source: (reg.source as 'filesystem' | 'cms') || 'filesystem',
+          seoStatus: 'incomplete',
+          seoDescription: '',
+          heroDescription: '',
+          sectionCount: 0,
+          templateId: null,
+          previewThumbnail: null,
+          navigationLabel: null,
+          categoryLabel: null,
+          subCategoryLabel: null,
+          subSubCategoryLabel: null,
+          createdAt: reg.createdAt,
+          updatedAt: reg.updatedAt,
+          isLinked: false,
+        }));
+    } catch {
+      // ignore if pageRegistry does not exist
+    }
+
+    return [...cmsPageRows, ...staticRegistryRows];
   }
 
   private async resolveNavLabels(

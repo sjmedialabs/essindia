@@ -5,6 +5,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useCtaAction, type CtaFormType } from '@/hooks/useCtaAction';
 import { HeroTitle } from '@/components/ui/HeroTitle';
+import { getHeroBackgroundStyles } from '@/lib/utils';
 
 interface AomHeroContent {
   bgColor?: string;
@@ -75,15 +76,24 @@ export function AomHero({ content }: { content?: AomHeroContent }) {
   const { handleClick: handleBtn2Click, modalNode: modal2 } = useCtaAction(button2Url, button2FormType);
   const rightImage = content?.image || '/App- App over view (mobile app)/f3273dba-dc3e-435a-bf5b-2c68d5a7ccd1 1.png';
 
-  const gradientColor1 = content?.gradientColor1 || '#06b6d4';
-  const gradientColor2 = content?.gradientColor2 || '#0284c7';
-  const gradientColor3 = content?.gradientColor3 || '#0f172a';
+  const gradientColor1 = content?.gradientColor1;
+  const gradientColor2 = content?.gradientColor2;
+  const gradientColor3 = content?.gradientColor3;
 
-  // We use a beautiful radial gradient mesh if default or custom bg
-  const hasCustomBg = content?.bgColor && content.bgColor !== '#0f172a';
-  const bgStyles = hasCustomBg
-    ? { backgroundColor: bgColor }
-    : { backgroundImage: `radial-gradient(100% 100% at 50% 0%, ${gradientColor1} 0%, ${gradientColor2} 40%, ${gradientColor3} 100%)` };
+  const isGradient = bgColor.includes('gradient') || bgColor.includes('rgba') || bgColor.startsWith('linear') || bgColor.startsWith('radial');
+
+  const bgStyles = getHeroBackgroundStyles(
+    {
+      gradientColor1,
+      gradientColor2,
+      gradientColor3,
+    },
+    isGradient
+      ? { backgroundImage: bgColor }
+      : content?.bgColor
+      ? { backgroundColor: bgColor }
+      : { backgroundImage: 'radial-gradient(100% 100% at 50% 0%, #06b6d4 0%, #0284c7 40%, #0f172a 100%)' }
+  );
 
   return (
     <section

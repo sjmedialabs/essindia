@@ -4,6 +4,8 @@ import React, { useState, useRef } from 'react';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { FormattedText } from '@/components/ui/FormattedText';
+import { safeImageUrl } from '@/lib/utils';
 
 interface PointItem {
   title: string;
@@ -125,19 +127,13 @@ export function UgandaInsights({ content }: { content?: UgandaInsightsContent })
         {/* Header Block */}
         <div className="text-center max-w-3xl mx-auto mb-10">
           {tag && (
-            <span className="inline-block text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-500 mb-3">
-              {tag}
-            </span>
+            <FormattedText content={tag} as="span" className="inline-block text-xs sm:text-sm font-bold uppercase tracking-wider text-slate-500 mb-3" />
           )}
           {title && (
-            <h2 className="text-2xl sm:text-[34px] font-bold text-[#1d1b4b] mb-4 tracking-tight leading-tight">
-              {title}
-            </h2>
+            <FormattedText content={title} as="h2" className="text-2xl sm:text-[34px] font-bold text-[#1d1b4b] mb-4 tracking-tight leading-tight" />
           )}
           {description && (
-            <p className="text-xs sm:text-sm text-slate-400 leading-relaxed max-w-2xl mx-auto">
-              {description}
-            </p>
+            <FormattedText content={description} className="text-xs sm:text-sm text-slate-400 leading-relaxed max-w-2xl mx-auto" />
           )}
         </div>
 
@@ -176,7 +172,7 @@ export function UgandaInsights({ content }: { content?: UgandaInsightsContent })
                       : 'bg-slate-100 text-slate-600 hover:bg-slate-200 hover:text-slate-900'
                   }`}
                 >
-                  {tab.tabName}
+                  <FormattedText content={tab.tabName} as="span" />
                 </button>
               );
             })}
@@ -209,21 +205,15 @@ export function UgandaInsights({ content }: { content?: UgandaInsightsContent })
             >
               {/* Content Title */}
               {activeTab.contentTitle && (
-                <h3 className="text-xl sm:text-[28px] font-extrabold text-[#1d1b4b] leading-tight tracking-tight">
-                  {activeTab.contentTitle}
-                </h3>
+                <FormattedText content={activeTab.contentTitle} as="h3" className="text-xl sm:text-[28px] font-extrabold text-[#1d1b4b] leading-tight tracking-tight" />
               )}
 
               {/* Body Paragraphs */}
               {activeTab.body1 && (
-                <p className="text-xs sm:text-sm text-slate-700 leading-relaxed">
-                  {activeTab.body1}
-                </p>
+                <FormattedText content={activeTab.body1} className="text-xs sm:text-sm text-slate-700 leading-relaxed" />
               )}
               {activeTab.body2 && (
-                <p className="text-xs sm:text-sm text-slate-700 leading-relaxed font-medium">
-                  {activeTab.body2}
-                </p>
+                <FormattedText content={activeTab.body2} className="text-xs sm:text-sm text-slate-700 leading-relaxed font-medium" />
               )}
 
               {/* Points checklist */}
@@ -233,8 +223,8 @@ export function UgandaInsights({ content }: { content?: UgandaInsightsContent })
                     <li key={pidx} className="text-xs sm:text-sm text-slate-700 flex items-start gap-3">
                       <span className="flex-shrink-0 w-1.5 h-1.5 rounded-full bg-slate-900 mt-2" />
                       <div>
-                        <strong className="text-slate-950 font-bold">{p.title}:</strong>{' '}
-                        <span className="text-slate-600">{p.description}</span>
+                        <FormattedText content={p.title} as="strong" className="text-slate-950 font-bold mr-1" />
+                        <FormattedText content={p.description} as="span" className="text-slate-600" />
                       </div>
                     </li>
                   ))}
@@ -243,16 +233,14 @@ export function UgandaInsights({ content }: { content?: UgandaInsightsContent })
 
               {/* Subsections Rich text */}
               {activeTab.subsections && (
-                <div className="whitespace-pre-line text-xs sm:text-sm text-slate-700 leading-relaxed space-y-6 border-t border-slate-100 pt-6">
-                  {activeTab.subsections}
-                </div>
+                <FormattedText content={activeTab.subsections} className="whitespace-pre-line text-xs sm:text-sm text-slate-700 leading-relaxed space-y-6 border-t border-slate-100 pt-6" />
               )}
 
               {/* Mockup Dashboard Image */}
-              {activeTab.image && (
+              {safeImageUrl(activeTab.image) && (
                 <div className="relative w-full aspect-[16/9] max-w-4xl mx-auto rounded-xl overflow-hidden border border-slate-150 shadow-sm mt-8">
                   <Image
-                    src={activeTab.image}
+                    src={safeImageUrl(activeTab.image)}
                     alt={activeTab.contentTitle || 'Dashboard detail'}
                     fill
                     className="object-contain"

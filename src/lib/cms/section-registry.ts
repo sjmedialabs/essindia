@@ -2167,7 +2167,7 @@ const RAW_SECTION_REGISTRY: SectionTypeDefinition[] = [
     defaultVariant: 'default',
     supportsVariants: false,
     fieldOrder: [
-      'badgeText', 'title', 'cards',
+      'badgeText', 'title', 'description', 'cards',
     ],
   },
   {

@@ -149,15 +149,19 @@ export function RpaHero({ content }: { content?: RpaHeroContent }) {
 
             {/* Description */}
             {description && (
-              <motion.p
+              <motion.div
                 initial={{ opacity: 0, y: 15 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: 0.2 }}
                 className="text-base sm:text-lg leading-relaxed font-light mb-8 max-w-xl"
                 style={{ color: descriptionColor }}
               >
-                {description}
-              </motion.p>
+                {typeof description === 'string' && (description.includes('<p>') || description.includes('<')) ? (
+                  <div dangerouslySetInnerHTML={{ __html: description }} />
+                ) : (
+                  <p>{description}</p>
+                )}
+              </motion.div>
             )}
 
             {/* CTAs */}
