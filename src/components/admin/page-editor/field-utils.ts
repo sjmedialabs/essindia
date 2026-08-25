@@ -20,9 +20,11 @@ export type FieldType =
   | 'null';
 
 /** Fields editors should not change — heading level is fixed in the component. */
-export function isHiddenCmsField(key: string, sectionType?: string): boolean {
+export function isHiddenCmsField(key: string, sectionType?: string, keyPath?: string): boolean {
   const lower = key.toLowerCase();
   if (lower === 'headingtag' || lower === 'titletag') return true;
+  if (lower === 'overviewimages' || lower.startsWith('overviewimage')) return true;
+  if ((sectionType === 'case-study-detail' || sectionType === 'case-study-detail-block') && key === 'bgColor') return true;
 
   if (sectionType === 'blog-detail-block') {
     if (
@@ -36,6 +38,15 @@ export function isHiddenCmsField(key: string, sectionType?: string): boolean {
       key === 'title'
     ) {
       return true;
+    }
+  }
+
+  // Comment down/hide image and title fields for categories in AssFeaturesGrid section
+  if (sectionType === 'ass-features-grid' && keyPath) {
+    if (keyPath.includes('categories') && !keyPath.includes('items')) {
+      if (lower === 'image' || lower === 'title') {
+        return true;
+      }
     }
   }
 
@@ -168,6 +179,9 @@ function baseHumanLabel(key: string): string {
   if (key === 'titleSecondaryColor') return 'Title Secondary Color (Highlights 4th, 5th, 7th words)';
   if (key === 'titleGradientFrom' || key === 'titleGradientStart') return 'Title Gradient Start Color';
   if (key === 'titleGradientTo' || key === 'titleGradientEnd') return 'Title Gradient End Color';
+  if (key === 'gradientFrom') return 'Hero BG Gradient 1 (Start Color)';
+  if (key === 'gradientVia') return 'Hero BG Gradient 2 (Middle Color)';
+  if (key === 'gradientTo') return 'Hero BG Gradient 3 (End Color)';
   if (key === 'enableTitleGradientAnimation' || key === 'enableGradientAnimation' || key === 'animateTitleGradient') return 'Enable Title Gradient Animation';
   if (key === 'descriptionColor') return 'Description Text Color';
   if (key === 'button1Color') return 'Button 1 Text Color';
@@ -256,6 +270,11 @@ export function humanLabel(
   key: string,
   options?: { sectionType?: string; keyPath?: string }
 ): string {
+  if (options?.keyPath?.includes('challengePoints') || options?.keyPath?.includes('challenge_points')) {
+    if (key === 'title') return 'Point Title';
+    if (key === 'description') return 'Point Description';
+  }
+
   if (options?.sectionType === 'sticky-card') {
     if (key === 'image') return 'Image Upload';
     if (key === 'title') return 'Title';

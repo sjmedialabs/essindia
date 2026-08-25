@@ -185,6 +185,7 @@ export function CaseStudyDetailBlock({ content }: CaseStudyDetailBlockProps) {
               </div>
             </div>
             
+            {/* Overview Images Section commented out
             {overviewImages.length > 0 && (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {overviewImages.map((img, idx) => (
@@ -194,6 +195,7 @@ export function CaseStudyDetailBlock({ content }: CaseStudyDetailBlockProps) {
                 ))}
               </div>
             )}
+            */}
           </div>
 
           {/* Challenge */}

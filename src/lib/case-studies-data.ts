@@ -18,6 +18,12 @@ export interface CaseStudyPost {
   resultsHtml?: string;
   resultsItems?: string[];
   bgColor?: string;
+  gradientFrom?: string;
+  gradientVia?: string;
+  gradientTo?: string;
+  titleGradientFrom?: string;
+  titleGradientTo?: string;
+  enableTitleGradientAnimation?: boolean;
   badgeBgColor?: string;
   badgeBorderColor?: string;
   badgeText?: string;
@@ -29,6 +35,7 @@ export interface CaseStudyPost {
   overviewParagraphs?: string[];
   challengeTitle?: string;
   challengeDescription?: string;
+  challengePoints?: { title: string; description: string }[];
   solutionsTitle?: string;
   solutionsDescription?: string;
   resultsTitle?: string;

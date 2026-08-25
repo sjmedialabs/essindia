@@ -144,6 +144,8 @@ function CaseStudyManager({ pageId, onRefresh }: { pageId: string; onRefresh: ()
   const [date, setDate] = React.useState('');
   const [image, setImage] = React.useState('');
   const [description, setDescription] = React.useState('');
+  const [gradientFrom, setGradientFrom] = React.useState('#1e2445');
+  const [gradientTo, setGradientTo] = React.useState('#292048');
   const [status, setStatus] = React.useState('draft');
 
   // Overview
@@ -283,7 +285,9 @@ function CaseStudyManager({ pageId, onRefresh }: { pageId: string; onRefresh: ()
         ...defaultContent,
         title,
         titleColor: '#ffffff',
-        bgColor: 'linear-gradient(135deg, #1e2445 0%, #292048 100%)',
+        bgColor: `linear-gradient(135deg, ${gradientFrom || '#1e2445'} 0%, ${gradientTo || '#292048'} 100%)`,
+        gradientFrom: gradientFrom || '#1e2445',
+        gradientTo: gradientTo || '#292048',
         badgeBgColor: '#ffffff',
         badgeBorderColor: '#7c3aed',
         badgeText: topic || 'Caetrory Name',
@@ -465,6 +469,16 @@ function CaseStudyManager({ pageId, onRefresh }: { pageId: string; onRefresh: ()
                         <label className="admin-label">Hero Description</label>
                         <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} className="admin-input resize-none" />
                       </div>
+                      <div className="grid grid-cols-1 gap-6">
+                        <div className="space-y-1">
+                          <label className="admin-label">Hero BG Gradient 1 (Start)</label>
+                          <ColorPickerField fieldKey="gradientFrom" value={gradientFrom} onChange={(val) => setGradientFrom(val)} />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="admin-label">Hero BG Gradient 2 (End)</label>
+                          <ColorPickerField fieldKey="gradientTo" value={gradientTo} onChange={(val) => setGradientTo(val)} />
+                        </div>
+                      </div>
                       <div className="space-y-1">
                         <label className="admin-label">Hero Image URL</label>
                         <MediaField fieldKey="hero-image" value={image} onChange={(val) => setImage(val)} />
@@ -484,14 +498,6 @@ function CaseStudyManager({ pageId, onRefresh }: { pageId: string; onRefresh: ()
                       <div className="space-y-1">
                         <label className="admin-label">Overview Text</label>
                         <textarea value={overview} onChange={(e) => setOverview(e.target.value)} rows={6} className="admin-input resize-none" />
-                      </div>
-                      <div className="space-y-1">
-                        <label className="admin-label">Overview Image 1 URL</label>
-                        <MediaField fieldKey="overview-image-1" value={overviewImage1} onChange={(val) => setOverviewImage1(val)} />
-                      </div>
-                      <div className="space-y-1">
-                        <label className="admin-label">Overview Image 2 URL</label>
-                        <MediaField fieldKey="overview-image-2" value={overviewImage2} onChange={(val) => setOverviewImage2(val)} />
                       </div>
                     </div>
                   )}

@@ -17,14 +17,20 @@ export function CaseStudyDetailSection({ content }: CaseStudyDetailSectionProps)
   // We receive content which should match the structure of CaseStudyPost
   const cs = content as CaseStudyPost;
 
-  if (!cs) {
-    return <div>Case study not found</div>;
-  }
+  const gradientFrom = cs.gradientFrom;
+  const gradientVia = cs.gradientVia;
+  const gradientTo = cs.gradientTo;
+
+  const heroBg = (gradientFrom && gradientTo)
+    ? (gradientVia
+        ? `linear-gradient(135deg, ${gradientFrom} 0%, ${gradientVia} 50%, ${gradientTo} 100%)`
+        : `linear-gradient(135deg, ${gradientFrom} 0%, ${gradientTo} 100%)`)
+    : (cs.bgColor || 'linear-gradient(135deg, #1e2445 0%, #292048 100%)');
 
   return (
     <article className="bg-[#fcfdfd] min-h-screen">
       {/* 1. Hero Section */}
-      <section className="relative px-6 pt-30 pb-14 overflow-hidden animate-fade-in" style={{ background: cs.bgColor || 'linear-gradient(135deg, #1e2445 0%, #292048 100%)' }}>
+      <section className="relative px-6 pt-30 pb-14 overflow-hidden animate-fade-in" style={{ background: heroBg }}>
         <div className="relative max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           {/* Left: Text Content */}
           <motion.div
@@ -101,7 +107,7 @@ export function CaseStudyDetailSection({ content }: CaseStudyDetailSectionProps)
       <section className="py-16 px-6 bg-white border-b">
         <div className="max-w-7xl mx-auto">
           <h2 className="text-[40px] font-bold text-slate-900 mb-6">{cs.overviewTitle || 'Overview'}</h2>
-          <div className="text-[#4b5563] text-[17px] leading-[1.8] space-y-6 max-w-none mb-14 font-normal">
+          <div className="text-[#4b5563] text-[17px] leading-[1.8] space-y-6 max-w-none font-normal">
             {cs.overviewParagraphs && cs.overviewParagraphs.length > 0 ? (
               cs.overviewParagraphs.map((paragraph: string, idx: number) => (
                 <p key={idx}>{paragraph}</p>
@@ -123,6 +129,7 @@ export function CaseStudyDetailSection({ content }: CaseStudyDetailSectionProps)
             )}
           </div>
 
+          {/* Overview Images Section commented out
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
             {(() => {
               const validImages = (cs.overviewImages || []).filter(Boolean);
@@ -148,6 +155,7 @@ export function CaseStudyDetailSection({ content }: CaseStudyDetailSectionProps)
               );
             })()}
           </div>
+          */}
         </div>
       </section>
 
@@ -170,6 +178,22 @@ export function CaseStudyDetailSection({ content }: CaseStudyDetailSectionProps)
                 </p>
               )}
             </div>
+
+            {cs.challengePoints && cs.challengePoints.length > 0 && (
+              <div className="mt-8 space-y-4">
+                {cs.challengePoints.map((pt: any, idx: number) => {
+                  const ptTitle = typeof pt === 'string' ? pt : pt?.title;
+                  const ptDesc = typeof pt === 'string' ? '' : pt?.description;
+                  if (!ptTitle && !ptDesc) return null;
+                  return (
+                    <div key={idx} className="bg-slate-50/80 border border-slate-200/60 rounded-xl p-4">
+                      {ptTitle && <h4 className="font-bold text-slate-800 text-base mb-1">{ptTitle}</h4>}
+                      {ptDesc && <p className="text-slate-600 text-sm leading-relaxed">{ptDesc}</p>}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
           {/* Right Column: Challenge Image */}
