@@ -11,6 +11,7 @@ const globalsSchema = z.object({
   robotsExtraDisallow: z.array(z.string()).optional(),
   preferWww: z.boolean().optional(),
   forceHttps: z.boolean().optional(),
+  defaultHomePage: z.string().optional(),
 });
 
 export async function GET() {

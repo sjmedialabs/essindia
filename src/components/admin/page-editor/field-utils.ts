@@ -41,9 +41,10 @@ export function isHiddenCmsField(key: string, sectionType?: string, keyPath?: st
     }
   }
 
-  // Comment down/hide image and title fields for categories in AssFeaturesGrid section
-  if (sectionType === 'ass-features-grid' && keyPath) {
-    if (keyPath.includes('categories') && !keyPath.includes('items')) {
+  // Hide categoryTabs, image, and title fields for categories in AssFeaturesGrid section
+  if (sectionType === 'ass-features-grid') {
+    if (lower === 'categorytabs' || lower === 'category_tabs') return true;
+    if (keyPath && keyPath.includes('categories') && !keyPath.includes('items')) {
       if (lower === 'image' || lower === 'title') {
         return true;
       }
@@ -422,8 +423,14 @@ export function detectFieldType(
       return 'text';
     }
 
+    if (sectionType === 'ass-features-grid' && (lower === 'description' || lower === 'desc')) {
+      return 'textarea';
+    }
     if (sectionType === 'landing1-testimonials' && lower === 'quote') {
       return 'textarea';
+    }
+    if (lower === 'badge' || lower === 'badgetext' || lower.includes('badge')) {
+      return 'text';
     }
     if (sectionType === 'oracle-hero' && (lower === 'badge' || lower === 'badgetext')) {
       return 'text';
