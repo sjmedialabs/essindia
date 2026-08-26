@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import type { CategoryTreeNode } from '@/lib/cms/types';
+import { slugify } from '@/lib/cms/utils';
 import {
   Select,
   SelectContent,
@@ -230,9 +231,12 @@ export default function CategoriesModule() {
     return filterNodes(tree);
   }, [tree, searchQuery]);
 
+  const [slugTouched, setSlugTouched] = React.useState(false);
+
   const openCreate = (parentId?: string) => {
     setEditingId(null);
     setNewSubParentId(parentId || null);
+    setSlugTouched(false);
 
     // Auto-calculate the next sort order based on siblings
     let maxOrder = 0;
@@ -257,6 +261,7 @@ export default function CategoriesModule() {
   const openEdit = (category: CategoryTreeNode) => {
     setEditingId(category.id);
     setNewSubParentId(null);
+    setSlugTouched(false);
     setForm({
       name: category.name,
       slug: category.slug,
@@ -459,8 +464,28 @@ export default function CategoriesModule() {
                 <input
                   placeholder="Category name"
                   value={form.name}
-                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  onChange={(e) => {
+                    const newName = e.target.value;
+                    setForm((prev) => ({
+                      ...prev,
+                      name: newName,
+                      slug: !slugTouched ? slugify(newName) : prev.slug,
+                    }));
+                  }}
                   className="admin-input"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="admin-label">Category Slug</label>
+                <input
+                  placeholder="category-slug"
+                  value={form.slug}
+                  onChange={(e) => {
+                    setSlugTouched(true);
+                    setForm({ ...form, slug: e.target.value });
+                  }}
+                  className="admin-input font-mono text-xs text-slate-700"
                 />
               </div>
               {newSubParentId && (

@@ -230,7 +230,7 @@ export class PageAdminRepository {
       });
       if (!nav) throw new Error('Invalid navigation menu item');
 
-      const navSlug = nav.slug || slugify(nav.label);
+      const navSlug = slugify(nav.label) || nav.slug?.replace(/^\//, '') || '';
 
       if (data.categoryId) {
         const categorySlugs = await this.getCategorySlugPath(data.categoryId);
@@ -462,7 +462,7 @@ export class PageAdminRepository {
           where: eq(navigationItems.id, finalNavId),
         });
         if (!nav) throw new Error('Invalid navigation menu item');
-        const navSlug = nav.slug || slugify(nav.label);
+        const navSlug = slugify(nav.label) || nav.slug?.replace(/^\//, '') || '';
 
         if (finalCatId) {
           const categorySlugs = await this.getCategorySlugPath(finalCatId);
@@ -779,22 +779,22 @@ export class PageAdminRepository {
     const page = await this.getById(id);
     if (!page) return null;
 
-    const baseSlug = page.slug;
-    const basePath = page.fullPath.replace(/\/$/, '');
-    const baseTitle = page.title;
+    const cleanBaseSlug = page.slug.replace(/-copy(-\d+)?$/, '');
+    const cleanBaseTitle = page.title.replace(/\s*\(Copy\s*\d*\)$/i, '');
+    const basePath = page.fullPath.replace(/-copy(-\d+)?$/, '').replace(/\/$/, '');
 
-    let candidateSlug = `${baseSlug}-copy`;
+    let candidateSlug = `${cleanBaseSlug}-copy`;
     let candidateFullPath = `${basePath}-copy`;
-    let candidateTitle = `${baseTitle} (Copy)`;
+    let candidateTitle = `${cleanBaseTitle} (Copy)`;
     let counter = 1;
 
     while (true) {
       const existing = await db.query.pages.findFirst({ where: eq(pages.fullPath, candidateFullPath) });
       if (!existing) break;
 
-      candidateSlug = `${baseSlug}-copy-${counter}`;
+      candidateSlug = `${cleanBaseSlug}-copy-${counter}`;
       candidateFullPath = `${basePath}-copy-${counter}`;
-      candidateTitle = `${baseTitle} (Copy ${counter})`;
+      candidateTitle = `${cleanBaseTitle} (Copy ${counter})`;
       counter++;
     }
 

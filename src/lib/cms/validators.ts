@@ -58,6 +58,10 @@ export const updatePageSchema = z.object({
   status: z.enum(['draft', 'published', 'scheduled', 'archived']).optional(),
   pageType: z.string().max(100).optional(),
   publishedAt: z.string().datetime().nullable().optional(),
+  navigationItemId: z.string().uuid().nullable().optional(),
+  megaMenuCategoryId: z.string().uuid().nullable().optional(),
+  megaMenuSubCategoryId: z.string().uuid().nullable().optional(),
+  megaMenuSubSubCategoryId: z.string().uuid().nullable().optional(),
 });
 
 export const seoSchema = z.object({

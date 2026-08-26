@@ -32,12 +32,13 @@ export async function PUT(request: Request, props: { params: Promise<{ id: strin
 
   try {
     if (level === 'category') {
+      const computedSlug = slug ? slugify(slug) : (name ? slugify(name) : undefined);
       const [row] = await db
         .update(megaMenuCategories)
         .set({
           name,
           pageId: pageId !== undefined ? (pageId ?? null) : undefined,
-          slug: slug || (name ? slugify(name) : undefined),
+          slug: computedSlug,
           orderIndex,
           status,
           updatedAt: new Date(),
@@ -52,7 +53,7 @@ export async function PUT(request: Request, props: { params: Promise<{ id: strin
             .set({
               sortOrder: orderIndex,
               title: name,
-              slug: slug || (name ? slugify(name) : undefined),
+              slug: computedSlug,
               updatedAt: new Date(),
             })
             .where(eq(pages.id, row.pageId));
@@ -65,7 +66,7 @@ export async function PUT(request: Request, props: { params: Promise<{ id: strin
           .set({
             sortOrder: orderIndex,
             title: name,
-            slug: slug || (name ? slugify(name) : undefined),
+            slug: computedSlug,
             updatedAt: new Date(),
           })
           .where(eq(pages.id, params.id))
@@ -86,11 +87,12 @@ export async function PUT(request: Request, props: { params: Promise<{ id: strin
     }
 
     if (level === 'sub') {
+      const computedSubSlug = slug ? slugify(slug) : (name ? slugify(name) : undefined);
       const [row] = await db
         .update(megaMenuSubCategories)
         .set({
           name,
-          slug: slug || (name ? slugify(name) : undefined),
+          slug: computedSubSlug,
           description,
           thumbnail,
           pageId,
@@ -108,7 +110,7 @@ export async function PUT(request: Request, props: { params: Promise<{ id: strin
             .set({
               sortOrder: orderIndex,
               title: name,
-              slug: slug || (name ? slugify(name) : undefined),
+              slug: computedSubSlug,
               updatedAt: new Date(),
             })
             .where(eq(pages.id, row.pageId));
@@ -124,7 +126,7 @@ export async function PUT(request: Request, props: { params: Promise<{ id: strin
           .set({
             sortOrder: orderIndex,
             title: name,
-            slug: slug || (name ? slugify(name) : undefined),
+            slug: computedSubSlug,
             updatedAt: new Date(),
           })
           .where(eq(pages.id, params.id))
@@ -145,11 +147,12 @@ export async function PUT(request: Request, props: { params: Promise<{ id: strin
     }
 
     if (level === 'sub-sub') {
+      const computedSubSubSlug = slug ? slugify(slug) : (name ? slugify(name) : undefined);
       const [row] = await db
         .update(megaMenuSubSubCategories)
         .set({
           name,
-          slug: slug || (name ? slugify(name) : undefined),
+          slug: computedSubSubSlug,
           pageId,
           orderIndex,
           status,
@@ -165,7 +168,7 @@ export async function PUT(request: Request, props: { params: Promise<{ id: strin
             .set({
               sortOrder: orderIndex,
               title: name,
-              slug: slug || (name ? slugify(name) : undefined),
+              slug: computedSubSubSlug,
               updatedAt: new Date(),
             })
             .where(eq(pages.id, row.pageId));
@@ -185,7 +188,7 @@ export async function PUT(request: Request, props: { params: Promise<{ id: strin
           .set({
             sortOrder: orderIndex,
             title: name,
-            slug: slug || (name ? slugify(name) : undefined),
+            slug: computedSubSubSlug,
             updatedAt: new Date(),
           })
           .where(eq(pages.id, params.id))

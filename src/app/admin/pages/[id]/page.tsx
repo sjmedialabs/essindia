@@ -33,6 +33,10 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import Link from 'next/link';
+import type { NavigationTreeItem } from '@/lib/cms/navigation-tree-types';
+import type { MegaMenuPayload } from '@/lib/cms/mega-menu-types';
+import { buildPagePathFromNavHierarchy, resolvePageSlug } from '@/lib/cms/build-page-path-from-nav';
+import { slugify } from '@/lib/cms/utils';
 import { SECTION_REGISTRY } from '@/lib/cms/section-registry';
 import { SectionRenderer } from '@/components/cms/SectionRenderer';
 import {
@@ -64,6 +68,10 @@ interface PageData {
   status: string;
   pageType: string | null;
   templateId: string | null;
+  navigationItemId?: string | null;
+  megaMenuCategoryId?: string | null;
+  megaMenuSubCategoryId?: string | null;
+  megaMenuSubSubCategoryId?: string | null;
   template: {
     id: string;
     name: string;
@@ -2150,6 +2158,102 @@ export default function PageEditor() {
   const [dirtySections, setDirtySections] = React.useState<Set<string>>(new Set());
   const [showExamplePreview, setShowExamplePreview] = React.useState(false);
 
+  // Navigation placement state
+  const [navItems, setNavItems] = React.useState<NavigationTreeItem[]>([]);
+  const [megaMenu, setMegaMenu] = React.useState<MegaMenuPayload | null>(null);
+  const [megaMenuLoading, setMegaMenuLoading] = React.useState(false);
+
+  React.useEffect(() => {
+    fetch('/api/admin/navigation/hierarchy?location=header-main&for=page-create')
+      .then(async (res) => {
+        if (!res.ok) return;
+        const data = await res.json();
+        setNavItems(data.items || []);
+      })
+      .catch((err) => console.error('Failed to load navigation items:', err));
+  }, []);
+
+  React.useEffect(() => {
+    if (!page?.navigationItemId) {
+      setMegaMenu(null);
+      return;
+    }
+
+    const selectedNav = navItems.find((n) => n.id === page.navigationItemId);
+    if (!selectedNav?.megaMenuEnabled) {
+      setMegaMenu(null);
+      return;
+    }
+
+    setMegaMenuLoading(true);
+    fetch(`/api/admin/navigation/hierarchy?navigationItemId=${page.navigationItemId}`)
+      .then(async (res) => {
+        const data = await res.json();
+        if (res.ok) {
+          setMegaMenu(data);
+        } else {
+          setMegaMenu(null);
+        }
+      })
+      .catch(() => setMegaMenu(null))
+      .finally(() => setMegaMenuLoading(false));
+  }, [page?.navigationItemId, navItems]);
+
+  const activeCategory = React.useMemo(() => {
+    return megaMenu?.categories.find((c) => c.id === (page?.megaMenuCategoryId || '')) || null;
+  }, [megaMenu, page?.megaMenuCategoryId]);
+
+  const activeSubCategory = React.useMemo(() => {
+    return activeCategory?.subCategories.find((s) => s.id === (page?.megaMenuSubCategoryId || '')) || null;
+  }, [activeCategory, page?.megaMenuSubCategoryId]);
+
+  const handleNavigationChange = (
+    newNavId: string,
+    newMegaCatId: string = '',
+    newMegaSubCatId: string = '',
+    newMegaSubSubCatId: string = ''
+  ) => {
+    if (!page) return;
+
+    const selectedNav = navItems.find((n) => n.id === newNavId);
+    const pageSlug = resolvePageSlug(page.title, page.slug);
+
+    let newFullPath: string;
+    if (!selectedNav) {
+      newFullPath = `/${pageSlug}`;
+    } else {
+      const navSlug = slugify(selectedNav.label) || selectedNav.slug?.replace(/^\//, '') || '';
+      if (megaMenu && newMegaCatId) {
+        const cat = megaMenu.categories.find((c) => c.id === newMegaCatId);
+        const sub = cat?.subCategories.find((s) => s.id === newMegaSubCatId);
+        const subSub = sub?.subSubCategories.find((l) => l.id === newMegaSubSubCatId);
+        newFullPath = buildPagePathFromNavHierarchy({
+          navSlug,
+          categorySlug: cat?.slug,
+          subSlug: sub?.slug,
+          subSubSlug: subSub?.slug,
+          pageSlug,
+        });
+      } else {
+        newFullPath = `/${navSlug.replace(/^\//, '')}/${pageSlug}`;
+      }
+    }
+
+    setPage((prev) =>
+      prev
+        ? {
+            ...prev,
+            navigationItemId: newNavId || null,
+            megaMenuCategoryId: newMegaCatId || null,
+            megaMenuSubCategoryId: newMegaSubCatId || null,
+            megaMenuSubSubCategoryId: newMegaSubSubCatId || null,
+            fullPath: newFullPath,
+            slug: pageSlug,
+          }
+        : prev
+    );
+  };
+
   const isLandingPage = React.useMemo(() => {
     return page?.template?.name?.toLowerCase().includes('landing page') || page?.pageType === 'landing-page' || false;
   }, [page]);
@@ -2167,6 +2271,11 @@ export default function PageEditor() {
     const current = JSON.stringify({
       title: page.title,
       slug: page.slug,
+      fullPath: page.fullPath,
+      navigationItemId: page.navigationItemId || null,
+      megaMenuCategoryId: page.megaMenuCategoryId || null,
+      megaMenuSubCategoryId: page.megaMenuSubCategoryId || null,
+      megaMenuSubSubCategoryId: page.megaMenuSubSubCategoryId || null,
       sections: page.sections,
     });
     const seoChanged = JSON.stringify(seoForm) !== savedSeoSnapshot;
@@ -2180,6 +2289,11 @@ export default function PageEditor() {
       JSON.stringify({
         title: p.title,
         slug: p.slug,
+        fullPath: p.fullPath,
+        navigationItemId: p.navigationItemId || null,
+        megaMenuCategoryId: p.megaMenuCategoryId || null,
+        megaMenuSubCategoryId: p.megaMenuSubCategoryId || null,
+        megaMenuSubSubCategoryId: p.megaMenuSubSubCategoryId || null,
         sections: p.sections,
       })
     );
@@ -2246,7 +2360,15 @@ export default function PageEditor() {
       const metaRes = await fetch(`/api/admin/pages/${pageId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: page.title, slug: page.slug, fullPath: page.fullPath }),
+        body: JSON.stringify({
+          title: page.title,
+          slug: page.slug,
+          fullPath: page.fullPath,
+          navigationItemId: page.navigationItemId || null,
+          megaMenuCategoryId: page.megaMenuCategoryId || null,
+          megaMenuSubCategoryId: page.megaMenuSubCategoryId || null,
+          megaMenuSubSubCategoryId: page.megaMenuSubSubCategoryId || null,
+        }),
       });
       if (!metaRes.ok) throw new Error('Failed to save page settings');
 
@@ -2734,6 +2856,127 @@ export default function PageEditor() {
 
         {/* ===== Sidebar ===== */}
         <div className="space-y-4">
+          {/* ===== Navigation placement Card ===== */}
+          <div className="bg-white rounded-2xl border border-slate-100 p-6 space-y-4 shadow-sm">
+            <h2 className="font-bold text-slate-800 text-base">Navigation placement</h2>
+
+            {page.status !== 'published' && page.navigationItemId && (
+              <div className="bg-amber-50 border border-amber-200/80 rounded-xl p-3 text-xs text-amber-800 space-y-1">
+                <p className="font-semibold flex items-center gap-1.5 text-amber-900">
+                  <AlertCircle className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                  Draft Page Notice
+                </p>
+                <p className="text-[11px] text-amber-700 leading-relaxed">
+                  This page is currently a <strong>Draft</strong>. Live navbar links will return 404 until you click <strong>Publish</strong>.
+                </p>
+              </div>
+            )}
+
+            <div className="space-y-1.5">
+              <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest block">
+                MENU ITEM (NAV BAR)
+              </label>
+              <select
+                value={page.navigationItemId || ''}
+                onChange={(e) => handleNavigationChange(e.target.value)}
+                className="w-full bg-slate-50 rounded-2xl px-4 py-3 text-sm font-semibold outline-none border border-slate-200 focus:border-[#4B2A63]/30 focus:ring-2 focus:ring-[#4B2A63]/10 text-slate-800 cursor-pointer"
+              >
+                <option value="">None — unlinked page</option>
+                {navItems.map((n) => (
+                  <option key={n.id} value={n.id}>
+                    {n.label} {n.megaMenuEnabled ? '(Mega Menu)' : ''}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {megaMenuLoading ? (
+              <p className="text-xs text-slate-400 animate-pulse">Loading Mega Menu structure...</p>
+            ) : megaMenu ? (
+              <div className="space-y-3 pt-3 border-t border-slate-100">
+                <div>
+                  <h4 className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                    <Layers className="w-3.5 h-3.5 text-[#4B2A63]" />
+                    Mega Menu Linking (Optional)
+                  </h4>
+                </div>
+
+                <div className="space-y-3 pl-3 border-l-2 border-slate-100">
+                  <div>
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">
+                      Category (Tab)
+                    </label>
+                    <select
+                      value={page.megaMenuCategoryId || ''}
+                      onChange={(e) => handleNavigationChange(page.navigationItemId || '', e.target.value)}
+                      className="w-full bg-slate-50 rounded-xl px-3 py-2.5 text-xs font-semibold outline-none border border-slate-200 focus:border-[#4B2A63]/30 text-slate-800 cursor-pointer"
+                    >
+                      <option value="">None — do not link in Mega Menu</option>
+                      {megaMenu.categories.map((c) => (
+                        <option key={c.id} value={c.id}>
+                          {c.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {page.megaMenuCategoryId && activeCategory && activeCategory.subCategories.length > 0 && (
+                    <div>
+                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">
+                        Sub Category (Panel)
+                      </label>
+                      <select
+                        value={page.megaMenuSubCategoryId || ''}
+                        onChange={(e) =>
+                          handleNavigationChange(
+                            page.navigationItemId || '',
+                            page.megaMenuCategoryId || '',
+                            e.target.value
+                          )
+                        }
+                        className="w-full bg-slate-50 rounded-xl px-3 py-2.5 text-xs font-semibold outline-none border border-slate-200 focus:border-[#4B2A63]/30 text-slate-800 cursor-pointer"
+                      >
+                        <option value="">None — select sub category</option>
+                        {activeCategory.subCategories.map((s) => (
+                          <option key={s.id} value={s.id}>
+                            {s.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+
+                  {page.megaMenuSubCategoryId && activeSubCategory && activeSubCategory.subSubCategories.length > 0 && (
+                    <div>
+                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">
+                        Leaf Link (Grid Link)
+                      </label>
+                      <select
+                        value={page.megaMenuSubSubCategoryId || ''}
+                        onChange={(e) =>
+                          handleNavigationChange(
+                            page.navigationItemId || '',
+                            page.megaMenuCategoryId || '',
+                            page.megaMenuSubCategoryId || '',
+                            e.target.value
+                          )
+                        }
+                        className="w-full bg-slate-50 rounded-xl px-3 py-2.5 text-xs font-semibold outline-none border border-slate-200 focus:border-[#4B2A63]/30 text-slate-800 cursor-pointer"
+                      >
+                        <option value="">None — select leaf link</option>
+                        {activeSubCategory.subSubCategories.map((l) => (
+                          <option key={l.id} value={l.id}>
+                            {l.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ) : null}
+          </div>
+
           {/* ===== Page General Settings ===== */}
           <div className="bg-white rounded-2xl border border-slate-100 p-6 space-y-4 shadow-sm">
             <div className="flex items-center gap-2 text-[#4B2A63]">
