@@ -77,7 +77,9 @@ const TESTIMONIALS_TABS: Record<string, string[]> = {
 
 const CASE_STUDY_DETAIL_TABS: Record<string, string[]> = {
   hero: [
-    'bgColor',
+    'gradientFrom',
+    'gradientVia',
+    'gradientTo',
     'badgeBgColor',
     'badgeBorderColor',
     'badgeText',
@@ -86,12 +88,15 @@ const CASE_STUDY_DETAIL_TABS: Record<string, string[]> = {
     'dateColor',
     'title',
     'titleColor',
+    'titleGradientFrom',
+    'titleGradientTo',
+    'enableTitleGradientAnimation',
     'description',
     'descriptionColor',
     'image'
   ],
-  overview: ['overviewTitle', 'overviewParagraphs', 'overviewImages'],
-  challenge: ['challengeTitle', 'challengeDescription', 'challengeImage'],
+  overview: ['overviewTitle', 'overviewParagraphs'],
+  challenge: ['challengeTitle', 'challengeDescription', 'challengeImage', 'challengePoints'],
   ess: ['solutionsTitle', 'solutionsDescription', 'solutionModules'],
   results: ['resultsTitle', 'resultsSubtitle', 'resultsItems', 'resultsCtaDescription']
 };

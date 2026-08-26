@@ -13,7 +13,7 @@ import {
   templates,
   templateSections,
 } from '@/lib/db/schema';
-import { asc, desc, eq, ne, or, and, isNull, ilike } from 'drizzle-orm';
+import { asc, desc, eq, ne, or, and, isNull, ilike, inArray } from 'drizzle-orm';
 import { buildFullPath, buildPageTree, slugify } from '@/lib/cms/utils';
 import {
   buildPagePathFromNavAndCategorySlugs,
@@ -230,7 +230,7 @@ export class PageAdminRepository {
       });
       if (!nav) throw new Error('Invalid navigation menu item');
 
-      const navSlug = nav.slug || slugify(nav.label);
+      const navSlug = slugify(nav.label) || nav.slug?.replace(/^\//, '') || '';
 
       if (data.categoryId) {
         const categorySlugs = await this.getCategorySlugPath(data.categoryId);
@@ -462,7 +462,7 @@ export class PageAdminRepository {
           where: eq(navigationItems.id, finalNavId),
         });
         if (!nav) throw new Error('Invalid navigation menu item');
-        const navSlug = nav.slug || slugify(nav.label);
+        const navSlug = slugify(nav.label) || nav.slug?.replace(/^\//, '') || '';
 
         if (finalCatId) {
           const categorySlugs = await this.getCategorySlugPath(finalCatId);
@@ -793,22 +793,22 @@ export class PageAdminRepository {
     const page = await this.getById(id);
     if (!page) return null;
 
-    const baseSlug = page.slug;
-    const basePath = page.fullPath.replace(/\/$/, '');
-    const baseTitle = page.title;
+    const cleanBaseSlug = page.slug.replace(/-copy(-\d+)?$/, '');
+    const cleanBaseTitle = page.title.replace(/\s*\(Copy\s*\d*\)$/i, '');
+    const basePath = page.fullPath.replace(/-copy(-\d+)?$/, '').replace(/\/$/, '');
 
-    let candidateSlug = `${baseSlug}-copy`;
+    let candidateSlug = `${cleanBaseSlug}-copy`;
     let candidateFullPath = `${basePath}-copy`;
-    let candidateTitle = `${baseTitle} (Copy)`;
+    let candidateTitle = `${cleanBaseTitle} (Copy)`;
     let counter = 1;
 
     while (true) {
       const existing = await db.query.pages.findFirst({ where: eq(pages.fullPath, candidateFullPath) });
       if (!existing) break;
 
-      candidateSlug = `${baseSlug}-copy-${counter}`;
+      candidateSlug = `${cleanBaseSlug}-copy-${counter}`;
       candidateFullPath = `${basePath}-copy-${counter}`;
-      candidateTitle = `${baseTitle} (Copy ${counter})`;
+      candidateTitle = `${cleanBaseTitle} (Copy ${counter})`;
       counter++;
     }
 
@@ -1245,6 +1245,245 @@ export class PageAdminRepository {
       },
       note: 'Auto-saved revision',
     });
+  }
+
+  /** Sync page fullPaths when a category, sub-category, or sub-sub-category slug/name is updated. */
+  async syncPagePathsForCategoryChange(
+    targetId: string,
+    level: 'category' | 'sub' | 'sub-sub'
+  ) {
+    const pageIdSet = new Set<string>();
+
+    if (level === 'category') {
+      const cat = await db.query.megaMenuCategories.findFirst({
+        where: eq(megaMenuCategories.id, targetId),
+        with: {
+          subCategories: {
+            with: {
+              subSubCategories: true,
+            },
+          },
+        },
+      });
+      if (cat) {
+        if (cat.pageId) pageIdSet.add(cat.pageId);
+
+        const subIds = cat.subCategories.map((s) => s.id);
+        const leafIds = cat.subCategories.flatMap((s) => s.subSubCategories.map((l) => l.id));
+
+        cat.subCategories.forEach((sub) => {
+          if (sub.pageId) pageIdSet.add(sub.pageId);
+          sub.subSubCategories.forEach((leaf) => {
+            if (leaf.pageId) pageIdSet.add(leaf.pageId);
+          });
+        });
+
+        const linkedCatPages = await db.query.pages.findMany({
+          where: eq(pages.megaMenuCategoryId, targetId),
+          columns: { id: true },
+        });
+        linkedCatPages.forEach((p) => pageIdSet.add(p.id));
+
+        if (subIds.length > 0) {
+          const linkedSubPages = await db.query.pages.findMany({
+            where: inArray(pages.megaMenuSubCategoryId, subIds),
+            columns: { id: true },
+          });
+          linkedSubPages.forEach((p) => pageIdSet.add(p.id));
+        }
+
+        if (leafIds.length > 0) {
+          const linkedLeafPages = await db.query.pages.findMany({
+            where: inArray(pages.megaMenuSubSubCategoryId, leafIds),
+            columns: { id: true },
+          });
+          linkedLeafPages.forEach((p) => pageIdSet.add(p.id));
+        }
+      }
+    } else if (level === 'sub') {
+      const sub = await db.query.megaMenuSubCategories.findFirst({
+        where: eq(megaMenuSubCategories.id, targetId),
+        with: {
+          subSubCategories: true,
+        },
+      });
+      if (sub) {
+        if (sub.pageId) pageIdSet.add(sub.pageId);
+        const leafIds = sub.subSubCategories.map((l) => l.id);
+
+        sub.subSubCategories.forEach((leaf) => {
+          if (leaf.pageId) pageIdSet.add(leaf.pageId);
+        });
+
+        const linkedSubPages = await db.query.pages.findMany({
+          where: eq(pages.megaMenuSubCategoryId, targetId),
+          columns: { id: true },
+        });
+        linkedSubPages.forEach((p) => pageIdSet.add(p.id));
+
+        if (leafIds.length > 0) {
+          const linkedLeafPages = await db.query.pages.findMany({
+            where: inArray(pages.megaMenuSubSubCategoryId, leafIds),
+            columns: { id: true },
+          });
+          linkedLeafPages.forEach((p) => pageIdSet.add(p.id));
+        }
+      }
+    } else if (level === 'sub-sub') {
+      const leaf = await db.query.megaMenuSubSubCategories.findFirst({
+        where: eq(megaMenuSubSubCategories.id, targetId),
+      });
+      if (leaf?.pageId) pageIdSet.add(leaf.pageId);
+
+      const linkedPages = await db.query.pages.findMany({
+        where: eq(pages.megaMenuSubSubCategoryId, targetId),
+        columns: { id: true },
+      });
+      linkedPages.forEach((p) => pageIdSet.add(p.id));
+    }
+
+    const stdLinkedPages = await db.query.pages.findMany({
+      where: eq(pages.categoryId, targetId),
+      columns: { id: true },
+    });
+    stdLinkedPages.forEach((p) => pageIdSet.add(p.id));
+
+    for (const pageId of pageIdSet) {
+      const page = await db.query.pages.findFirst({
+        where: eq(pages.id, pageId),
+      });
+      if (!page) continue;
+
+      let categorySlug: string | undefined;
+      let subSlug: string | undefined;
+      let subSubSlug: string | undefined;
+      let navItemId: string | null = page.navigationItemId || null;
+
+      if (page.megaMenuSubSubCategoryId) {
+        const leaf = await db.query.megaMenuSubSubCategories.findFirst({
+          where: eq(megaMenuSubSubCategories.id, page.megaMenuSubSubCategoryId),
+        });
+        if (leaf) {
+          subSubSlug = leaf.slug;
+          const sub = await db.query.megaMenuSubCategories.findFirst({
+            where: eq(megaMenuSubCategories.id, leaf.subCategoryId),
+          });
+          if (sub) {
+            subSlug = sub.slug;
+            const cat = await db.query.megaMenuCategories.findFirst({
+              where: eq(megaMenuCategories.id, sub.categoryId),
+            });
+            if (cat) {
+              categorySlug = cat.slug;
+              if (!navItemId) navItemId = cat.navigationItemId;
+            }
+          }
+        }
+      } else if (page.megaMenuSubCategoryId) {
+        const sub = await db.query.megaMenuSubCategories.findFirst({
+          where: eq(megaMenuSubCategories.id, page.megaMenuSubCategoryId),
+        });
+        if (sub) {
+          subSlug = sub.slug;
+          const cat = await db.query.megaMenuCategories.findFirst({
+            where: eq(megaMenuCategories.id, sub.categoryId),
+          });
+          if (cat) {
+            categorySlug = cat.slug;
+            if (!navItemId) navItemId = cat.navigationItemId;
+          }
+        }
+      } else if (page.megaMenuCategoryId) {
+        const cat = await db.query.megaMenuCategories.findFirst({
+          where: eq(megaMenuCategories.id, page.megaMenuCategoryId),
+        });
+        if (cat) {
+          categorySlug = cat.slug;
+          if (!navItemId) navItemId = cat.navigationItemId;
+        }
+      }
+
+      if (!categorySlug && !subSlug && !subSubSlug) {
+        const catAsPage = await db.query.megaMenuCategories.findFirst({
+          where: eq(megaMenuCategories.pageId, page.id),
+        });
+        if (catAsPage) {
+          categorySlug = catAsPage.slug;
+          if (!navItemId) navItemId = catAsPage.navigationItemId;
+        } else {
+          const subAsPage = await db.query.megaMenuSubCategories.findFirst({
+            where: eq(megaMenuSubCategories.pageId, page.id),
+          });
+          if (subAsPage) {
+            subSlug = subAsPage.slug;
+            const cat = await db.query.megaMenuCategories.findFirst({
+              where: eq(megaMenuCategories.id, subAsPage.categoryId),
+            });
+            if (cat) {
+              categorySlug = cat.slug;
+              if (!navItemId) navItemId = cat.navigationItemId;
+            }
+          } else {
+            const leafAsPage = await db.query.megaMenuSubSubCategories.findFirst({
+              where: eq(megaMenuSubSubCategories.pageId, page.id),
+            });
+            if (leafAsPage) {
+              subSubSlug = leafAsPage.slug;
+              const sub = await db.query.megaMenuSubCategories.findFirst({
+                where: eq(megaMenuSubCategories.id, leafAsPage.subCategoryId),
+              });
+              if (sub) {
+                subSlug = sub.slug;
+                const cat = await db.query.megaMenuCategories.findFirst({
+                  where: eq(megaMenuCategories.id, sub.categoryId),
+                });
+                if (cat) {
+                  categorySlug = cat.slug;
+                  if (!navItemId) navItemId = cat.navigationItemId;
+                }
+              }
+            }
+          }
+        }
+      }
+
+      let navSlug = '';
+      if (navItemId) {
+        const nav = await db.query.navigationItems.findFirst({
+          where: eq(navigationItems.id, navItemId),
+        });
+        if (nav) {
+          navSlug = slugify(nav.label) || nav.slug?.replace(/^\//, '') || '';
+        }
+      }
+
+      const pageSlug = resolvePageSlug(page.title, page.slug);
+
+      const newFullPath = buildPagePathFromNavHierarchy({
+        navSlug,
+        categorySlug,
+        subSlug,
+        subSubSlug,
+        pageSlug,
+      });
+
+      if (newFullPath !== page.fullPath || (navItemId && navItemId !== page.navigationItemId)) {
+        await db
+          .update(pages)
+          .set({
+            fullPath: newFullPath,
+            navigationItemId: navItemId || page.navigationItemId,
+            updatedAt: new Date(),
+          })
+          .where(eq(pages.id, page.id));
+
+        await this.invalidateCache(page.fullPath);
+        await this.invalidateCache(newFullPath);
+        revalidatePath('/', 'layout');
+      }
+    }
+
+
   }
 
   private async invalidateCache(fullPath: string) {

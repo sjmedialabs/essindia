@@ -3,6 +3,7 @@ import { categories, pages } from '@/lib/db/schema';
 import { and, asc, eq, inArray, isNull, ne, sql } from 'drizzle-orm';
 import { buildCategoryTree, slugify } from '@/lib/cms/utils';
 import type { CategoryTreeNode } from '@/lib/cms/types';
+import { pageAdminRepository } from './page-admin.repository';
 
 export class CategoryRepository {
   async getAll() {
@@ -184,8 +185,14 @@ export class CategoryRepository {
       throw new Error('Cannot update an archived category');
     }
 
-    const slug = data.slug ?? current.slug;
-    if (data.slug) await this.assertSlugUnique(slug, id);
+    const slug = data.slug
+      ? slugify(data.slug)
+      : data.name
+      ? slugify(data.name)
+      : current.slug;
+    if (slug !== current.slug) {
+      await this.assertSlugUnique(slug, id);
+    }
 
     if (data.parentId !== undefined) {
       await this.assertParentValid(id, data.parentId);
@@ -193,9 +200,11 @@ export class CategoryRepository {
 
     const [updated] = await db
       .update(categories)
-      .set({ ...data, updatedAt: new Date() })
+      .set({ ...data, slug, updatedAt: new Date() })
       .where(eq(categories.id, id))
       .returning();
+
+    await pageAdminRepository.syncPagePathsForCategoryChange(id, 'category');
     return updated;
   }
 

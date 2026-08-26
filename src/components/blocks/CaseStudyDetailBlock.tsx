@@ -73,7 +73,7 @@ export function CaseStudyDetailBlock({ content }: CaseStudyDetailBlockProps) {
   ];
 
   const overviewTitle = content?.overviewTitle || 'Overview';
-  const overviewText = content?.overviewText || 'The client is a leading retail chain operating in the Democratic Republic of Congo (DRC) with a history spanning over 20 years. They have a wide retail network of 22 stores across various cities and regions in DRC. The client deals in a vast range of products, catering to the diverse needs of their customer base.\n\nThe company was previously using disparate software systems to manage its diverse operations. This approach resulted in data silos and manual data transfers between systems, which was time-consuming, prone to errors, and inefficient. The client also faced challenges in generating timely and accurate reports due to the lack of integration between their various systems. This hindered their ability to make informed business decisions.\n\nTo overcome these challenges, the client decided to replace its existing systems with a comprehensive, integrated ERP solution. They wanted an ERP system that could streamline their business processes, improve operational efficiency, and provide real-time visibility into their operations.';
+  const overviewText = content?.overviewText || (content as any)?.overview || (Array.isArray((content as any)?.overviewParagraphs) && (content as any).overviewParagraphs.length > 0 ? (content as any).overviewParagraphs.join('\n\n') : undefined) || 'The client is a leading retail chain operating in the Democratic Republic of Congo (DRC) with a history spanning over 20 years. They have a wide retail network of 22 stores across various cities and regions in DRC. The client deals in a vast range of products, catering to the diverse needs of their customer base.\n\nThe company was previously using disparate software systems to manage its diverse operations. This approach resulted in data silos and manual data transfers between systems, which was time-consuming, prone to errors, and inefficient. The client also faced challenges in generating timely and accurate reports due to the lack of integration between their various systems. This hindered their ability to make informed business decisions.\n\nTo overcome these challenges, the client decided to replace its existing systems with a comprehensive, integrated ERP solution. They wanted an ERP system that could streamline their business processes, improve operational efficiency, and provide real-time visibility into their operations.';
   const overviewImages = content?.overviewImages || [
     { image: '/Case-studies details/image 105.png' },
     { image: '/Case-studies details/image 106.png' },
@@ -185,6 +185,7 @@ export function CaseStudyDetailBlock({ content }: CaseStudyDetailBlockProps) {
               </div>
             </div>
             
+            {/* Overview Images Section commented out
             {overviewImages.length > 0 && (
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                 {overviewImages.map((img, idx) => (
@@ -194,6 +195,7 @@ export function CaseStudyDetailBlock({ content }: CaseStudyDetailBlockProps) {
                 ))}
               </div>
             )}
+            */}
           </div>
 
           {/* Challenge */}
@@ -217,14 +219,22 @@ export function CaseStudyDetailBlock({ content }: CaseStudyDetailBlockProps) {
             </div>
             
             <div className="flex flex-wrap gap-6">
-              {solutionModules.map((module, idx) => (
-                <div key={idx} className="flex flex-col items-center justify-center bg-white border border-slate-200 rounded-2xl p-6 shadow-sm w-48 text-center hover:shadow-md transition-shadow">
-                  <div className="w-12 h-12 mb-4 text-[#1a1e4a]">
-                    <img src={module.iconImage} alt={module.label} className="w-full h-full object-contain" />
+              {solutionModules.map((module: any, idx: number) => {
+                const title = module.label || module.name || module.title;
+                const icon = module.iconImage || module.icon || module.image;
+                const desc = module.description || module.desc;
+                return (
+                  <div key={idx} className="flex-1 min-w-[200px] max-w-[300px] flex flex-col items-center justify-center bg-white border border-slate-200 rounded-2xl p-6 shadow-sm text-center gap-3 hover:shadow-md transition-all">
+                    {icon && (
+                      <div className="w-12 h-12 text-[#1a1e4a]">
+                        <img src={icon} alt={title || 'Module'} className="w-full h-full object-contain" />
+                      </div>
+                    )}
+                    {title && <h4 className="text-base font-bold text-slate-900 leading-snug">{title}</h4>}
+                    {desc && <p className="text-slate-600 text-sm leading-relaxed font-normal">{desc}</p>}
                   </div>
-                  <h4 className="text-sm font-bold text-slate-800">{module.label}</h4>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
 

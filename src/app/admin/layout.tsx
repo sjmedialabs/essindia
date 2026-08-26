@@ -50,6 +50,7 @@ const navGroups = [
     label: 'Content Assets',
     items: [
       { icon: ImageIcon, label: 'Media Library', href: '/admin/media' },
+      { icon: FileText, label: 'Case Studies', href: '/admin/case-studies' },
       { icon: Briefcase, label: 'Careers', href: '/admin/careers' },
       { icon: Settings, label: 'Footer Settings', href: '/admin/footer' },
       // { icon: Briefcase, label: 'Solutions', href: '/admin/solutions' },
