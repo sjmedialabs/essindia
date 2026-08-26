@@ -219,14 +219,22 @@ export function CaseStudyDetailBlock({ content }: CaseStudyDetailBlockProps) {
             </div>
             
             <div className="flex flex-wrap gap-6">
-              {solutionModules.map((module, idx) => (
-                <div key={idx} className="flex flex-col items-center justify-center bg-white border border-slate-200 rounded-2xl p-6 shadow-sm w-48 text-center hover:shadow-md transition-shadow">
-                  <div className="w-12 h-12 mb-4 text-[#1a1e4a]">
-                    <img src={module.iconImage} alt={module.label} className="w-full h-full object-contain" />
+              {solutionModules.map((module: any, idx: number) => {
+                const title = module.label || module.name || module.title;
+                const icon = module.iconImage || module.icon || module.image;
+                const desc = module.description || module.desc;
+                return (
+                  <div key={idx} className="flex-1 min-w-[200px] max-w-[300px] flex flex-col items-center justify-center bg-white border border-slate-200 rounded-2xl p-6 shadow-sm text-center gap-3 hover:shadow-md transition-all">
+                    {icon && (
+                      <div className="w-12 h-12 text-[#1a1e4a]">
+                        <img src={icon} alt={title || 'Module'} className="w-full h-full object-contain" />
+                      </div>
+                    )}
+                    {title && <h4 className="text-base font-bold text-slate-900 leading-snug">{title}</h4>}
+                    {desc && <p className="text-slate-600 text-sm leading-relaxed font-normal">{desc}</p>}
                   </div>
-                  <h4 className="text-sm font-bold text-slate-800">{module.label}</h4>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
 

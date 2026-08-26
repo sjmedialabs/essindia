@@ -408,6 +408,11 @@ export function detectFieldType(
     const lower = key.toLowerCase();
 
     if (lower === 'tabdesc') return 'text';
+    if (sectionType === 'career-perks' || lower === 'perk' || lower === 'perks' || key.toLowerCase().includes('perk')) {
+      if (lower === 'text' || lower === 'description' || lower === 'desc' || lower === 'name') {
+        return 'textarea';
+      }
+    }
     if (sectionType?.startsWith('landing1-') && (lower === 'desc' || lower === 'description')) {
       return 'textarea';
     }

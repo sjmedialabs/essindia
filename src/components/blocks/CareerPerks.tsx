@@ -68,7 +68,7 @@ export default function CareerPerks({ content }: CareerPerksProps) {
 
               {/* Perk Text */}
               <span className="font-bold text-slate-800 text-base md:text-[17px] leading-snug group-hover:text-white transition-colors duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] relative z-10 select-none">
-                {perk.text}
+                {typeof perk.text === 'string' ? perk.text.replace(/<[^>]*>/g, '') : perk.text}
               </span>
             </motion.div>
           ))}

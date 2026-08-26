@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { megaMenuCategories, megaMenuSubCategories } from '@/lib/db/schema';
+import { megaMenuCategories, megaMenuSubCategories, megaMenuSubSubCategories } from '@/lib/db/schema';
 import { eq } from 'drizzle-orm';
 import { megaMenuRepository } from '@/repositories/mega-menu.repository';
 import { navigationRepository } from '@/repositories/navigation.repository';
@@ -37,6 +37,13 @@ export async function POST(request: Request) {
           await tx.update(megaMenuSubCategories)
             .set({ orderIndex: item.orderIndex })
             .where(eq(megaMenuSubCategories.id, item.id));
+        }
+      } else if (level === 'sub-sub') {
+        for (const item of items) {
+          if (!isValidUuid(item.id)) continue;
+          await tx.update(megaMenuSubSubCategories)
+            .set({ orderIndex: item.orderIndex })
+            .where(eq(megaMenuSubSubCategories.id, item.id));
         }
       }
     });

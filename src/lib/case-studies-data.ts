@@ -14,7 +14,7 @@ export interface CaseStudyPost {
   challengeHtml: string;
   challengeImage: string;
   solutionHtml: string;
-  solutionModules: { name: string; icon: string }[];
+  solutionModules: { name: string; icon: string; description?: string }[];
   resultsHtml?: string;
   resultsItems?: string[];
   bgColor?: string;

@@ -225,12 +225,18 @@ export function CaseStudyDetailSection({ content }: CaseStudyDetailSectionProps)
 
           <div className="flex flex-wrap gap-6">
             {(cs.solutionModules && cs.solutionModules.length > 0) ? (
-              cs.solutionModules.map((mod, idx) => (
-                <div key={idx} className="flex-1 min-w-[200px] max-w-[280px] border border-slate-200 rounded-2xl p-6 flex flex-col items-center justify-center text-center gap-4 hover:shadow-lg transition-shadow bg-white">
-                  <img src={mod.icon || "/Case-studies details/finance-strategy_svgrepo.com.png"} alt={mod.name} className="w-10 h-10 object-contain" />
-                  <span className="text-slate-700 font-medium">{mod.name}</span>
-                </div>
-              ))
+              cs.solutionModules.map((mod: any, idx: number) => {
+                const title = mod.name || mod.title || mod.label;
+                const desc = mod.description || mod.desc;
+                const icon = mod.icon || mod.iconImage || mod.image || "/Case-studies details/finance-strategy_svgrepo.com.png";
+                return (
+                  <div key={idx} className="flex-1 min-w-[220px] max-w-[320px] border border-slate-200 rounded-2xl p-6 flex flex-col items-center justify-center text-center gap-3 hover:shadow-lg transition-all bg-white">
+                    <img src={icon} alt={title || 'Solution Module'} className="w-10 h-10 object-contain" />
+                    {title && <span className="text-slate-900 font-bold text-base leading-snug">{title}</span>}
+                    {desc && <p className="text-slate-600 text-sm leading-relaxed font-normal">{desc}</p>}
+                  </div>
+                );
+              })
             ) : (
               <>
                 <div className="flex-1 min-w-[200px] max-w-[280px] border border-slate-200 rounded-2xl p-6 flex flex-col items-center justify-center text-center gap-4 hover:shadow-lg transition-shadow bg-white">

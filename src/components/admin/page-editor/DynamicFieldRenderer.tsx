@@ -37,6 +37,11 @@ export function DynamicFieldRenderer({
   const fieldLabel = humanLabel(fieldKey, { sectionType, keyPath });
 
   let fieldType = detectFieldType(fieldKey, value, sectionType);
+  if (sectionType === 'career-perks' || keyPath.includes('perks') || fieldKey.toLowerCase().includes('perk')) {
+    if (fieldType === 'richtext' || fieldType === 'text') {
+      fieldType = 'textarea';
+    }
+  }
   if (fieldKey.toLowerCase().includes('pdf') || fieldKey.toLowerCase().includes('document')) {
     fieldType = 'image';
   }
