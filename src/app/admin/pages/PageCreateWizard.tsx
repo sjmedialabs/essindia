@@ -165,7 +165,7 @@ export function PageCreateWizard({ open, onClose, templates, onSubmit, fullPage 
   , [activeCategory, form.megaMenuSubCategoryId]);
 
   const routePreview = React.useMemo(() => {
-    const navSlug = selectedNav ? (selectedNav.slug || slugify(selectedNav.label)) : '';
+    const navSlug = selectedNav ? (slugify(selectedNav.label) || selectedNav.slug?.replace(/^\//, '') || '') : '';
     const pageSlug = form.title.trim()
       ? resolvePageSlug(form.title, form.slug)
       : form.slug.trim() || 'page-slug';

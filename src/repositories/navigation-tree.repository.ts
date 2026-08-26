@@ -80,7 +80,7 @@ export class NavigationTreeRepository {
       return items.map((item) => ({
         id: item.id,
         label: item.label,
-        slug: item.slug || slugify(item.label),
+        slug: slugify(item.label) || item.slug?.replace(/^\//, '') || '',
         url: item.url,
         megaMenuEnabled: item.megaMenuEnabled,
         orderIndex: item.orderIndex,
@@ -159,7 +159,7 @@ export class NavigationTreeRepository {
       ]),
     ]);
     const pageMap = await this.loadNavPages([...new Set(pageIds)]);
-    const navSlug = navItem.slug || slugify(navItem.label);
+    const navSlug = slugify(navItem.label) || navItem.slug?.replace(/^\//, '') || '';
 
     return {
       navigationItemId: navItem.id,
@@ -274,7 +274,7 @@ export class NavigationTreeRepository {
     return {
       navigationItemId: navItem.id,
       label: navItem.label,
-      slug: navItem.slug || slugify(navItem.label),
+      slug: slugify(navItem.label) || navItem.slug?.replace(/^\//, '') || '',
       megaMenuEnabled: navItem.megaMenuEnabled,
       categories: (item?.categories ?? []).map((cat) => ({
         id: cat.id,
@@ -518,7 +518,7 @@ export class NavigationTreeRepository {
         mode === 'public'
           ? await this.loadPublishedPages([...pageIds])
           : await this.loadNavPages([...pageIds]);
-      const navSlug = item.slug || slugify(item.label);
+      const navSlug = slugify(item.label) || item.slug?.replace(/^\//, '') || '';
 
       const tableCategories = categories
         .map((cat) => ({

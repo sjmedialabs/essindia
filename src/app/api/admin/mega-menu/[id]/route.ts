@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { revalidatePath } from 'next/cache';
 import { db } from '@/lib/db';
 import {
   megaMenuCategories,
@@ -16,6 +17,7 @@ import { slugify } from '@/lib/cms/utils';
 import { megaMenuRepository } from '@/repositories/mega-menu.repository';
 import { navigationRepository } from '@/repositories/navigation.repository';
 import { navigationTreeRepository } from '@/repositories/navigation-tree.repository';
+import { pageAdminRepository } from '@/repositories/page-admin.repository';
 
 export async function PUT(request: Request, props: { params: Promise<{ id: string }> }) {
   if (!(await isAdminRequest())) {
@@ -32,12 +34,13 @@ export async function PUT(request: Request, props: { params: Promise<{ id: strin
 
   try {
     if (level === 'category') {
+      const computedSlug = slug ? slugify(slug) : (name ? slugify(name) : undefined);
       const [row] = await db
         .update(megaMenuCategories)
         .set({
           name,
           pageId: pageId !== undefined ? (pageId ?? null) : undefined,
-          slug: slug || (name ? slugify(name) : undefined),
+          slug: computedSlug,
           orderIndex,
           status,
           updatedAt: new Date(),
@@ -52,11 +55,12 @@ export async function PUT(request: Request, props: { params: Promise<{ id: strin
             .set({
               sortOrder: orderIndex,
               title: name,
-              slug: slug || (name ? slugify(name) : undefined),
+              slug: computedSlug,
               updatedAt: new Date(),
             })
             .where(eq(pages.id, row.pageId));
         }
+        await pageAdminRepository.syncPagePathsForCategoryChange(params.id, 'category');
         await clearCaches(row.navigationItemId);
         return NextResponse.json(row);
       } else {
@@ -65,7 +69,7 @@ export async function PUT(request: Request, props: { params: Promise<{ id: strin
           .set({
             sortOrder: orderIndex,
             title: name,
-            slug: slug || (name ? slugify(name) : undefined),
+            slug: computedSlug,
             updatedAt: new Date(),
           })
           .where(eq(pages.id, params.id))
@@ -86,11 +90,12 @@ export async function PUT(request: Request, props: { params: Promise<{ id: strin
     }
 
     if (level === 'sub') {
+      const computedSubSlug = slug ? slugify(slug) : (name ? slugify(name) : undefined);
       const [row] = await db
         .update(megaMenuSubCategories)
         .set({
           name,
-          slug: slug || (name ? slugify(name) : undefined),
+          slug: computedSubSlug,
           description,
           thumbnail,
           pageId,
@@ -108,7 +113,7 @@ export async function PUT(request: Request, props: { params: Promise<{ id: strin
             .set({
               sortOrder: orderIndex,
               title: name,
-              slug: slug || (name ? slugify(name) : undefined),
+              slug: computedSubSlug,
               updatedAt: new Date(),
             })
             .where(eq(pages.id, row.pageId));
@@ -116,6 +121,7 @@ export async function PUT(request: Request, props: { params: Promise<{ id: strin
         const cat = await db.query.megaMenuCategories.findFirst({
           where: eq(megaMenuCategories.id, row.categoryId),
         });
+        await pageAdminRepository.syncPagePathsForCategoryChange(params.id, 'sub');
         if (cat) await clearCaches(cat.navigationItemId);
         return NextResponse.json(row);
       } else {
@@ -124,7 +130,7 @@ export async function PUT(request: Request, props: { params: Promise<{ id: strin
           .set({
             sortOrder: orderIndex,
             title: name,
-            slug: slug || (name ? slugify(name) : undefined),
+            slug: computedSubSlug,
             updatedAt: new Date(),
           })
           .where(eq(pages.id, params.id))
@@ -145,11 +151,12 @@ export async function PUT(request: Request, props: { params: Promise<{ id: strin
     }
 
     if (level === 'sub-sub') {
+      const computedSubSubSlug = slug ? slugify(slug) : (name ? slugify(name) : undefined);
       const [row] = await db
         .update(megaMenuSubSubCategories)
         .set({
           name,
-          slug: slug || (name ? slugify(name) : undefined),
+          slug: computedSubSubSlug,
           pageId,
           orderIndex,
           status,
@@ -165,7 +172,7 @@ export async function PUT(request: Request, props: { params: Promise<{ id: strin
             .set({
               sortOrder: orderIndex,
               title: name,
-              slug: slug || (name ? slugify(name) : undefined),
+              slug: computedSubSubSlug,
               updatedAt: new Date(),
             })
             .where(eq(pages.id, row.pageId));
@@ -175,6 +182,7 @@ export async function PUT(request: Request, props: { params: Promise<{ id: strin
           with: { category: true },
         });
         const category = sub?.category;
+        await pageAdminRepository.syncPagePathsForCategoryChange(params.id, 'sub-sub');
         if (category && !Array.isArray(category) && 'navigationItemId' in category) {
           await clearCaches(category.navigationItemId as string);
         }
@@ -185,7 +193,7 @@ export async function PUT(request: Request, props: { params: Promise<{ id: strin
           .set({
             sortOrder: orderIndex,
             title: name,
-            slug: slug || (name ? slugify(name) : undefined),
+            slug: computedSubSubSlug,
             updatedAt: new Date(),
           })
           .where(eq(pages.id, params.id))
@@ -269,4 +277,5 @@ async function clearCaches(navigationItemId: string) {
   await megaMenuRepository.clearCacheForNavItem(navigationItemId, 'header-main');
   await navigationRepository.clearCache('header-main');
   await navigationTreeRepository.clearCache('header-main');
+  revalidatePath('/', 'layout');
 }

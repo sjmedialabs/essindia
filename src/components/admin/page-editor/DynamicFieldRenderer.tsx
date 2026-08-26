@@ -32,11 +32,16 @@ export function DynamicFieldRenderer({
   depth = 0,
   sectionType,
 }: DynamicFieldRendererProps) {
-  if (isHiddenCmsField(fieldKey, sectionType)) return null;
+  if (isHiddenCmsField(fieldKey, sectionType, keyPath)) return null;
 
   const fieldLabel = humanLabel(fieldKey, { sectionType, keyPath });
 
   let fieldType = detectFieldType(fieldKey, value, sectionType);
+  if (sectionType === 'career-perks' || keyPath.includes('perks') || fieldKey.toLowerCase().includes('perk')) {
+    if (fieldType === 'richtext' || fieldType === 'text') {
+      fieldType = 'textarea';
+    }
+  }
   if (fieldKey.toLowerCase().includes('pdf') || fieldKey.toLowerCase().includes('document')) {
     fieldType = 'image';
   }
@@ -637,7 +642,21 @@ function ArrayField({
   sectionType?: string;
 }) {
   let normalizedValue = value;
-  if (sectionType === 'bi-tabs' && fieldKey === 'tabs' && Array.isArray(value)) {
+  if ((fieldKey === 'challengePoints' || fieldKey === 'challengepoints') && Array.isArray(value)) {
+    normalizedValue = value.map(item => {
+      if (typeof item === 'string') {
+        return { title: item, description: '' };
+      }
+      if (item && typeof item === 'object' && !Array.isArray(item)) {
+        const objItem = item as Record<string, any>;
+        return {
+          title: String(objItem.title || objItem.name || objItem.heading || ''),
+          description: String(objItem.description || objItem.desc || objItem.paragraph || '')
+        };
+      }
+      return { title: '', description: '' };
+    });
+  } else if (sectionType === 'bi-tabs' && fieldKey === 'tabs' && Array.isArray(value)) {
     normalizedValue = value.map(item => {
       if (item && typeof item === 'object' && !Array.isArray(item)) {
         return {
@@ -795,6 +814,10 @@ function ArrayField({
             }
             const locationOrder = ['city', 'address', 'name', 'phone', 'email'];
             sortedKeys = locationOrder;
+          } else if (fieldKey === 'challengePoints' || fieldKey === 'challengepoints') {
+            const challengeOrder = ['title', 'description'];
+            sortedKeys = challengeOrder.filter(k => k in objItem);
+            if (sortedKeys.length === 0) sortedKeys = ['title', 'description'];
           } else if (fieldKey === 'sections' && 'items' in objItem) {
             const sectionOrder = ['title', 'items'];
             sortedKeys = sectionOrder;
@@ -966,6 +989,17 @@ function ArrayField({
             } else if (sectionType === 'rpa-industries') {
               const industryOrder = ['icon', 'title', 'description'];
               sortedKeys = industryOrder.filter(k => k in objItem);
+            }
+          } else if (fieldKey === 'categories') {
+            let categoryOrder = ['name', 'items'];
+            sortedKeys = categoryOrder.filter(k => k in objItem);
+            for (const k of Object.keys(objItem)) {
+              if (sectionType === 'ass-features-grid' && (k === 'image' || k === 'title')) {
+                continue;
+              }
+              if (!sortedKeys.includes(k)) {
+                sortedKeys.push(k);
+              }
             }
           } else {
             // Heuristic to sort common fields logically

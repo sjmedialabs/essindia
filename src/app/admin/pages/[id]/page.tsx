@@ -33,6 +33,10 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import Link from 'next/link';
+import type { NavigationTreeItem } from '@/lib/cms/navigation-tree-types';
+import type { MegaMenuPayload } from '@/lib/cms/mega-menu-types';
+import { buildPagePathFromNavHierarchy, resolvePageSlug } from '@/lib/cms/build-page-path-from-nav';
+import { slugify } from '@/lib/cms/utils';
 import { SECTION_REGISTRY } from '@/lib/cms/section-registry';
 import { SectionRenderer } from '@/components/cms/SectionRenderer';
 import {
@@ -64,6 +68,10 @@ interface PageData {
   status: string;
   pageType: string | null;
   templateId: string | null;
+  navigationItemId?: string | null;
+  megaMenuCategoryId?: string | null;
+  megaMenuSubCategoryId?: string | null;
+  megaMenuSubSubCategoryId?: string | null;
   template: {
     id: string;
     name: string;
@@ -127,12 +135,14 @@ function findSchemaForSection(
 // Case Study Posts Manager Component
 // ---------------------------------------------------------------------------
 
-function CaseStudyManager({ pageId, onRefresh }: { pageId: string; onRefresh: () => void }) {
+export function CaseStudyManager({ pageId, onRefresh }: { pageId?: string; onRefresh?: () => void }) {
   const [studies, setStudies] = React.useState<any[]>([]);
   const [templates, setTemplates] = React.useState<any[]>([]);
   const [isLoading, setIsLoading] = React.useState(true);
   const [showCreateModal, setShowCreateModal] = React.useState(false);
   const [isCreating, setIsCreating] = React.useState(false);
+  const [editingStudyId, setEditingStudyId] = React.useState<string | null>(null);
+  const [isFetchingDetail, setIsFetchingDetail] = React.useState(false);
   const [activeTab, setActiveTab] = React.useState('basic');
 
   // Basic Info
@@ -144,6 +154,8 @@ function CaseStudyManager({ pageId, onRefresh }: { pageId: string; onRefresh: ()
   const [date, setDate] = React.useState('');
   const [image, setImage] = React.useState('');
   const [description, setDescription] = React.useState('');
+  const [gradientFrom, setGradientFrom] = React.useState('#1e2445');
+  const [gradientTo, setGradientTo] = React.useState('#292048');
   const [status, setStatus] = React.useState('draft');
 
   // Overview
@@ -172,9 +184,25 @@ function CaseStudyManager({ pageId, onRefresh }: { pageId: string; onRefresh: ()
       const res = await fetch('/api/admin/pages');
       if (res.ok) {
         const tree = await res.json();
+        let targetPageId = pageId;
+        if (!targetPageId) {
+          const findCaseStudiesNode = (nodes: any[]): any => {
+            for (const node of nodes) {
+              if (node.fullPath === '/case-studies' || node.slug === 'case-studies') return node;
+              if (node.children) {
+                const found = findCaseStudiesNode(node.children);
+                if (found) return found;
+              }
+            }
+            return null;
+          };
+          const csNode = findCaseStudiesNode(tree);
+          if (csNode) targetPageId = csNode.id;
+        }
+
         const findNode = (nodes: any[]): any => {
           for (const node of nodes) {
-            if (node.id === pageId) return node;
+            if (node.id === targetPageId) return node;
             if (node.children) {
               const found = findNode(node.children);
               if (found) return found;
@@ -213,10 +241,72 @@ function CaseStudyManager({ pageId, onRefresh }: { pageId: string; onRefresh: ()
   }, [fetchStudies, fetchTemplates]);
 
   React.useEffect(() => {
-    if (!slugTouched) {
+    if (!slugTouched && !editingStudyId) {
       setSlug(title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, ''));
     }
-  }, [title, slugTouched]);
+  }, [title, slugTouched, editingStudyId]);
+
+  const resetForm = () => {
+    setEditingStudyId(null);
+    setTitle(''); setSlug(''); setSlugTouched(false); setTopic(''); setIndustry(''); setDate(''); setImage(''); setDescription(''); setGradientFrom('#1e2445'); setGradientTo('#292048'); setStatus('draft');
+    setOverview(''); setOverviewImage1(''); setOverviewImage2('');
+    setChallengeTitle(''); setChallengeDescription(''); setChallengeImage(''); setChallengePoints([{ title: '', description: '' }]);
+    setSolutionsTitle(''); setSolutionsDescription(''); setSolutionModules([{ name: '', description: '', icon: '' }]);
+    setResultsTitle(''); setResultsItems(['']);
+    setActiveTab('basic');
+  };
+
+  const handleOpenCreate = () => {
+    resetForm();
+    setShowCreateModal(true);
+  };
+
+  const handleOpenEdit = async (studyId: string) => {
+    setIsFetchingDetail(true);
+    try {
+      const res = await fetch(`/api/admin/pages/${studyId}`);
+      if (!res.ok) throw new Error('Failed to load case study details');
+      const pageData = await res.json();
+
+      setEditingStudyId(studyId);
+      setTitle(pageData.title || '');
+      setSlug(pageData.slug || '');
+      setSlugTouched(true);
+      setStatus(pageData.status || 'draft');
+
+      const detailSection = pageData.sections?.find((s: any) => s.type === 'case-study-detail');
+      const content = detailSection?.content || {};
+
+      setTopic(content.badgeText || content.topic || '');
+      setIndustry(content.industry || '');
+      setDate(content.date || '');
+      setImage(content.image || '');
+      setDescription(content.description || '');
+      setGradientFrom(content.gradientFrom || '#1e2445');
+      setGradientTo(content.gradientTo || '#292048');
+
+      setOverview(Array.isArray(content.overviewParagraphs) ? content.overviewParagraphs.join('\n\n') : (content.overview || ''));
+
+      setChallengeTitle(content.challengeTitle || '');
+      setChallengeDescription(content.challengeDescription || '');
+      setChallengeImage(content.challengeImage || '');
+      setChallengePoints(Array.isArray(content.challengePoints) && content.challengePoints.length > 0 ? content.challengePoints : [{ title: '', description: '' }]);
+
+      setSolutionsTitle(content.solutionsTitle || '');
+      setSolutionsDescription(content.solutionsDescription || '');
+      setSolutionModules(Array.isArray(content.solutionModules) && content.solutionModules.length > 0 ? content.solutionModules : [{ name: '', description: '', icon: '' }]);
+
+      setResultsTitle(content.resultsTitle || '');
+      setResultsItems(Array.isArray(content.resultsItems) && content.resultsItems.length > 0 ? content.resultsItems : ['']);
+
+      setActiveTab('basic');
+      setShowCreateModal(true);
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to load case study');
+    } finally {
+      setIsFetchingDetail(false);
+    }
+  };
 
   const handleDelete = async (id: string) => {
     if (!confirm('Are you sure you want to delete this case study?')) return;
@@ -225,7 +315,7 @@ function CaseStudyManager({ pageId, onRefresh }: { pageId: string; onRefresh: ()
       if (res.ok) {
         toast.success('Case study deleted successfully');
         fetchStudies();
-        onRefresh();
+        onRefresh?.();
       } else {
         toast.error('Failed to delete case study');
       }
@@ -234,56 +324,22 @@ function CaseStudyManager({ pageId, onRefresh }: { pageId: string; onRefresh: ()
     }
   };
 
-  const handleCreate = async (e: React.FormEvent) => {
+  const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!title.trim() || !slug.trim()) return toast.error('Title and Slug are required');
     setIsCreating(true);
     try {
-      // 1. Get Template
-      const detailTemplate = templates.find((t: any) =>
-        t.templateSections?.some((ts: any) => ts.type === 'case-study-detail')
-      );
-      if (!detailTemplate) {
-        throw new Error('Case Study Detail template not found');
-      }
-      const templateId = detailTemplate.id;
-
-      // 2. Create Page
-      const createPageRes = await fetch('/api/admin/pages', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title,
-          slug,
-          parentId: pageId,
-          templateId,
-          pageType: 'standard',
-          status: 'draft',
-        }),
-      });
-
-      if (!createPageRes.ok) throw new Error('Failed to create page');
-      const pageData = await createPageRes.json();
-
-      // 3. Find section
-      const detailSection = pageData.sections?.find((s: any) => s.type === 'case-study-detail');
-      if (!detailSection) {
-        throw new Error('Created page does not contain case-study-detail section');
-      }
-
-      // 4. Update section with all form data
-      const defaultContent = detailSection.content || detailTemplate.templateSections?.find((ts: any) => ts.type === 'case-study-detail')?.contentJson || {};
-
       const filteredChallengePoints = challengePoints.filter(p => p.title.trim() || p.description.trim());
       const filteredSolutions = solutionModules.filter(m => m.name.trim() || m.description.trim() || m.icon.trim());
       const filteredResults = resultsItems.filter(r => r.trim());
       const filteredOverviewImages = [overviewImage1, overviewImage2].filter(img => img.trim());
 
       const updatedContent = {
-        ...defaultContent,
         title,
         titleColor: '#ffffff',
-        bgColor: 'linear-gradient(135deg, #1e2445 0%, #292048 100%)',
+        bgColor: `linear-gradient(135deg, ${gradientFrom || '#1e2445'} 0%, ${gradientTo || '#292048'} 100%)`,
+        gradientFrom: gradientFrom || '#1e2445',
+        gradientTo: gradientTo || '#292048',
         badgeBgColor: '#ffffff',
         badgeBorderColor: '#7c3aed',
         badgeText: topic || 'Caetrory Name',
@@ -294,6 +350,7 @@ function CaseStudyManager({ pageId, onRefresh }: { pageId: string; onRefresh: ()
         descriptionColor: '#e2e8f0',
         image: image || undefined,
         overview: overview || undefined,
+        overviewParagraphs: overview ? overview.split('\n\n').map(p => p.trim()).filter(Boolean) : undefined,
         overviewImages: filteredOverviewImages.length > 0 ? filteredOverviewImages : undefined,
         challengeTitle: challengeTitle || undefined,
         challengeDescription: challengeDescription || undefined,
@@ -306,43 +363,125 @@ function CaseStudyManager({ pageId, onRefresh }: { pageId: string; onRefresh: ()
         resultsItems: filteredResults.length > 0 ? filteredResults : undefined,
       };
 
-      const updateSectionRes = await fetch(
-        `/api/admin/pages/${pageData.id}/sections/${detailSection.id}`,
-        {
+      if (editingStudyId) {
+        // Mode 1: Edit existing case study
+        await fetch(`/api/admin/pages/${editingStudyId}`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ content: updatedContent }),
+          body: JSON.stringify({ title, slug, status }),
+        });
+
+        const pageRes = await fetch(`/api/admin/pages/${editingStudyId}`);
+        if (pageRes.ok) {
+          const pageData = await pageRes.json();
+          const detailSection = pageData.sections?.find((s: any) => s.type === 'case-study-detail');
+          if (detailSection) {
+            await fetch(`/api/admin/pages/${editingStudyId}/sections/${detailSection.id}`, {
+              method: 'PATCH',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ content: { ...(detailSection.content || {}), ...updatedContent } }),
+            });
+          }
         }
-      );
 
-      if (!updateSectionRes.ok) {
-        throw new Error('Failed to save case study details');
-      }
+        if (status === 'published') {
+          await fetch(`/api/admin/pages/${editingStudyId}/actions`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'publish' }),
+          });
+        }
 
-      // 5. Publish if requested
-      if (status === 'published') {
-        await fetch(`/api/admin/pages/${pageData.id}/actions`, {
+        toast.success('Case Study updated successfully');
+      } else {
+        // Mode 2: Create new case study
+        let parentTargetId = pageId || null;
+        if (!parentTargetId) {
+          const pagesRes = await fetch('/api/admin/pages');
+          if (pagesRes.ok) {
+            const tree = await pagesRes.json();
+            const findCaseStudiesNode = (nodes: any[]): any => {
+              for (const node of nodes) {
+                if (node.fullPath === '/case-studies' || node.slug === 'case-studies') return node;
+                if (node.children) {
+                  const found = findCaseStudiesNode(node.children);
+                  if (found) return found;
+                }
+              }
+              return null;
+            };
+            const csNode = findCaseStudiesNode(tree);
+            if (csNode && csNode.id) parentTargetId = csNode.id;
+          }
+        }
+
+        let detailTemplate = templates.find((t: any) =>
+          t.templateSections?.some((ts: any) => ts.type === 'case-study-detail')
+        );
+
+        if (!detailTemplate) {
+          const tmplRes = await fetch('/api/admin/templates');
+          if (tmplRes.ok) {
+            const allTmpls = await tmplRes.json();
+            setTemplates(allTmpls);
+            detailTemplate = allTmpls.find((t: any) =>
+              t.templateSections?.some((ts: any) => ts.type === 'case-study-detail')
+            );
+          }
+        }
+
+        if (!detailTemplate) throw new Error('Case Study Detail template not found');
+
+        const createPageRes = await fetch('/api/admin/pages', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ action: 'publish' }),
+          body: JSON.stringify({
+            title: title.trim(),
+            slug: slug.trim() || undefined,
+            parentId: parentTargetId ? parentTargetId : null,
+            templateId: detailTemplate.id ? detailTemplate.id : null,
+            pageType: 'standard',
+            status: 'draft',
+          }),
         });
+
+        if (!createPageRes.ok) {
+          const errBody = await createPageRes.json().catch(() => ({}));
+          throw new Error(errBody.error || errBody.message || 'Failed to create page');
+        }
+        const pageData = await createPageRes.json();
+
+        const detailSection = pageData.sections?.find((s: any) => s.type === 'case-study-detail');
+        if (!detailSection) throw new Error('Created page does not contain case-study-detail section');
+
+        const defaultContent = detailSection.content || detailTemplate.templateSections?.find((ts: any) => ts.type === 'case-study-detail')?.contentJson || {};
+
+        await fetch(
+          `/api/admin/pages/${pageData.id}/sections/${detailSection.id}`,
+          {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ content: { ...defaultContent, ...updatedContent } }),
+          }
+        );
+
+        if (status === 'published') {
+          await fetch(`/api/admin/pages/${pageData.id}/actions`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'publish' }),
+          });
+        }
+
+        toast.success('Case Study created successfully');
       }
 
-      toast.success('Case Study created successfully');
       setShowCreateModal(false);
-
-      // Reset
-      setTitle(''); setSlug(''); setTopic(''); setIndustry(''); setDate(''); setImage('');
-      setOverview(''); setOverviewImage1(''); setOverviewImage2('');
-      setChallengeTitle(''); setChallengeDescription(''); setChallengePoints([{ title: '', description: '' }]);
-      setSolutionsTitle(''); setSolutionsDescription(''); setSolutionModules([{ name: '', description: '', icon: '' }]);
-      setResultsTitle(''); setResultsItems(['']);
-      setActiveTab('basic');
-
+      resetForm();
       fetchStudies();
-      onRefresh();
+      onRefresh?.();
     } catch (err: any) {
-      toast.error(err.message || 'Failed to create case study');
+      toast.error(err.message || 'Failed to save case study');
     } finally {
       setIsCreating(false);
     }
@@ -357,10 +496,10 @@ function CaseStudyManager({ pageId, onRefresh }: { pageId: string; onRefresh: ()
             Case Study Posts Manager
           </h2>
           <p className="text-xs text-slate-400">
-            Create, view, and delete case studies nested under this listing page.
+            Create, view, edit, and delete case studies.
           </p>
         </div>
-        <Button onClick={() => setShowCreateModal(true)} className="bg-[#4B2A63] hover:bg-[#3B198F] text-white rounded-full px-6 gap-2 h-10 shadow-sm">
+        <Button onClick={handleOpenCreate} className="bg-[#4B2A63] hover:bg-[#3B198F] text-white rounded-full px-6 gap-2 h-10 shadow-sm">
           <Plus className="w-4 h-4" />
           Add Case Study
         </Button>
@@ -391,12 +530,53 @@ function CaseStudyManager({ pageId, onRefresh }: { pageId: string; onRefresh: ()
                     <span className="text-[10px] font-mono text-slate-400 block truncate">{study.fullPath}</span>
                   </td>
                   <td className="py-3.5 px-2">
-                    <span className={cn('text-[9px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-tighter', study.status === 'published' ? 'bg-emerald-50 text-emerald-600' : 'bg-amber-50 text-amber-600')}>{study.status}</span>
+                    <div className="relative inline-block">
+                      <select
+                        value={study.status || 'draft'}
+                        onChange={async (e) => {
+                          const newStatus = e.target.value;
+                          if (newStatus === study.status) return;
+                          try {
+                            const action = newStatus === 'published' ? 'publish' : 'unpublish';
+                            const res = await fetch(`/api/admin/pages/${study.id}/actions`, {
+                              method: 'POST',
+                              headers: { 'Content-Type': 'application/json' },
+                              body: JSON.stringify({ action }),
+                            });
+                            if (res.ok) {
+                              toast.success(`Status updated to ${newStatus}`);
+                              setStudies(prev =>
+                                prev.map(s => (s.id === study.id ? { ...s, status: newStatus } : s))
+                              );
+                              onRefresh?.();
+                            } else {
+                              toast.error('Failed to update status');
+                            }
+                          } catch (err) {
+                            toast.error('Failed to update status');
+                          }
+                        }}
+                        className={cn(
+                          'appearance-none bg-none [background-image:none] text-[8px] font-black pl-2 pr-4 py-0 rounded-full uppercase tracking-tighter cursor-pointer border transition-all focus:outline-none h-4.5 leading-none',
+                          study.status === 'published'
+                            ? 'bg-emerald-50 text-emerald-700 border-emerald-200/80 hover:bg-emerald-100/80'
+                            : 'bg-amber-50 text-amber-700 border-amber-200/80 hover:bg-amber-100/80'
+                        )}
+                      >
+                        <option value="published" className="bg-white text-slate-800 font-semibold text-xs">Published</option>
+                        <option value="draft" className="bg-white text-slate-800 font-semibold text-xs">Draft</option>
+                      </select>
+                      <ChevronDown className={cn(
+                        'w-2 h-2 absolute right-1 top-1/2 -translate-y-1/2 pointer-events-none transition-colors opacity-75',
+                        study.status === 'published' ? 'text-emerald-700' : 'text-amber-700'
+                      )} />
+                    </div>
                   </td>
                   <td className="py-3.5 px-2 text-right">
                     <div className="flex justify-end gap-1">
-                      <Button variant="ghost" size="icon" className="h-8 w-8 text-[#4B2A63] hover:bg-[#4B2A63]/5" onClick={() => (window.location.href = `/admin/pages/${study.id}`)}><Edit className="w-4 h-4" /></Button>
-                      <Button variant="ghost" size="icon" className="h-8 w-8 text-rose-500 hover:bg-rose-50" onClick={() => handleDelete(study.id)}><Trash2 className="w-4 h-4" /></Button>
+                      <Button variant="ghost" size="icon" className="h-8 w-8 text-[#4B2A63] hover:bg-[#4B2A63]/5" onClick={() => handleOpenEdit(study.id)} disabled={isFetchingDetail}>
+                        <Edit className="w-4 h-4" />
+                      </Button>
                     </div>
                   </td>
                 </tr>
@@ -406,14 +586,16 @@ function CaseStudyManager({ pageId, onRefresh }: { pageId: string; onRefresh: ()
         </div>
       )}
 
-      {/* Create Modal */}
+      {/* Create / Edit Modal */}
       <AnimatePresence>
         {showCreateModal && (
           <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
             <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }} className="bg-white rounded-3xl w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl border border-slate-100 flex flex-col">
               <div className="px-6 py-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
-                <h3 className="font-bold text-slate-900 text-lg flex items-center gap-2">Add Case Study</h3>
-                <button onClick={() => setShowCreateModal(false)} className="p-1.5 rounded-full hover:bg-slate-200 text-slate-400"><X className="w-5 h-5" /></button>
+                <h3 className="font-bold text-slate-900 text-lg flex items-center gap-2">
+                  {editingStudyId ? 'Edit Case Study' : 'Add Case Study'}
+                </h3>
+                <button onClick={() => { setShowCreateModal(false); resetForm(); }} className="p-1.5 rounded-full hover:bg-slate-200 text-slate-400"><X className="w-5 h-5" /></button>
               </div>
 
               <div className="flex overflow-hidden flex-1 min-h-0">
@@ -434,7 +616,7 @@ function CaseStudyManager({ pageId, onRefresh }: { pageId: string; onRefresh: ()
                 </div>
 
                 {/* Form Content */}
-                <form id="caseStudyForm" onSubmit={handleCreate} className="flex-1 overflow-y-auto p-8 bg-white">
+                <form id="caseStudyForm" onSubmit={handleSave} className="flex-1 overflow-y-auto p-8 bg-white">
                   {activeTab === 'basic' && (
                     <div className="space-y-6">
                       <div className="grid grid-cols-2 gap-6">
@@ -465,6 +647,16 @@ function CaseStudyManager({ pageId, onRefresh }: { pageId: string; onRefresh: ()
                         <label className="admin-label">Hero Description</label>
                         <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} className="admin-input resize-none" />
                       </div>
+                      <div className="grid grid-cols-1 gap-6">
+                        <div className="space-y-1">
+                          <label className="admin-label">Hero BG Gradient 1 (Start)</label>
+                          <ColorPickerField fieldKey="gradientFrom" value={gradientFrom} onChange={(val) => setGradientFrom(val)} />
+                        </div>
+                        <div className="space-y-1">
+                          <label className="admin-label">Hero BG Gradient 2 (End)</label>
+                          <ColorPickerField fieldKey="gradientTo" value={gradientTo} onChange={(val) => setGradientTo(val)} />
+                        </div>
+                      </div>
                       <div className="space-y-1">
                         <label className="admin-label">Hero Image URL</label>
                         <MediaField fieldKey="hero-image" value={image} onChange={(val) => setImage(val)} />
@@ -484,14 +676,6 @@ function CaseStudyManager({ pageId, onRefresh }: { pageId: string; onRefresh: ()
                       <div className="space-y-1">
                         <label className="admin-label">Overview Text</label>
                         <textarea value={overview} onChange={(e) => setOverview(e.target.value)} rows={6} className="admin-input resize-none" />
-                      </div>
-                      <div className="space-y-1">
-                        <label className="admin-label">Overview Image 1 URL</label>
-                        <MediaField fieldKey="overview-image-1" value={overviewImage1} onChange={(val) => setOverviewImage1(val)} />
-                      </div>
-                      <div className="space-y-1">
-                        <label className="admin-label">Overview Image 2 URL</label>
-                        <MediaField fieldKey="overview-image-2" value={overviewImage2} onChange={(val) => setOverviewImage2(val)} />
                       </div>
                     </div>
                   )}
@@ -579,7 +763,7 @@ function CaseStudyManager({ pageId, onRefresh }: { pageId: string; onRefresh: ()
                 <Button type="button" variant="ghost" onClick={() => setShowCreateModal(false)} className="rounded-full">Cancel</Button>
                 <Button form="caseStudyForm" type="submit" disabled={isCreating} className="bg-[#4B2A63] hover:bg-[#3B198F] text-white rounded-full px-8 shadow-sm">
                   {isCreating ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
-                  Create Case Study
+                  {editingStudyId ? 'Save Changes' : 'Create Case Study'}
                 </Button>
               </div>
             </motion.div>
@@ -1974,6 +2158,102 @@ export default function PageEditor() {
   const [dirtySections, setDirtySections] = React.useState<Set<string>>(new Set());
   const [showExamplePreview, setShowExamplePreview] = React.useState(false);
 
+  // Navigation placement state
+  const [navItems, setNavItems] = React.useState<NavigationTreeItem[]>([]);
+  const [megaMenu, setMegaMenu] = React.useState<MegaMenuPayload | null>(null);
+  const [megaMenuLoading, setMegaMenuLoading] = React.useState(false);
+
+  React.useEffect(() => {
+    fetch('/api/admin/navigation/hierarchy?location=header-main&for=page-create')
+      .then(async (res) => {
+        if (!res.ok) return;
+        const data = await res.json();
+        setNavItems(data.items || []);
+      })
+      .catch((err) => console.error('Failed to load navigation items:', err));
+  }, []);
+
+  React.useEffect(() => {
+    if (!page?.navigationItemId) {
+      setMegaMenu(null);
+      return;
+    }
+
+    const selectedNav = navItems.find((n) => n.id === page.navigationItemId);
+    if (!selectedNav?.megaMenuEnabled) {
+      setMegaMenu(null);
+      return;
+    }
+
+    setMegaMenuLoading(true);
+    fetch(`/api/admin/navigation/hierarchy?navigationItemId=${page.navigationItemId}`)
+      .then(async (res) => {
+        const data = await res.json();
+        if (res.ok) {
+          setMegaMenu(data);
+        } else {
+          setMegaMenu(null);
+        }
+      })
+      .catch(() => setMegaMenu(null))
+      .finally(() => setMegaMenuLoading(false));
+  }, [page?.navigationItemId, navItems]);
+
+  const activeCategory = React.useMemo(() => {
+    return megaMenu?.categories.find((c) => c.id === (page?.megaMenuCategoryId || '')) || null;
+  }, [megaMenu, page?.megaMenuCategoryId]);
+
+  const activeSubCategory = React.useMemo(() => {
+    return activeCategory?.subCategories.find((s) => s.id === (page?.megaMenuSubCategoryId || '')) || null;
+  }, [activeCategory, page?.megaMenuSubCategoryId]);
+
+  const handleNavigationChange = (
+    newNavId: string,
+    newMegaCatId: string = '',
+    newMegaSubCatId: string = '',
+    newMegaSubSubCatId: string = ''
+  ) => {
+    if (!page) return;
+
+    const selectedNav = navItems.find((n) => n.id === newNavId);
+    const pageSlug = resolvePageSlug(page.title, page.slug);
+
+    let newFullPath: string;
+    if (!selectedNav) {
+      newFullPath = `/${pageSlug}`;
+    } else {
+      const navSlug = slugify(selectedNav.label) || selectedNav.slug?.replace(/^\//, '') || '';
+      if (megaMenu && newMegaCatId) {
+        const cat = megaMenu.categories.find((c) => c.id === newMegaCatId);
+        const sub = cat?.subCategories.find((s) => s.id === newMegaSubCatId);
+        const subSub = sub?.subSubCategories.find((l) => l.id === newMegaSubSubCatId);
+        newFullPath = buildPagePathFromNavHierarchy({
+          navSlug,
+          categorySlug: cat?.slug,
+          subSlug: sub?.slug,
+          subSubSlug: subSub?.slug,
+          pageSlug,
+        });
+      } else {
+        newFullPath = `/${navSlug.replace(/^\//, '')}/${pageSlug}`;
+      }
+    }
+
+    setPage((prev) =>
+      prev
+        ? {
+            ...prev,
+            navigationItemId: newNavId || null,
+            megaMenuCategoryId: newMegaCatId || null,
+            megaMenuSubCategoryId: newMegaSubCatId || null,
+            megaMenuSubSubCategoryId: newMegaSubSubCatId || null,
+            fullPath: newFullPath,
+            slug: pageSlug,
+          }
+        : prev
+    );
+  };
+
   const isLandingPage = React.useMemo(() => {
     return page?.template?.name?.toLowerCase().includes('landing page') || page?.pageType === 'landing-page' || false;
   }, [page]);
@@ -1991,6 +2271,11 @@ export default function PageEditor() {
     const current = JSON.stringify({
       title: page.title,
       slug: page.slug,
+      fullPath: page.fullPath,
+      navigationItemId: page.navigationItemId || null,
+      megaMenuCategoryId: page.megaMenuCategoryId || null,
+      megaMenuSubCategoryId: page.megaMenuSubCategoryId || null,
+      megaMenuSubSubCategoryId: page.megaMenuSubSubCategoryId || null,
       sections: page.sections,
     });
     const seoChanged = JSON.stringify(seoForm) !== savedSeoSnapshot;
@@ -2004,6 +2289,11 @@ export default function PageEditor() {
       JSON.stringify({
         title: p.title,
         slug: p.slug,
+        fullPath: p.fullPath,
+        navigationItemId: p.navigationItemId || null,
+        megaMenuCategoryId: p.megaMenuCategoryId || null,
+        megaMenuSubCategoryId: p.megaMenuSubCategoryId || null,
+        megaMenuSubSubCategoryId: p.megaMenuSubSubCategoryId || null,
         sections: p.sections,
       })
     );
@@ -2070,7 +2360,15 @@ export default function PageEditor() {
       const metaRes = await fetch(`/api/admin/pages/${pageId}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: page.title, slug: page.slug, fullPath: page.fullPath }),
+        body: JSON.stringify({
+          title: page.title,
+          slug: page.slug,
+          fullPath: page.fullPath,
+          navigationItemId: page.navigationItemId || null,
+          megaMenuCategoryId: page.megaMenuCategoryId || null,
+          megaMenuSubCategoryId: page.megaMenuSubCategoryId || null,
+          megaMenuSubSubCategoryId: page.megaMenuSubSubCategoryId || null,
+        }),
       });
       if (!metaRes.ok) throw new Error('Failed to save page settings');
 
@@ -2558,6 +2856,127 @@ export default function PageEditor() {
 
         {/* ===== Sidebar ===== */}
         <div className="space-y-4">
+          {/* ===== Navigation placement Card ===== */}
+          <div className="bg-white rounded-2xl border border-slate-100 p-6 space-y-4 shadow-sm">
+            <h2 className="font-bold text-slate-800 text-base">Navigation placement</h2>
+
+            {page.status !== 'published' && page.navigationItemId && (
+              <div className="bg-amber-50 border border-amber-200/80 rounded-xl p-3 text-xs text-amber-800 space-y-1">
+                <p className="font-semibold flex items-center gap-1.5 text-amber-900">
+                  <AlertCircle className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                  Draft Page Notice
+                </p>
+                <p className="text-[11px] text-amber-700 leading-relaxed">
+                  This page is currently a <strong>Draft</strong>. Live navbar links will return 404 until you click <strong>Publish</strong>.
+                </p>
+              </div>
+            )}
+
+            <div className="space-y-1.5">
+              <label className="text-[11px] font-black text-slate-400 uppercase tracking-widest block">
+                MENU ITEM (NAV BAR)
+              </label>
+              <select
+                value={page.navigationItemId || ''}
+                onChange={(e) => handleNavigationChange(e.target.value)}
+                className="w-full bg-slate-50 rounded-2xl px-4 py-3 text-sm font-semibold outline-none border border-slate-200 focus:border-[#4B2A63]/30 focus:ring-2 focus:ring-[#4B2A63]/10 text-slate-800 cursor-pointer"
+              >
+                <option value="">None — unlinked page</option>
+                {navItems.map((n) => (
+                  <option key={n.id} value={n.id}>
+                    {n.label} {n.megaMenuEnabled ? '(Mega Menu)' : ''}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {megaMenuLoading ? (
+              <p className="text-xs text-slate-400 animate-pulse">Loading Mega Menu structure...</p>
+            ) : megaMenu ? (
+              <div className="space-y-3 pt-3 border-t border-slate-100">
+                <div>
+                  <h4 className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                    <Layers className="w-3.5 h-3.5 text-[#4B2A63]" />
+                    Mega Menu Linking (Optional)
+                  </h4>
+                </div>
+
+                <div className="space-y-3 pl-3 border-l-2 border-slate-100">
+                  <div>
+                    <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">
+                      Category (Tab)
+                    </label>
+                    <select
+                      value={page.megaMenuCategoryId || ''}
+                      onChange={(e) => handleNavigationChange(page.navigationItemId || '', e.target.value)}
+                      className="w-full bg-slate-50 rounded-xl px-3 py-2.5 text-xs font-semibold outline-none border border-slate-200 focus:border-[#4B2A63]/30 text-slate-800 cursor-pointer"
+                    >
+                      <option value="">None — do not link in Mega Menu</option>
+                      {megaMenu.categories.map((c) => (
+                        <option key={c.id} value={c.id}>
+                          {c.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {page.megaMenuCategoryId && activeCategory && activeCategory.subCategories.length > 0 && (
+                    <div>
+                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">
+                        Sub Category (Panel)
+                      </label>
+                      <select
+                        value={page.megaMenuSubCategoryId || ''}
+                        onChange={(e) =>
+                          handleNavigationChange(
+                            page.navigationItemId || '',
+                            page.megaMenuCategoryId || '',
+                            e.target.value
+                          )
+                        }
+                        className="w-full bg-slate-50 rounded-xl px-3 py-2.5 text-xs font-semibold outline-none border border-slate-200 focus:border-[#4B2A63]/30 text-slate-800 cursor-pointer"
+                      >
+                        <option value="">None — select sub category</option>
+                        {activeCategory.subCategories.map((s) => (
+                          <option key={s.id} value={s.id}>
+                            {s.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+
+                  {page.megaMenuSubCategoryId && activeSubCategory && activeSubCategory.subSubCategories.length > 0 && (
+                    <div>
+                      <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block mb-1">
+                        Leaf Link (Grid Link)
+                      </label>
+                      <select
+                        value={page.megaMenuSubSubCategoryId || ''}
+                        onChange={(e) =>
+                          handleNavigationChange(
+                            page.navigationItemId || '',
+                            page.megaMenuCategoryId || '',
+                            page.megaMenuSubCategoryId || '',
+                            e.target.value
+                          )
+                        }
+                        className="w-full bg-slate-50 rounded-xl px-3 py-2.5 text-xs font-semibold outline-none border border-slate-200 focus:border-[#4B2A63]/30 text-slate-800 cursor-pointer"
+                      >
+                        <option value="">None — select leaf link</option>
+                        {activeSubCategory.subSubCategories.map((l) => (
+                          <option key={l.id} value={l.id}>
+                            {l.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
+                </div>
+              </div>
+            ) : null}
+          </div>
+
           {/* ===== Page General Settings ===== */}
           <div className="bg-white rounded-2xl border border-slate-100 p-6 space-y-4 shadow-sm">
             <div className="flex items-center gap-2 text-[#4B2A63]">

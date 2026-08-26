@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import type { CategoryTreeNode } from '@/lib/cms/types';
+import { slugify } from '@/lib/cms/utils';
 import {
   Select,
   SelectContent,
@@ -205,6 +206,40 @@ export default function CategoriesModule() {
     }
   };
 
+  const handleChildReorder = async (parentId: string, newChildren: CategoryTreeNode[], depth: number) => {
+    const updateChildrenInTree = (nodes: CategoryTreeNode[]): CategoryTreeNode[] => {
+      return nodes.map((node) => {
+        if (node.id === parentId) {
+          return { ...node, children: newChildren };
+        }
+        if (node.children?.length) {
+          return { ...node, children: updateChildrenInTree(node.children) };
+        }
+        return node;
+      });
+    };
+
+    setTree((prev) => updateChildrenInTree(prev));
+
+    try {
+      const items = newChildren.map((child, index) => ({
+        id: child.id,
+        orderIndex: index + 1,
+      }));
+      const level = depth === 0 ? 'sub' : 'sub-sub';
+      const res = await fetch('/api/admin/mega-menu/reorder', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ level, items, navigationItemId: selectedNavId }),
+      });
+      if (!res.ok) throw new Error('Failed to save order');
+      toast.success(depth === 0 ? 'Sub-categories reordered' : 'Sub-sub-categories reordered');
+    } catch (e) {
+      toast.error('Failed to save order');
+      handleRefresh();
+    }
+  };
+
   React.useEffect(() => {
     fetchNavItems();
     fetchRegistryPages();
@@ -230,9 +265,12 @@ export default function CategoriesModule() {
     return filterNodes(tree);
   }, [tree, searchQuery]);
 
+  const [slugTouched, setSlugTouched] = React.useState(false);
+
   const openCreate = (parentId?: string) => {
     setEditingId(null);
     setNewSubParentId(parentId || null);
+    setSlugTouched(false);
 
     // Auto-calculate the next sort order based on siblings
     let maxOrder = 0;
@@ -257,6 +295,7 @@ export default function CategoriesModule() {
   const openEdit = (category: CategoryTreeNode) => {
     setEditingId(category.id);
     setNewSubParentId(null);
+    setSlugTouched(false);
     setForm({
       name: category.name,
       slug: category.slug,
@@ -424,6 +463,7 @@ export default function CategoriesModule() {
                   onRefresh={handleRefresh}
                   onEdit={openEdit}
                   onAddSubCategory={(parentId) => openCreate(parentId)}
+                  onReorderChildren={searchQuery ? undefined : handleChildReorder}
                   expandSignal={searchQuery ? 'expand' : expandSignal}
                 />
               ))}
@@ -459,8 +499,28 @@ export default function CategoriesModule() {
                 <input
                   placeholder="Category name"
                   value={form.name}
-                  onChange={(e) => setForm({ ...form, name: e.target.value })}
+                  onChange={(e) => {
+                    const newName = e.target.value;
+                    setForm((prev) => ({
+                      ...prev,
+                      name: newName,
+                      slug: !slugTouched ? slugify(newName) : prev.slug,
+                    }));
+                  }}
                   className="admin-input"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="admin-label">Category Slug</label>
+                <input
+                  placeholder="category-slug"
+                  value={form.slug}
+                  onChange={(e) => {
+                    setSlugTouched(true);
+                    setForm({ ...form, slug: e.target.value });
+                  }}
+                  className="admin-input font-mono text-xs text-slate-700"
                 />
               </div>
               {newSubParentId && (
@@ -569,6 +629,7 @@ function CategoryRow({
   onRefresh,
   onEdit,
   onAddSubCategory,
+  onReorderChildren,
   expandSignal,
 }: {
   category: CategoryTreeNode;
@@ -578,11 +639,17 @@ function CategoryRow({
   onRefresh: () => void;
   onEdit: (category: CategoryTreeNode) => void;
   onAddSubCategory: (parentId: string) => void;
+  onReorderChildren?: (parentId: string, newChildren: CategoryTreeNode[], depth: number) => void;
   expandSignal: 'expand' | 'collapse' | null;
 }) {
   const [open, setOpen] = React.useState(depth < 1);
+  const [childrenList, setChildrenList] = React.useState<CategoryTreeNode[]>(category.children || []);
 
-  const hasChildren = category.children && category.children.length > 0;
+  React.useEffect(() => {
+    setChildrenList(category.children || []);
+  }, [category.children]);
+
+  const hasChildren = childrenList && childrenList.length > 0;
 
   React.useEffect(() => {
     if (expandSignal === 'expand') setOpen(true);
@@ -626,9 +693,8 @@ function CategoryRow({
           depth > 0 && 'ml-5 border-l border-l-slate-200'
         )}
       >
-        {depth === 0 && (
-          <GripVertical className="w-3.5 h-3.5 text-slate-300 cursor-grab active:cursor-grabbing hover:text-slate-600 transition-colors shrink-0" />
-        )}
+        <GripVertical className="w-3.5 h-3.5 text-slate-300 cursor-grab active:cursor-grabbing hover:text-slate-600 transition-colors shrink-0" />
+        
         {/* Expand tree */}
         <button
           type="button"
@@ -688,36 +754,39 @@ function CategoryRow({
       <AnimatePresence>
         {open && hasChildren && (
           <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}>
-            {category.children!.map((child) => (
-              <CategoryRow
-                key={child.id}
-                category={child}
-                depth={depth + 1}
-                allCategories={allCategories}
-                registryPages={registryPages}
-                onRefresh={onRefresh}
-                onEdit={onEdit}
-                onAddSubCategory={onAddSubCategory}
-                expandSignal={expandSignal}
-              />
-            ))}
+            <Reorder.Group
+              axis="y"
+              values={childrenList}
+              onReorder={(newChildren) => {
+                setChildrenList(newChildren);
+                onReorderChildren?.(category.id, newChildren, depth);
+              }}
+              className="space-y-0.5"
+            >
+              {childrenList.map((child) => (
+                <CategoryRow
+                  key={child.id}
+                  category={child}
+                  depth={depth + 1}
+                  allCategories={allCategories}
+                  registryPages={registryPages}
+                  onRefresh={onRefresh}
+                  onEdit={onEdit}
+                  onAddSubCategory={onAddSubCategory}
+                  onReorderChildren={onReorderChildren}
+                  expandSignal={expandSignal}
+                />
+              ))}
+            </Reorder.Group>
           </motion.div>
         )}
       </AnimatePresence>
     </>
   );
 
-  if (depth === 0) {
-    return (
-      <Reorder.Item value={category} id={category.id} className="relative bg-white">
-        {rowContent}
-      </Reorder.Item>
-    );
-  }
-
   return (
-    <motion.div className="relative" layout>
+    <Reorder.Item value={category} id={category.id} className="relative bg-white">
       {rowContent}
-    </motion.div>
+    </Reorder.Item>
   );
 }

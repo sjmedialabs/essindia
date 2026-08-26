@@ -62,6 +62,10 @@ export function ArrayFieldEditor({
   const addItem = () => {
     if (sectionType === 'landing1-process' && fieldKey === 'process' && value.length >= 7) return;
     if (sectionType === 'landing2-testimonials' && fieldKey === 'testimonials' && value.length >= 2) return;
+    if (fieldKey === 'challengePoints' || fieldKey === 'challengepoints') {
+      onChange([...value, { title: '', description: '' }]);
+      return;
+    }
     if (value.length > 0) {
       const template = createEmptyFromTemplate(value[0]);
       onChange([...value, template]);
@@ -121,7 +125,11 @@ export function ArrayFieldEditor({
           defaultObj = { icon: '', title: '', description: '', contact: '' };
         }
       } else if (lowerKey === 'categories') {
-        defaultObj = { name: '', items: [], tabs: [] };
+        if (sectionType === 'ass-features-grid') {
+          defaultObj = { name: '', items: [] };
+        } else {
+          defaultObj = { name: '', items: [], tabs: [] };
+        }
       } else if (lowerKey === 'items') {
         if (sectionType === 'staffing-technologies') {
           defaultObj = { label: '' };
