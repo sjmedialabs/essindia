@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { Search } from 'lucide-react';
 import { useCtaAction, type CtaFormType } from '@/hooks/useCtaAction';
+import { safeImageUrl } from '@/lib/utils';
 
 interface IntegrationItem {
   image?: string;
@@ -268,10 +269,10 @@ export function AssFeaturesGrid({ content }: { content?: AssFeaturesGridContent 
                     key={idx}
                     className="bg-white rounded-2xl border border-slate-200 p-6 flex flex-col items-start hover:shadow-[0_12px_30px_rgba(0,0,0,0.03)] hover:border-blue-200 transition-all duration-300 group h-full"
                   >
-                    {item.image && (
+                    {safeImageUrl(item.image) && (
                       <div className="w-10 h-10 relative mb-4">
                         <Image
-                          src={item.image}
+                          src={safeImageUrl(item.image)}
                           alt={item.title || ''}
                           fill
                           className="object-contain"

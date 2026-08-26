@@ -1029,7 +1029,7 @@ function ArrayField({
             let categoryOrder = ['name', 'items'];
             sortedKeys = categoryOrder.filter(k => k in objItem);
             for (const k of Object.keys(objItem)) {
-              if (sectionType === 'ass-features-grid' && (k === 'image' || k === 'title')) {
+              if (sectionType === 'ass-features-grid' && (k === 'image' || k === 'title' || k.toLowerCase().includes('tab'))) {
                 continue;
               }
               if (!sortedKeys.includes(k)) {

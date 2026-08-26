@@ -10,6 +10,7 @@ export interface SeoGlobals {
   robotsExtraDisallow: string[];
   preferWww: boolean;
   forceHttps: boolean;
+  defaultHomePage?: string;
 }
 
 export interface FormTypeSettings {
@@ -28,6 +29,7 @@ const DEFAULT_SEO_GLOBALS: SeoGlobals = {
   robotsExtraDisallow: [],
   preferWww: false,
   forceHttps: true,
+  defaultHomePage: '/',
 };
 
 const DEFAULT_FORM_SETTINGS: FormSettings = {

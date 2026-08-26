@@ -55,16 +55,24 @@ export function safeImageUrl(url?: string | null, fallback = ''): string {
   if (!url || typeof url !== 'string') return fallback;
   const cleaned = url.replace(/[\u200B-\u200D\uFEFF]/g, '').trim();
   if (!cleaned) return fallback;
-  if (cleaned.startsWith('/') || cleaned.startsWith('http://') || cleaned.startsWith('https://') || cleaned.startsWith('data:')) {
-    if (cleaned.startsWith('http://') || cleaned.startsWith('https://')) {
-      try {
-        new URL(cleaned);
-        return cleaned;
-      } catch {
-        return fallback;
-      }
+
+  if (cleaned.startsWith('http://') || cleaned.startsWith('https://')) {
+    try {
+      new URL(cleaned);
+      return cleaned;
+    } catch {
+      return fallback;
     }
+  }
+
+  if (cleaned.startsWith('/') || cleaned.startsWith('data:')) {
     return cleaned;
   }
+
+  // Handle relative image path missing leading slash
+  if (/^[a-zA-Z0-9_\-\.\/]+$/.test(cleaned) && !cleaned.includes('://')) {
+    return `/${cleaned}`;
+  }
+
   return fallback;
 }

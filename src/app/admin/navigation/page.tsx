@@ -92,13 +92,17 @@ export default function NavigationModule() {
     }
   };
 
-  // Fetch all menus and pages on mount
+  const [defaultHomePage, setDefaultHomePage] = useState<string>('/');
+  const [isSavingDefaultHomePage, setIsSavingDefaultHomePage] = useState(false);
+
+  // Fetch all menus, pages, and site settings on mount
   useEffect(() => {
     async function initData() {
       try {
-        const [menusRes, pagesRes] = await Promise.all([
+        const [menusRes, pagesRes, settingsRes] = await Promise.all([
           fetch('/api/admin/navigation', { credentials: 'same-origin', cache: 'no-store' }),
           fetch('/api/admin/pages?registry=true', { credentials: 'same-origin', cache: 'no-store' }),
+          fetch('/api/admin/site-settings', { credentials: 'same-origin', cache: 'no-store' }),
         ]);
 
         if (menusRes.ok) {
@@ -117,12 +121,37 @@ export default function NavigationModule() {
             setRegistryPages(pagesData);
           }
         }
+
+        if (settingsRes.ok) {
+          const settingsData = await settingsRes.json();
+          if (settingsData && settingsData.defaultHomePage) {
+            setDefaultHomePage(settingsData.defaultHomePage);
+          }
+        }
       } catch (error) {
         toast.error('Failed to load navigation configuration');
       }
     }
     initData();
   }, []);
+
+  const handleSaveDefaultHomePage = async (path: string) => {
+    setDefaultHomePage(path);
+    setIsSavingDefaultHomePage(true);
+    try {
+      const res = await fetch('/api/admin/site-settings', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ defaultHomePage: path }),
+      });
+      if (!res.ok) throw new Error('Save failed');
+      toast.success('Default Home Page updated successfully!');
+    } catch {
+      toast.error('Failed to update Default Home Page');
+    } finally {
+      setIsSavingDefaultHomePage(false);
+    }
+  };
 
   // Fetch items for the active menu
   useEffect(() => {
@@ -727,6 +756,26 @@ export default function NavigationModule() {
                     </label>
                   </div>
                 </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-slate-700">Default Home Page</label>
+                  <p className="text-[11px] text-slate-400">Select which published page renders when visitors open the root website URL (/).</p>
+                  <select
+                    value={defaultHomePage}
+                    onChange={(e) => handleSaveDefaultHomePage(e.target.value)}
+                    disabled={isSavingDefaultHomePage}
+                    className="w-full px-2.5 py-1.5 rounded-md border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#5C2B6A]/40 focus:border-[#5C2B6A] transition-all text-xs bg-white font-medium"
+                  >
+                    <option value="/">Default Index Home Page (/)</option>
+                    {registryPages
+                      .filter((p) => (p.status === 'published' || p.status === undefined) && (p.path || p.routePath) !== '/')
+                      .map((p) => (
+                        <option key={p.id} value={p.path || p.routePath}>
+                          {p.title} ({p.path || p.routePath})
+                        </option>
+                      ))}
+                  </select>
+                </div>
+
                 <div className="space-y-1">
                   <label className="text-xs font-semibold text-slate-700">Logo target page link</label>
                   <p className="text-[11px] text-slate-400">Page to open when user clicks the logo in the header.</p>
