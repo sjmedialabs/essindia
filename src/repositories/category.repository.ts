@@ -3,6 +3,7 @@ import { categories, pages } from '@/lib/db/schema';
 import { and, asc, eq, inArray, isNull, ne, sql } from 'drizzle-orm';
 import { buildCategoryTree, slugify } from '@/lib/cms/utils';
 import type { CategoryTreeNode } from '@/lib/cms/types';
+import { pageAdminRepository } from './page-admin.repository';
 
 export class CategoryRepository {
   async getAll() {
@@ -202,6 +203,8 @@ export class CategoryRepository {
       .set({ ...data, slug, updatedAt: new Date() })
       .where(eq(categories.id, id))
       .returning();
+
+    await pageAdminRepository.syncPagePathsForCategoryChange(id, 'category');
     return updated;
   }
 
