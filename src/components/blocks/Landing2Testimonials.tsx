@@ -67,52 +67,77 @@ export function Landing2Testimonials({ content }: { content?: Landing2Testimonia
 
         {/* Testimonial Cards Grid (2-column on desktop) */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10 text-left">
-          {items.map((item, idx) => (
-            <div key={idx} className="flex flex-col group">
-              {/* Image & Video Thumbnail Box */}
-              <div
-                onClick={() => item.videoUrl && setActiveVideoUrl(item.videoUrl)}
-                className="relative w-full aspect-[16/10] rounded-2xl overflow-hidden shadow-sm border border-slate-200/80 mb-6 bg-slate-200 cursor-pointer group-hover:shadow-md transition-all duration-300"
-              >
-                <Image
-                  src={item.image || '/Landing Page-2/assets/3ddf828267cb844171aaad94b1f6da3e7949acbd.png'}
-                  alt={item.author}
-                  fill
-                  className="object-cover group-hover:scale-103 transition-transform duration-500"
-                />
+          {items.map((item, idx) => {
+            const media = (item as any).mediaUrl || item.image || item.videoUrl || '';
+            const isVideo = media.toLowerCase().match(/\.(mp4|webm|ogg|mov)(\?.*)?$/) || media.includes('youtube.com') || media.includes('vimeo.com') || media.includes('youtu.be');
 
-                {/* White Circular Play Button Badge */}
-                <div className="absolute inset-0 flex items-center justify-center bg-black/10 group-hover:bg-black/20 transition-colors">
-                  <div className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-white text-slate-900 flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform">
-                    <svg className="w-6 h-6 fill-current ml-1" viewBox="0 0 24 24">
-                      <path d="M8 5v14l11-7z" />
-                    </svg>
-                  </div>
+            return (
+              <div key={idx} className="flex flex-col group">
+                {/* Image & Video Box */}
+                <div
+                  onClick={() => isVideo && setActiveVideoUrl(media)}
+                  className={`relative w-full aspect-[16/10] rounded-2xl overflow-hidden shadow-sm border border-slate-200/80 mb-6 bg-slate-200 ${
+                    isVideo ? 'cursor-pointer group-hover:shadow-md' : ''
+                  } transition-all duration-300`}
+                >
+                  {isVideo && media.toLowerCase().match(/\.(mp4|webm|ogg|mov)(\?.*)?$/) ? (
+                    <video
+                      src={media}
+                      className="w-full h-full object-cover"
+                      controlsList="nodownload"
+                      muted
+                      playsInline
+                      loop
+                      autoPlay
+                    />
+                  ) : (
+                    <Image
+                      src={media || '/Landing Page-2/assets/3ddf828267cb844171aaad94b1f6da3e7949acbd.png'}
+                      alt={item.author || 'Testimonial Image'}
+                      fill
+                      className="object-cover group-hover:scale-103 transition-transform duration-500"
+                    />
+                  )}
+
+                  {/* Play Button Badge for Videos */}
+                  {isVideo && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/10 group-hover:bg-black/20 transition-colors">
+                      <div className="w-14 h-14 md:w-16 md:h-16 rounded-full bg-white text-slate-900 flex items-center justify-center shadow-lg transform group-hover:scale-110 transition-transform">
+                        <svg className="w-6 h-6 fill-current ml-1" viewBox="0 0 24 24">
+                          <path d="M8 5v14l11-7z" />
+                        </svg>
+                      </div>
+                    </div>
+                  )}
                 </div>
+
+                {/* Customer Quote */}
+                {item.quote && (
+                  <h3 className="text-slate-900 text-xl md:text-2xl font-bold leading-snug tracking-tight mb-3">
+                    {item.quote.includes('<p>') || item.quote.includes('<strong>') || item.quote.includes('<em>') || item.quote.includes('<span>') || item.quote.includes('<br>') ? (
+                      <span dangerouslySetInnerHTML={{ __html: item.quote }} />
+                    ) : (
+                      item.quote
+                    )}
+                  </h3>
+                )}
+
+                {/* Customer Author Name */}
+                {item.author && (
+                  <p className="text-slate-900 font-bold text-sm md:text-base mb-0.5">
+                    {item.author}
+                  </p>
+                )}
+
+                {/* Customer Role & Company */}
+                {item.role && (
+                  <p className="text-slate-500 font-medium text-xs md:text-sm">
+                    {item.role}
+                  </p>
+                )}
               </div>
-
-              {/* Customer Quote */}
-              {item.quote && (
-                <h3 className="text-slate-900 text-xl md:text-2xl font-bold leading-snug tracking-tight mb-3">
-                  {item.quote}
-                </h3>
-              )}
-
-              {/* Customer Author Name */}
-              {item.author && (
-                <p className="text-slate-900 font-bold text-sm md:text-base mb-0.5">
-                  {item.author}
-                </p>
-              )}
-
-              {/* Customer Role & Company */}
-              {item.role && (
-                <p className="text-slate-500 font-medium text-xs md:text-sm">
-                  {item.role}
-                </p>
-              )}
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 

@@ -16,6 +16,9 @@ interface ErpFeature {
 
 interface ErpFeaturesTabContent {
   heading?: string;
+  headingColor?: string;
+  headingSecondaryColor?: string;
+  highlightedWordIndices?: number[];
   subheading?: string;
   features?: ErpFeature[];
 }
@@ -28,6 +31,11 @@ const defaultIcons = [Calendar, Zap, Layers, BarChart3];
 
 export function ErpFeaturesTab({ content }: ErpFeaturesTabProps) {
   const heading = content?.heading || 'Why 1,500+ Enterprises Chose ebizframe.ai';
+  const headingColor = content?.headingColor || '#0f172a';
+  const headingSecondaryColor = content?.headingSecondaryColor || '#6B26D9';
+  const highlightedWordIndices = Array.isArray(content?.highlightedWordIndices)
+    ? content.highlightedWordIndices
+    : undefined;
   const subheading = content?.subheading || 'Select standard version or customizable version';
 
   const features: ErpFeature[] = (content?.features && content.features.length > 0)
@@ -81,8 +89,8 @@ export function ErpFeaturesTab({ content }: ErpFeaturesTabProps) {
         {/* Header Block */}
         <div className="text-center max-w-3xl mx-auto mb-8 md:mb-10">
           <MotionSection variant="fadeUp">
-            <h2 className="text-3xl md:text-4xl lg:text-[42px] font-bold text-slate-900 tracking-tight leading-tight mb-2.5">
-              {renderFormattedHeading(heading)}
+            <h2 className="text-3xl md:text-4xl lg:text-[42px] font-bold tracking-tight leading-tight mb-2.5" style={{ color: headingColor }}>
+              {renderFormattedHeading(heading, headingSecondaryColor, highlightedWordIndices)}
             </h2>
           </MotionSection>
 
@@ -199,15 +207,35 @@ export function ErpFeaturesTab({ content }: ErpFeaturesTabProps) {
   );
 }
 
-function renderFormattedHeading(text: string) {
+function renderFormattedHeading(text: string, secondaryColor?: string, highlightedWordIndices?: number[]) {
   if (!text) return null;
+  const words = text.split(/\s+/).filter(Boolean);
+
+  if (highlightedWordIndices && highlightedWordIndices.length > 0) {
+    return (
+      <>
+        {words.map((word, idx) => {
+          const isHighlight = highlightedWordIndices.includes(idx);
+          return (
+            <span
+              key={idx}
+              style={{ color: isHighlight ? (secondaryColor || '#6B26D9') : undefined }}
+            >
+              {word}{' '}
+            </span>
+          );
+        })}
+      </>
+    );
+  }
+
   if (text.toLowerCase().includes('ebizframe.ai')) {
     const parts = text.split(/(ebizframe\.ai)/i);
     return (
       <>
         {parts.map((part, idx) =>
           part.toLowerCase() === 'ebizframe.ai' ? (
-            <span key={idx} className="text-[#6B26D9]">
+            <span key={idx} style={{ color: secondaryColor || '#6B26D9' }}>
               {part}
             </span>
           ) : (
@@ -226,21 +254,7 @@ function renderHighlightedText(text: string) {
     return <div dangerouslySetInnerHTML={{ __html: text }} />;
   }
 
-  // Highlight key metrics like 90 Days, 90 days, 1,500+ times, etc.
-  const regex = /(\b90 [Dd]ays\b|\b1,500\+ times\b|\b[A-Za-z0-9]+\b)/g;
-  return (
-    <span>
-      {text.split(/(\b90 [Dd]ays\b|\b1,500\+ times\b)/g).map((chunk, i) =>
-        /(\b90 [Dd]ays\b|\b1,500\+ times\b)/i.test(chunk) ? (
-          <strong key={i} className="text-[#6B26D9] font-bold">
-            {chunk}
-          </strong>
-        ) : (
-          chunk
-        )
-      )}
-    </span>
-  );
+  return <span>{text}</span>;
 }
 
 export default ErpFeaturesTab;

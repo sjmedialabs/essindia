@@ -19,6 +19,7 @@ export async function HeaderShell() {
     const menuRecord = await db
       .select({
         logoUrl: navigationMenus.logoUrl,
+        logoLink: navigationMenus.logoLink,
         getStartedText: navigationMenus.getStartedText,
         getStartedLink: navigationMenus.getStartedLink,
         countryDropdownText: navigationMenus.countryDropdownText,
@@ -33,6 +34,7 @@ export async function HeaderShell() {
       <Header
         navData={navData}
         logoUrl={menuRecord?.logoUrl ?? undefined}
+        logoLink={menuRecord?.logoLink ?? undefined}
         getStartedText={menuRecord?.getStartedText ?? undefined}
         getStartedLink={menuRecord?.getStartedLink ?? undefined}
         countryDropdownText={menuRecord?.countryDropdownText ?? undefined}

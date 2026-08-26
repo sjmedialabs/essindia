@@ -175,8 +175,11 @@ function baseHumanLabel(key: string): string {
   if (key === 'badgeBgColor') return 'Badge Background Color';
   if (key === 'badgeColor' || key === 'badgeTextColor') return 'Badge Text Color';
   if (key === 'badgeBorderColor') return 'Badge Border Color';
+  if (key === 'headingColor') return 'Heading Primary Color';
+  if (key === 'headingSecondaryColor') return 'Heading Secondary Color';
   if (key === 'titleColor') return 'Title Text Color';
-  if (key === 'titleSecondaryColor') return 'Title Secondary Color (Highlights 4th, 5th, 7th words)';
+  if (key === 'titleSecondaryColor') return 'Title Secondary Color';
+  if (key === 'highlightedWordIndices') return 'Highlighted Word Positions';
   if (key === 'titleGradientFrom' || key === 'titleGradientStart') return 'Title Gradient Start Color';
   if (key === 'titleGradientTo' || key === 'titleGradientEnd') return 'Title Gradient End Color';
   if (key === 'gradientFrom') return 'Hero BG Gradient 1 (Start Color)';
@@ -247,6 +250,9 @@ function baseHumanLabel(key: string): string {
   if (key === 'ctaFormType') return 'CTA Form Action';
   if (key === 'whatWeGet') return 'What You Get';
   if (key === 'mobileNumber') return 'Mobile Number';
+  if (key === 'contactTitle') return 'Contact Title';
+  if (key === 'disclaimerText') return 'Disclaimer Text';
+  if (key === 'note') return 'Note';
   if (key === 'sectionTitle') return 'Section Title';
   if (key.toLowerCase().endsWith('pdfurl') || key.toLowerCase().endsWith('pdf')) {
     const prefix = key.replace(/PdfUrl$|pdfUrl$|Pdf$|pdf$/, '');
@@ -329,11 +335,10 @@ export function humanLabel(
   }
 
   if (options?.sectionType === 'landing2-testimonials' && options?.keyPath?.includes('testimonials.')) {
-    if (key === 'quote') return 'Title';
-    if (key === 'author') return 'Name';
+    if (key === 'mediaUrl' || key === 'image' || key === 'videoUrl') return 'Image / Video Upload';
+    if (key === 'quote') return 'Quote';
     if (key === 'role') return 'Role';
-    if (key === 'image') return 'Thumbnail Image';
-    if (key === 'videoUrl') return 'Video Upload';
+    if (key === 'author') return 'Designation / Author';
   }
 
   if (options?.sectionType === 'blog-detail-block') {
@@ -407,6 +412,22 @@ export function detectFieldType(
   if (typeof value === 'string') {
     const lower = key.toLowerCase();
 
+    if (lower.includes('button') && lower.includes('text')) {
+      return 'text';
+    }
+    if (lower.includes('btn') && lower.includes('text')) {
+      return 'text';
+    }
+    if (lower === 'ctalabel' || lower === 'ctatext' || lower === 'buttontext') {
+      return 'text';
+    }
+
+    if (sectionType === 'landing1-testimonials' && lower === 'quote') {
+      return 'textarea';
+    }
+    if (sectionType === 'oracle-hero' && (lower === 'badge' || lower === 'badgetext')) {
+      return 'text';
+    }
     if (lower === 'tabdesc') return 'text';
     if (sectionType === 'career-perks' || lower === 'perk' || lower === 'perks' || key.toLowerCase().includes('perk')) {
       if (lower === 'text' || lower === 'description' || lower === 'desc' || lower === 'name') {
@@ -419,7 +440,7 @@ export function detectFieldType(
     if (lower === 'topic' || lower === 'category') return 'topicSelect';
     if (lower === 'industry' || lower === 'industries') return 'industrySelect';
     if (lower.endsWith('formtype')) return 'formSelect';
-    if (lower === 'icon' && (sectionType === 'bi-business-impact' || sectionType === 'rpa-overview' || sectionType === 'rpa-capabilities' || sectionType === 'rpa-industries' || value.startsWith('/') || value.includes('.') || value.includes('://'))) return 'image';
+    if (lower === 'icon' && (sectionType === 'landing1-cta' || sectionType === 'bi-business-impact' || sectionType === 'rpa-overview' || sectionType === 'rpa-capabilities' || sectionType === 'rpa-industries' || value.startsWith('/') || value.includes('.') || value.includes('://'))) return 'image';
     if (IMAGE_PATTERNS.some((p) => lower.includes(p)) && !lower.endsWith('alt')) return 'image';
     if (lower === 'color' || lower.endsWith('color') || lower.startsWith('color') || lower.includes('accent') || lower.startsWith('gradient')) {
       return 'color';

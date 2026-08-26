@@ -271,6 +271,7 @@ export const navigationMenus = pgTable('navigation_menus', {
   name: varchar('name', { length: 255 }).notNull().unique(),
   location: varchar('location', { length: 100 }).notNull(), // 'header', 'footer', 'sidebar'
   logoUrl: text('logo_url').default('/footer-logo.png'),
+  logoLink: varchar('logo_link', { length: 500 }).default('/'),
   getStartedText: varchar('get_started_text', { length: 255 }).default('Get started'),
   getStartedLink: varchar('get_started_link', { length: 500 }).default('/contact-us'),
   countryDropdownText: varchar('country_dropdown_text', { length: 255 }).default('Select Country'),

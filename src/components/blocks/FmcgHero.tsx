@@ -147,11 +147,11 @@ export function FmcgHero({ content }: { content?: FmcgHeroContent }) {
 
           {/* Right Image Column */}
           {rightImage && (
-            <div className="flex-1 w-full max-w-[500px] relative aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl border border-white/10 flex justify-center items-center">
+            <div className="flex-1 w-full max-w-[500px] relative flex justify-center items-center">
               <motion.div
                 animate={{ y: [0, -12, 0] }}
                 transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-                className="w-full h-full relative"
+                className="w-full relative aspect-[4/3]"
               >
                 <Image
                   src={rightImage}

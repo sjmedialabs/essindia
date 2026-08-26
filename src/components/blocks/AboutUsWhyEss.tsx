@@ -6,6 +6,8 @@ import { ShieldCheck } from 'lucide-react';
 
 interface TrustCard {
   image?: string;
+  icon?: string;
+  iconUrl?: string;
   title?: string;
   description?: string;
 }
@@ -121,7 +123,8 @@ export function AboutUsWhyEss({ content }: AboutUsWhyEssProps) {
         {/* 6 Dark Glass Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
           {trustCards.map((card, index) => {
-            const iconSrc = typeof card.image === 'string' ? card.image.trim() : '';
+            const rawIcon = card.image || card.icon || card.iconUrl || '';
+            const iconSrc = typeof rawIcon === 'string' ? rawIcon.trim() : '';
 
             return (
               <motion.div
@@ -135,13 +138,12 @@ export function AboutUsWhyEss({ content }: AboutUsWhyEssProps) {
                 <div>
                   {/* Top Left Circular Icon Container */}
                   <div className="w-14 h-14 rounded-full bg-[#200D52]/80 border border-[#C084FC]/40 flex items-center justify-center text-[#C084FC] mb-6 relative">
-                    {iconSrc && !iconSrc.includes('/about-us/') ? (
+                    {iconSrc ? (
                       /* eslint-disable-next-line @next/next/no-img-element */
                       <img
                         src={encodeURI(iconSrc)}
                         alt={card.title || 'Trust Card Icon'}
-                        className="w-6 h-6 object-contain"
-                        style={{ filter: 'drop-shadow(0 0 1px #C084FC) sepia(1) hue-rotate(220deg) saturate(3)' }}
+                        className="w-9 h-9 object-contain"
                       />
                     ) : (
                       <DefaultTrustIcon index={index} />
@@ -200,31 +202,31 @@ function renderFormattedTitle(titleText: string, primaryColor?: string, secondar
 
 function DefaultTrustIcon({ index }: { index: number }) {
   const icons = [
-    <svg key="1" className="w-6 h-6 text-[#C084FC]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg key="1" className="w-8 h-8 text-[#C084FC]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <rect x="3" y="7" width="18" height="13" rx="2" strokeWidth="1.8" />
       <path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2" strokeWidth="1.8" strokeLinecap="round" />
       <path d="M12 12v3m-3-1.5h6" strokeWidth="1.8" strokeLinecap="round" />
     </svg>,
 
-    <svg key="2" className="w-6 h-6 text-[#C084FC]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg key="2" className="w-8 h-8 text-[#C084FC]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <circle cx="6" cy="6" r="2.5" strokeWidth="1.8" />
       <circle cx="18" cy="6" r="2.5" strokeWidth="1.8" />
       <circle cx="12" cy="18" r="2.5" strokeWidth="1.8" />
       <path d="M8.5 6h7M7.5 8.5l3 7M16.5 8.5l-3 7" strokeWidth="1.8" strokeLinecap="round" />
     </svg>,
 
-    <svg key="3" className="w-6 h-6 text-[#C084FC]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg key="3" className="w-8 h-8 text-[#C084FC]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <circle cx="12" cy="8" r="3.5" strokeWidth="1.8" />
       <path d="M6 20v-1a5 5 0 0110 0v1" strokeWidth="1.8" strokeLinecap="round" />
       <path d="M12 2v2m8 8h2M2 12h2" strokeWidth="1.8" strokeLinecap="round" />
     </svg>,
 
-    <svg key="4" className="w-6 h-6 text-[#C084FC]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg key="4" className="w-8 h-8 text-[#C084FC]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" strokeWidth="1.8" strokeLinejoin="round" />
       <path d="M9 12l2 2 4-4" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
     </svg>,
 
-    <svg key="5" className="w-6 h-6 text-[#C084FC]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg key="5" className="w-8 h-8 text-[#C084FC]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <circle cx="12" cy="12" r="3" strokeWidth="1.8" />
       <circle cx="12" cy="4" r="2" strokeWidth="1.8" />
       <circle cx="20" cy="12" r="2" strokeWidth="1.8" />
@@ -233,7 +235,7 @@ function DefaultTrustIcon({ index }: { index: number }) {
       <path d="M12 7v2m5 3h2m-7 5v2m-5-7H4" strokeWidth="1.8" strokeLinecap="round" />
     </svg>,
 
-    <svg key="6" className="w-6 h-6 text-[#C084FC]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <svg key="6" className="w-8 h-8 text-[#C084FC]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <rect x="4" y="13" width="4" height="7" rx="1" strokeWidth="1.8" />
       <rect x="10" y="9" width="4" height="11" rx="1" strokeWidth="1.8" />
       <rect x="16" y="4" width="4" height="16" rx="1" strokeWidth="1.8" />

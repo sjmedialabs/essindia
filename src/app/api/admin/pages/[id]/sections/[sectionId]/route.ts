@@ -42,7 +42,10 @@ export async function DELETE(
 
   try {
     const { sectionId } = await params;
-    await pageAdminRepository.deleteSection(sectionId);
+    const deleted = await pageAdminRepository.deleteSection(sectionId);
+    if (!deleted) {
+      return notFound('Section not found');
+    }
     return NextResponse.json({ success: true });
   } catch (error) {
     return serverError(error);

@@ -2448,8 +2448,15 @@ export function SectionEditorCard({
       meta.fieldOrder.forEach((key) => {
         if (!(key in finalMerged)) {
           // Default arrays/booleans for known list fields
-          if (['items', 'processes', 'features', 'faqs', 'cards', 'values', 'modules', 'paragraphs', 'leftItems', 'rightItems', 'steps', 'logos', 'stats', 'statistics', 'slides', 'categories', 'tabs', 'benefits', 'industries', 'solutions', 'points', 'topics', 'links', 'testimonials', 'challenges', 'introModules', 'visionPoints', 'missionPoints'].includes(key) || key.endsWith('Points')) {
+          if (['items', 'processes', 'features', 'faqs', 'cards', 'values', 'modules', 'paragraphs', 'leftItems', 'rightItems', 'steps', 'logos', 'stats', 'statistics', 'slides', 'categories', 'tabs', 'benefits', 'industries', 'solutions', 'points', 'topics', 'links', 'testimonials', 'challenges', 'introModules', 'visionPoints', 'missionPoints', 'whatWeGet'].includes(key) || key.endsWith('Points')) {
             finalMerged[key] = [];
+          } else if (key === 'form') {
+            finalMerged[key] = {
+              title: 'Schedule your free demo',
+              disclaimerText: 'I agree to the Privacy Policy and consent to be contacted about ESS ERP.',
+              buttonText: 'Schedule Free Demo',
+              note: 'Your data is secure and never shared.'
+            };
           } else if (['autoScroll', 'isActive', 'supportsVariants'].includes(key)) {
             finalMerged[key] = true;
           } else {
@@ -2852,6 +2859,7 @@ export function SectionEditorCard({
                 value={mergedContent[key] as JsonValue}
                 onChange={(kp, val) => onContentChange(section.id, kp, val)}
                 sectionType={section.type}
+                allSectionValues={mergedContent as Record<string, JsonValue>}
               />
             ))
           )}

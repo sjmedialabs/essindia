@@ -149,7 +149,11 @@ export function ArrayFieldEditor({
           defaultObj = { iconType: 'copilot', title: '', desc: '' };
         }
       } else if (lowerKey === 'testimonials') {
-        defaultObj = { avatar: '', name: '', role: '', quote: '' };
+        if (sectionType === 'landing2-testimonials') {
+          defaultObj = { mediaUrl: '', quote: '', role: '', author: '' };
+        } else {
+          defaultObj = { avatar: '', name: '', role: '', quote: '' };
+        }
       } else if (lowerKey === 'industries') {
         defaultObj = { icon: '', name: '', desc: '' };
       } else if (lowerKey === 'tabs') {

@@ -29,11 +29,18 @@ export function ContactHero({ content }: { content?: ContactHeroContent }) {
   const backgroundImageUrl = content?.backgroundImageUrl || "/Contact us/banner.png";
 
   
-  const bgStyles = getHeroBackgroundStyles({
-    gradientColor1: content?.gradientColor1,
-    gradientColor2: content?.gradientColor2,
-    gradientColor3: content?.gradientColor3,
-  }, { backgroundColor: bgColor });
+  const hasCustomGradient = content?.gradientColor1 || content?.gradientColor2 || content?.gradientColor3;
+  const bgStyles = hasCustomGradient
+    ? getHeroBackgroundStyles({
+        gradientColor1: content?.gradientColor1,
+        gradientColor2: content?.gradientColor2,
+        gradientColor3: content?.gradientColor3,
+      })
+    : {
+        background: bgColor && bgColor !== '#000000' && bgColor !== '#000'
+          ? bgColor
+          : 'linear-gradient(180deg, #0d061f 0%, #150a33 100%)',
+      };
 
   return (
     <div className="w-full flex flex-col">
@@ -43,10 +50,12 @@ export function ContactHero({ content }: { content?: ContactHeroContent }) {
         style={bgStyles}
       >
         {/* Background Image Overlay */}
-        <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-50"
-          style={{ backgroundImage: `url("${backgroundImageUrl}")` }}
-        ></div>
+        {!hasCustomGradient && (
+          <div
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-30"
+            style={{ backgroundImage: `url("${backgroundImageUrl}")` }}
+          ></div>
+        )}
 
         {/* Content */}
         <div className="relative z-10 text-center px-4 max-w-4xl mx-auto flex flex-col items-center space-y-4">

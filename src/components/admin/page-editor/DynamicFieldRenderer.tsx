@@ -20,6 +20,7 @@ interface DynamicFieldRendererProps {
   onChange: (keyPath: string, value: JsonValue) => void;
   depth?: number;
   sectionType?: string;
+  allSectionValues?: Record<string, JsonValue>;
 }
 
 import { getImageHint } from '@/lib/cms/image-dimensions';
@@ -31,6 +32,7 @@ export function DynamicFieldRenderer({
   onChange,
   depth = 0,
   sectionType,
+  allSectionValues,
 }: DynamicFieldRendererProps) {
   if (isHiddenCmsField(fieldKey, sectionType, keyPath)) return null;
 
@@ -44,6 +46,19 @@ export function DynamicFieldRenderer({
   }
   if (fieldKey.toLowerCase().includes('pdf') || fieldKey.toLowerCase().includes('document')) {
     fieldType = 'image';
+  }
+
+  if (fieldKey === 'highlightedWordIndices') {
+    return (
+      <WordHighlightSelector
+        fieldKey={fieldKey}
+        label={fieldLabel}
+        value={value}
+        onChange={(v) => onChange(keyPath, v)}
+        sectionType={sectionType}
+        allSectionValues={allSectionValues}
+      />
+    );
   }
 
   if (sectionType === 'bi-features' && (fieldKey === 'standard' || fieldKey === 'professional')) {
@@ -530,6 +545,12 @@ function ObjectField({
 
   // Dynamically inject formType if a url/href field is present inside this object
   const mergedValue = { ...value };
+  if (sectionType === 'landing1-cta' && fieldKey === 'form') {
+    if (!('title' in mergedValue)) mergedValue['title'] = 'Schedule your free demo';
+    if (!('disclaimerText' in mergedValue)) mergedValue['disclaimerText'] = 'I agree to the Privacy Policy and consent to be contacted about ESS ERP.';
+    if (!('buttonText' in mergedValue)) mergedValue['buttonText'] = 'Schedule Free Demo';
+    if (!('note' in mergedValue)) mergedValue['note'] = 'Your data is secure and never shared.';
+  }
   const hasUrlKey = Object.keys(mergedValue).some(k => /^(url|href)$/i.test(k));
   if (hasUrlKey && !('formType' in mergedValue)) {
     mergedValue['formType'] = '';
@@ -765,7 +786,16 @@ function ArrayField({
             if (sectionType === 'landing1-testimonials') {
               testimonialOrder = ['avatar', 'name', 'rating', 'quote'];
             } else if (sectionType === 'landing2-testimonials') {
-              testimonialOrder = ['quote', 'author', 'role', 'image', 'videoUrl'];
+              // Standardize single media upload field for image or video
+              if ('image' in objItem && !('mediaUrl' in objItem)) {
+                objItem.mediaUrl = objItem.image || objItem.videoUrl || '';
+              }
+              testimonialOrder = ['mediaUrl', 'quote', 'role', 'author'];
+              for (const k of testimonialOrder) {
+                if (!(k in objItem)) {
+                  objItem[k] = '';
+                }
+              }
             }
             sortedKeys = testimonialOrder.filter(k => k in objItem);
           } else if (fieldKey === 'cards') {
@@ -854,6 +884,11 @@ function ArrayField({
               itemOrder = ['image', 'title'];
             } else if (sectionType === 'staffing-technologies') {
               itemOrder = ['label'];
+            } else if (sectionType === 'about-us-why-ess') {
+              itemOrder = ['image', 'title', 'description'];
+              if (!('image' in objItem)) {
+                objItem.image = objItem.icon || objItem.iconUrl || '';
+              }
             }
             sortedKeys = itemOrder.filter(k => k in objItem);
           } else if (fieldKey === 'steps') {
@@ -1807,6 +1842,157 @@ function ContentSegmentsEditor({
           ))}
         </div>
       )}
+    </div>
+  );
+}
+
+interface WordHighlightSelectorProps {
+  fieldKey: string;
+  label: string;
+  value: JsonValue;
+  onChange: (v: JsonValue) => void;
+  sectionType?: string;
+  allSectionValues?: Record<string, JsonValue>;
+}
+
+function WordHighlightSelector({ label, value, onChange, allSectionValues }: WordHighlightSelectorProps) {
+  const getDirectTitle = () => {
+    if (allSectionValues) {
+      if (typeof allSectionValues.heading === 'string' && allSectionValues.heading.trim()) return allSectionValues.heading;
+      if (typeof allSectionValues.titleText === 'string' && allSectionValues.titleText.trim()) return allSectionValues.titleText;
+      if (typeof allSectionValues.title === 'string' && allSectionValues.title.trim()) return allSectionValues.title;
+      if (typeof allSectionValues.title_text === 'string' && allSectionValues.title_text.trim()) return allSectionValues.title_text;
+    }
+    return '';
+  };
+
+  const [domTitle, setDomTitle] = React.useState<string>('');
+
+  React.useEffect(() => {
+    const handleCheck = () => {
+      if (typeof window === 'undefined') return;
+      const inputs = Array.from(document.querySelectorAll('input, textarea'));
+      const titleInput = (inputs.find(i => {
+        const name = (i.getAttribute('name') || '').toLowerCase();
+        const placeholder = (i.getAttribute('placeholder') || '').toLowerCase();
+        const id = (i.getAttribute('id') || '').toLowerCase();
+        return name.includes('title') || placeholder.includes('title') || id.includes('title');
+      }) || inputs.find(i => (i as HTMLInputElement).value?.includes('Streamline'))) as HTMLInputElement | HTMLTextAreaElement | undefined;
+      
+      if (titleInput && titleInput.value) {
+        setDomTitle(titleInput.value);
+      }
+    };
+
+    handleCheck();
+    window.addEventListener('input', handleCheck);
+    window.addEventListener('keyup', handleCheck);
+    window.addEventListener('change', handleCheck);
+    const timer = setInterval(handleCheck, 500);
+
+    return () => {
+      window.removeEventListener('input', handleCheck);
+      window.removeEventListener('keyup', handleCheck);
+      window.removeEventListener('change', handleCheck);
+      clearInterval(timer);
+    };
+  }, []);
+
+  const titleText = getDirectTitle() || domTitle || "It's all about Streamline, Automate, and Accelerate for Business Fitness";
+
+  const selectedIndices: number[] = Array.isArray(value)
+    ? (value as number[])
+    : [3, 4, 6];
+
+  const words = titleText.split(/\s+/).filter(Boolean);
+
+  const toggleWord = (idx: number) => {
+    let next: number[];
+    if (selectedIndices.includes(idx)) {
+      next = selectedIndices.filter((i) => i !== idx);
+    } else {
+      next = [...selectedIndices, idx].sort((a, b) => a - b);
+    }
+    onChange(next);
+  };
+
+  const selectAll = () => {
+    onChange(words.map((_, i) => i));
+  };
+
+  const clearAll = () => {
+    onChange([]);
+  };
+
+  const resetDefault = () => {
+    onChange([3, 4, 6]);
+  };
+
+  return (
+    <div className="space-y-3 p-4 border border-purple-200 bg-purple-50/40 rounded-xl">
+      <div className="flex items-center justify-between flex-wrap gap-2">
+        <label className="text-xs font-bold text-slate-800 flex items-center gap-2">
+          <span>{label}</span>
+          <span className="bg-purple-100 text-purple-700 font-semibold px-2 py-0.5 rounded-full text-[11px]">
+            Total Words: {words.length}
+          </span>
+        </label>
+        <div className="flex items-center gap-1.5 text-[11px] font-medium">
+          <button
+            type="button"
+            onClick={resetDefault}
+            className="text-purple-600 hover:underline px-1.5 py-0.5 rounded bg-purple-100/60 hover:bg-purple-100"
+          >
+            Default (4, 5, 7)
+          </button>
+          <button
+            type="button"
+            onClick={selectAll}
+            className="text-slate-600 hover:underline px-1.5 py-0.5 rounded bg-slate-200/60 hover:bg-slate-200"
+          >
+            Select All
+          </button>
+          <button
+            type="button"
+            onClick={clearAll}
+            className="text-red-600 hover:underline px-1.5 py-0.5 rounded bg-red-100/60 hover:bg-red-100"
+          >
+            Clear
+          </button>
+        </div>
+      </div>
+
+      <p className="text-[11px] text-slate-500">
+        Click on any word below to toggle applying the Secondary Title Color to it:
+      </p>
+
+      <div className="flex flex-wrap gap-2 pt-1">
+        {words.length === 0 ? (
+          <span className="text-xs text-slate-400 italic">Enter a Title above to select words</span>
+        ) : (
+          words.map((word, idx) => {
+            const isSelected = selectedIndices.includes(idx);
+            return (
+              <button
+                key={idx}
+                type="button"
+                onClick={() => toggleWord(idx)}
+                className={cn(
+                  'px-3 py-1.5 rounded-lg text-xs font-medium border transition-all cursor-pointer flex items-center gap-1.5',
+                  isSelected
+                    ? 'bg-[#462294] text-white border-[#462294] shadow-sm font-semibold scale-[1.02]'
+                    : 'bg-white text-slate-700 border-slate-200 hover:border-purple-300 hover:bg-purple-50/50'
+                )}
+              >
+                <span className={cn('text-[10px] opacity-75', isSelected ? 'text-purple-200' : 'text-slate-400')}>
+                  #{idx + 1}
+                </span>
+                <span>{word}</span>
+              </button>
+            );
+          })
+        )}
+      </div>
     </div>
   );
 }

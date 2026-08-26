@@ -71,6 +71,7 @@ export default function NavigationModule() {
         body: JSON.stringify({
           location: activeMenuLocation,
           logoUrl: menuSettings.logoUrl,
+          logoLink: menuSettings.logoLink,
           getStartedText: menuSettings.getStartedText,
           getStartedLink: menuSettings.getStartedLink,
           countryDropdownText: menuSettings.countryDropdownText,
@@ -725,6 +726,24 @@ export default function NavigationModule() {
                       />
                     </label>
                   </div>
+                </div>
+                <div className="space-y-1">
+                  <label className="text-xs font-semibold text-slate-700">Logo target page link</label>
+                  <p className="text-[11px] text-slate-400">Page to open when user clicks the logo in the header.</p>
+                  <select
+                    value={menuSettings.logoLink || '/'}
+                    onChange={(e) => setMenuSettings((prev: any) => ({ ...prev, logoLink: e.target.value }))}
+                    className="w-full px-2.5 py-1.5 rounded-md border border-slate-200 focus:outline-none focus:ring-2 focus:ring-[#5C2B6A]/40 focus:border-[#5C2B6A] transition-all text-xs bg-white font-medium"
+                  >
+                    <option value="/">Home Page (/)</option>
+                    {registryPages
+                      .filter((p) => p.status === 'published' || p.status === undefined)
+                      .map((p) => (
+                        <option key={p.id} value={p.path || p.routePath}>
+                          {p.title} ({p.path || p.routePath})
+                        </option>
+                      ))}
+                  </select>
                 </div>
 
                 <div className="space-y-1">
