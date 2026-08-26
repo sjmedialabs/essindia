@@ -112,6 +112,12 @@ export function CaseStudyDetailSection({ content }: CaseStudyDetailSectionProps)
               cs.overviewParagraphs.map((paragraph: string, idx: number) => (
                 <p key={idx}>{paragraph}</p>
               ))
+            ) : cs.overview ? (
+              <div className="whitespace-pre-line space-y-4">
+                {cs.overview.split('\n\n').map((para: string, idx: number) => (
+                  <p key={idx}>{para}</p>
+                ))}
+              </div>
             ) : cs.overviewHtml ? (
               <div dangerouslySetInnerHTML={{ __html: cs.overviewHtml }} />
             ) : (

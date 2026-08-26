@@ -32,6 +32,7 @@ export interface CaseStudyPost {
   titleColor?: string;
   descriptionColor?: string;
   overviewTitle?: string;
+  overview?: string;
   overviewParagraphs?: string[];
   challengeTitle?: string;
   challengeDescription?: string;
