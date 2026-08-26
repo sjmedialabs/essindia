@@ -50,38 +50,38 @@ export function Landing1Testimonials({ content }: { content?: Landing1Testimonia
 
   return (
     <section className="py-20 bg-slate-50 text-slate-900 font-sans select-none border-b border-slate-200">
-      <div className="container mx-auto px-6 max-w-7xl">
+      <div className="container mx-auto px-6 max-w-5xl">
         
         {/* Header */}
-        <div className="text-center max-w-3xl mx-auto mb-16 space-y-4">
+        <div className="text-center max-w-3xl mx-auto mb-12 space-y-3">
           {data.badge && (
-            <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-semibold tracking-wider text-indigo-600 bg-indigo-50 border border-indigo-100 uppercase">
+            <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full text-xs font-semibold tracking-wider text-indigo-600 bg-indigo-50 border border-indigo-100 uppercase">
               <span className="w-1.5 h-1.5 rounded-full bg-indigo-600 animate-pulse" />
               {data.badge}
             </span>
           )}
           {data.title && (
-            <h2 className="text-3xl md:text-[40px] font-extrabold tracking-tight text-slate-900 leading-tight">
+            <h2 className="text-2xl md:text-3xl font-extrabold tracking-tight text-slate-900 leading-tight">
               {data.title}
             </h2>
           )}
           {data.description && (
-            <p className="text-slate-500 text-sm md:text-base max-w-2xl mx-auto leading-relaxed">
+            <p className="text-slate-500 text-xs md:text-sm max-w-xl mx-auto leading-relaxed">
               {data.description}
             </p>
           )}
         </div>
 
         {/* Testimonials Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {data.testimonials?.map((test, idx) => (
             <div
               key={idx}
-              className="bg-white p-8 rounded-[32px] border-2 border-[#FF9F1C] shadow-sm flex flex-col items-center text-center transition-all duration-300 hover:shadow-md hover:-translate-y-1"
+              className="bg-white p-5 md:p-6 rounded-[24px] border border-[#FF9F1C] shadow-sm flex flex-col items-center text-center transition-all duration-300 hover:shadow-md hover:-translate-y-1"
             >
               {/* Avatar */}
               {test.avatar && (
-                <div className="w-32 h-32 rounded-full overflow-hidden mb-6 border-4 border-slate-50 shadow-inner shrink-0 relative bg-slate-100">
+                <div className="w-20 h-20 rounded-full overflow-hidden mb-4 border-2 border-slate-50 shadow-inner shrink-0 relative bg-slate-100">
                   <img
                     src={test.avatar}
                     alt={test.name}
@@ -92,25 +92,25 @@ export function Landing1Testimonials({ content }: { content?: Landing1Testimonia
               )}
 
               {/* Name */}
-              <h4 className="text-lg font-extrabold text-[#49288a] tracking-wide mb-2">
+              <h4 className="text-base font-extrabold text-[#49288a] tracking-wide mb-1.5">
                 {test.name}
               </h4>
 
               {/* Star Rating */}
-              <div className="flex items-center gap-0.5 mb-4">
+              <div className="flex items-center gap-0.5 mb-3">
                 {[...Array(5)].map((_, starIdx) => {
                   const active = starIdx < test.rating;
                   return (
                     <Star
                       key={starIdx}
-                      className={`w-5 h-5 ${active ? 'fill-[#FF8A00] text-[#FF8A00]' : 'fill-[#E2E8F0] text-[#E2E8F0]'}`}
+                      className={`w-4 h-4 ${active ? 'fill-[#FF8A00] text-[#FF8A00]' : 'fill-[#E2E8F0] text-[#E2E8F0]'}`}
                     />
                   );
                 })}
               </div>
 
               {/* Quote */}
-              <p className="text-slate-600 text-sm leading-relaxed font-medium">
+              <p className="text-slate-600 text-xs leading-relaxed font-medium">
                 {test.quote}
               </p>
 

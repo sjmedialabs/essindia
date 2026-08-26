@@ -756,23 +756,37 @@ export class PageAdminRepository {
     return this.getById(pageId);
   }
 
-  async deleteSection(sectionId: string) {
+  async deleteSection(sectionId: string): Promise<boolean> {
     const section = await db.query.pageSections.findFirst({
       where: eq(pageSections.id, sectionId),
       with: { page: true },
     });
-    if (!section) return;
+
+    if (!section) {
+      // Fallback: Check if it's a template section
+      const templateSection = await db.query.templateSections.findFirst({
+        where: eq(templateSections.id, sectionId),
+      }).catch(() => null);
+
+      if (templateSection) {
+        await db.delete(templateSections).where(eq(templateSections.id, sectionId));
+        return true;
+      }
+      return false;
+    }
 
     await db.delete(pageSections).where(eq(pageSections.id, sectionId));
 
     if (section.sectionLibraryId) {
-      await sectionLibraryRepository.decrementUsage(section.sectionLibraryId);
+      await sectionLibraryRepository.decrementUsage(section.sectionLibraryId).catch(() => null);
     }
 
     if (section.page) {
-      await this.saveRevision(section.pageId);
-      await this.invalidateCache(section.page.fullPath);
+      await this.saveRevision(section.pageId).catch(() => null);
+      await this.invalidateCache(section.page.fullPath).catch(() => null);
     }
+
+    return true;
   }
 
   async duplicate(id: string) {

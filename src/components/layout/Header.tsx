@@ -38,21 +38,25 @@ export interface HeaderCountryLink {
   redirectUrl: string;
 }
 
-export function Header({
-  navData = [],
-  logoUrl = '/footer-logo.png',
-  getStartedText = 'Get started',
-  getStartedLink = '/contact-us',
-  countryDropdownText = 'Select Country',
-  countryLinks = [],
-}: {
+export interface HeaderProps {
   navData?: NavItem[];
   logoUrl?: string;
+  logoLink?: string;
   getStartedText?: string;
   getStartedLink?: string;
   countryDropdownText?: string;
   countryLinks?: HeaderCountryLink[];
-}) {
+}
+
+export function Header({
+  navData = [],
+  logoUrl = '/footer-logo.png',
+  logoLink = '/',
+  getStartedText = 'Get started',
+  getStartedLink = '/contact-us',
+  countryDropdownText = 'Select Country',
+  countryLinks = [],
+}: HeaderProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
   const [expandedMobileItems, setExpandedMobileItems] = React.useState<Record<string, boolean>>({});
   const [scrolled, setScrolled] = React.useState(false);
@@ -94,7 +98,7 @@ export function Header({
         <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-6 md:px-8">
 
           {/* Logo */}
-          <Link href="/" className="flex items-center group">
+          <Link href={logoLink || '/'} className="flex items-center group">
             <div className="relative">
               <img src={logoUrl} alt="Eastern Software Solutions Pvt.Ltd" className="h-10 w-[160px]" />
             </div>

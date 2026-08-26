@@ -120,7 +120,7 @@ export async function PUT(request: Request) {
 
   try {
     const body = await request.json();
-    const { location, logoUrl, getStartedText, getStartedLink, countryDropdownText, countryLinks } = body;
+    const { location, logoUrl, logoLink, getStartedText, getStartedLink, countryDropdownText, countryLinks } = body;
 
     if (!location) {
       return NextResponse.json({ error: 'location is required' }, { status: 400 });
@@ -130,6 +130,7 @@ export async function PUT(request: Request) {
       .update(navigationMenus)
       .set({
         logoUrl: logoUrl !== undefined ? logoUrl : undefined,
+        logoLink: logoLink !== undefined ? logoLink : undefined,
         getStartedText: getStartedText !== undefined ? getStartedText : undefined,
         getStartedLink: getStartedLink !== undefined ? getStartedLink : undefined,
         countryDropdownText: countryDropdownText !== undefined ? countryDropdownText : undefined,
@@ -143,11 +144,13 @@ export async function PUT(request: Request) {
       return NextResponse.json({ error: 'Menu not found' }, { status: 404 });
     }
 
-    await navigationRepository.clearCache('header-main');
-    await navigationTreeRepository.clearCache('header-main');
-
-    // Force revalidation of all layouts and pages (which includes the header components)
-    revalidatePath('/', 'layout');
+    try {
+      await navigationRepository.clearCache('header-main');
+      await navigationTreeRepository.clearCache('header-main');
+      revalidatePath('/', 'layout');
+    } catch {
+      // Cache clear non-fatal
+    }
 
     return NextResponse.json(updated[0]);
   } catch (error) {

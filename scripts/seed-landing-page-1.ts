@@ -460,7 +460,15 @@ async function seed() {
           'ROI Assessment',
           'No Obligation'
         ],
-        mobileNumber: '+91 80 0000 0000'
+        icon: '',
+        contactTitle: 'Prefer to talk now?',
+        mobileNumber: '+91 80 0000 0000',
+        form: {
+          title: 'Schedule your free demo',
+          disclaimerText: 'I agree to the Privacy Policy and consent to be contacted about ESS ERP.',
+          buttonText: 'Schedule Free Demo',
+          note: 'Your data is secure and never shared.'
+        }
       },
       order: 120
     }

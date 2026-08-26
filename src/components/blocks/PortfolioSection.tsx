@@ -142,66 +142,19 @@ export function PortfolioSection({ content }: PortfolioSectionProps) {
                   : "grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 xl:px-24"
               )}
             >
-              {projects.map((portfolio, index) => (
-                <motion.div
-                  key={index}
-                  variants={{
-                    initial: { opacity: 0, y: 30, filter: 'blur(10px)' },
-                    animate: { opacity: 1, y: 0, filter: 'blur(0px)', transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] } }
-                  }}
-                  whileHover={{ y: -10, transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] } }}
-                  className={cn(
-                    "flex flex-col group cursor-pointer",
-                    showArrows ? "w-full md:w-[calc(50%-20px)] lg:w-[calc(33.33%-26px)] shrink-0 flex-none snap-start" : ""
-                  )}
-                >
-                  {/* Image */}
-                  <div className="rounded-[32px] overflow-hidden bg-slate-200 aspect-[4/3] shadow-lg mb-8 relative">
-                    <motion.img 
-                      whileHover={{ scale: 1.05 }}
-                      transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
-                      src={portfolio.image} 
-                      alt={portfolio.title}
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        (e.target as HTMLImageElement).style.display = 'none';
-                      }}
-                    />
-                    {/* Subtle overlay on hover */}
-                    <div className="absolute inset-0 bg-black/0 group-hover:bg-[#4B2A63]/10 transition-colors duration-500" />
-                  </div>
-
-                  {/* Content */}
-                  <h3 className="text-[24px] font-bold text-[#4B2A63] mb-4 tracking-tight group-hover:text-black transition-colors">
-                    {portfolio.title}
-                  </h3>
-                  
-                  {/* Tags */}
-                  <div className="flex flex-wrap gap-2 mb-6">
-                    {portfolio.tags?.map(tag => (
-                      <span 
-                        key={tag} 
-                        className="bg-white/80 backdrop-blur-sm border border-slate-100 text-slate-500 px-4 py-1.5 rounded-full text-[11px] font-bold tracking-wider uppercase"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-
-                  {/* Link */}
-                  <div className="flex items-center text-slate-900 text-[15px] font-bold group-hover:text-[#4B2A63] transition-all duration-300 mt-auto cursor-pointer">
-                    {portfolio.ctaUrl ? (
-                      <a href={portfolio.ctaUrl} className="flex items-center">
-                        {portfolio.ctaText || 'Explore Project'} <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1.5" />
-                      </a>
-                    ) : (
-                      <>
-                        {portfolio.ctaText || 'Explore Project'} <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1.5" />
-                      </>
-                    )}
-                  </div>
-                </motion.div>
-              ))}
+              {projects.map((portfolio, index) => {
+                const targetUrl = portfolio.ctaUrl || (portfolio as any).url || (portfolio as any).link || (portfolio as any).buttonUrl || '';
+                const formType = ((portfolio as any).ctaFormType || (portfolio as any).formType || '') as CtaFormType;
+                return (
+                  <ProjectCard
+                    key={index}
+                    portfolio={portfolio}
+                    showArrows={showArrows}
+                    targetUrl={targetUrl}
+                    formType={formType}
+                  />
+                );
+              })}
             </StaggerContainer>
           </div>
 
@@ -238,5 +191,88 @@ export function PortfolioSection({ content }: PortfolioSectionProps) {
       </div>
       {modalNode}
     </section>
+  );
+}
+
+function ProjectCard({
+  portfolio,
+  showArrows,
+  targetUrl,
+  formType,
+}: {
+  portfolio: Project;
+  showArrows: boolean;
+  targetUrl: string;
+  formType: CtaFormType;
+}) {
+  const { handleClick, modalNode } = useCtaAction(targetUrl, formType);
+  const handleCardClick = (e: React.MouseEvent) => {
+    if (formType) {
+      e.preventDefault();
+      handleClick();
+    }
+  };
+
+  return (
+    <>
+      <motion.div
+        variants={{
+          initial: { opacity: 0, y: 30, filter: 'blur(10px)' },
+          animate: { opacity: 1, y: 0, filter: 'blur(0px)', transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] } }
+        }}
+        whileHover={{ y: -10, transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] } }}
+        className={cn(
+          "flex flex-col group cursor-pointer",
+          showArrows ? "w-full md:w-[calc(50%-20px)] lg:w-[calc(33.33%-26px)] shrink-0 flex-none snap-start" : ""
+        )}
+      >
+        {/* Image */}
+        <div className="rounded-[32px] overflow-hidden bg-slate-200 aspect-[4/3] shadow-lg mb-8 relative">
+          <motion.img 
+            whileHover={{ scale: 1.05 }}
+            transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+            src={portfolio.image} 
+            alt={portfolio.title}
+            className="w-full h-full object-cover"
+            onError={(e) => {
+              (e.target as HTMLImageElement).style.display = 'none';
+            }}
+          />
+          {/* Subtle overlay on hover */}
+          <div className="absolute inset-0 bg-black/0 group-hover:bg-[#4B2A63]/10 transition-colors duration-500" />
+        </div>
+
+        {/* Content */}
+        <h3 className="text-lg md:text-xl font-bold text-[#4B2A63] mb-2.5 tracking-tight group-hover:text-black transition-colors">
+          {portfolio.title}
+        </h3>
+        
+        {/* Tags */}
+        <div className="flex flex-wrap gap-1.5 mb-4">
+          {portfolio.tags?.map(tag => (
+            <span 
+              key={tag} 
+              className="bg-white/80 backdrop-blur-sm border border-slate-100 text-slate-500 px-3 py-1 rounded-full text-[10px] font-semibold tracking-wide uppercase"
+            >
+              {tag}
+            </span>
+          ))}
+        </div>
+
+        {/* Link */}
+        <div className="flex items-center text-slate-900 text-xs md:text-sm font-bold group-hover:text-[#4B2A63] transition-all duration-300 mt-auto cursor-pointer">
+          {targetUrl ? (
+            <a href={targetUrl} onClick={handleCardClick} className="flex items-center">
+              {portfolio.ctaText || 'Explore Project'} <ArrowRight className="w-3.5 h-3.5 ml-1.5 transition-transform group-hover:translate-x-1" />
+            </a>
+          ) : (
+            <span className="flex items-center">
+              {portfolio.ctaText || 'Explore Project'} <ArrowRight className="w-3.5 h-3.5 ml-1.5 transition-transform group-hover:translate-x-1" />
+            </span>
+          )}
+        </div>
+      </motion.div>
+      {modalNode}
+    </>
   );
 }

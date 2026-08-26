@@ -101,8 +101,8 @@ export function AomHero({ content }: { content?: AomHeroContent }) {
       style={bgStyles}
     >
       {/* Decorative lights */}
-      <div className="absolute top-10 left-10 w-72 h-72 bg-cyan-400/20 rounded-full blur-3xl" />
-      <div className="absolute bottom-10 right-10 w-96 h-96 bg-indigo-500/10 rounded-full" />
+      <div className="absolute top-10 left-10 w-72 h-72 bg-cyan-400/20 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute bottom-10 right-10 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
 
       <div className="container mx-auto max-w-7xl relative z-10">
         <div className="flex flex-col lg:flex-row items-center gap-12 lg:gap-8">
@@ -185,7 +185,7 @@ export function AomHero({ content }: { content?: AomHeroContent }) {
           {/* Right Image Column */}
           {rightImage && (
             <div className="flex-1 w-full flex justify-center">
-              <div className="relative w-full aspect-[4/3] max-w-[500px] rounded-2xl overflow-hidden animate-[float_6s_ease-in-out_infinite]">
+              <div className="relative w-full aspect-[4/3] max-w-[500px] animate-[float_6s_ease-in-out_infinite]">
                 <Image
                   src={rightImage}
                   alt={title}

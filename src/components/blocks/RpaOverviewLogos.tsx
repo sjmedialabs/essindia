@@ -26,7 +26,17 @@ export function RpaOverviewLogos({ content }: { content?: RpaOverviewLogosConten
     { image: '/RPA-Robotic Process Automation (RPA)/image 63.png' }
   ];
 
-  const logos = content?.logos && content.logos.length > 0 ? content.logos : defaultLogos;
+  const rawLogos = content?.logos && content.logos.length > 0 ? content.logos : defaultLogos;
+  const logos: PartnerLogo[] = rawLogos.map((item: any) => {
+    if (typeof item === 'string') {
+      return { image: item, name: '' };
+    }
+    return {
+      image: item?.image || item?.url || item?.src || item?.logo || '',
+      name: item?.name || item?.alt || item?.title || ''
+    };
+  }).filter((item) => Boolean(item.image));
+
   const duplicatedLogos = [...logos, ...logos, ...logos];
 
   if (!logos || logos.length === 0) return null;
@@ -48,12 +58,10 @@ export function RpaOverviewLogos({ content }: { content?: RpaOverviewLogosConten
                   className="relative w-24 h-10 md:w-28 md:h-12 shrink-0 select-none"
                 >
                   {logo.image && (
-                    <Image
+                    <img
                       src={logo.image}
                       alt={logo.name || 'Partner Logo'}
-                      fill
-                      sizes="(max-width: 768px) 96px, 112px"
-                      className="object-contain opacity-75 hover:opacity-100 transition-opacity duration-300"
+                      className="w-full h-full object-contain opacity-75 hover:opacity-100 transition-opacity duration-300"
                     />
                   )}
                 </div>
@@ -78,12 +86,10 @@ export function RpaOverviewLogos({ content }: { content?: RpaOverviewLogosConten
                 className="relative w-24 h-10 md:w-28 md:h-12 hover:scale-110 transition-all duration-300 select-none"
               >
                 {logo.image && (
-                  <Image
+                  <img
                     src={logo.image}
                     alt={logo.name || 'Partner Logo'}
-                    fill
-                    sizes="(max-width: 768px) 96px, 112px"
-                    className="object-contain"
+                    className="w-full h-full object-contain"
                   />
                 )}
               </motion.div>

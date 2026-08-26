@@ -15,6 +15,7 @@ interface ErpHeroContent {
   titleText?: string;
   titleColor?: string;
   titleSecondaryColor?: string;
+  highlightedWordIndices?: number[];
   descriptionText?: string;
   descriptionColor?: string;
   button1Text?: string;
@@ -71,11 +72,14 @@ export function ErpHero({ content }: ErpHeroProps) {
 
   const { handleClick: handleBtn1Click, modalNode: modal1 } = useCtaAction(button1Url, button1FormType);
   const { handleClick: handleBtn2Click, modalNode: modal2 } = useCtaAction(button2Url, button2FormType);
-  // Highlight 4th, 5th, and 7th words (indices 3, 4, 6)
+  const highlightedWordIndices = Array.isArray(content?.highlightedWordIndices)
+    ? content.highlightedWordIndices
+    : [3, 4, 6];
+
   const highlightTitle = (text: string) => {
-    const words = text.split(' ');
+    const words = text.split(/\s+/).filter(Boolean);
     return words.map((word, idx) => {
-      const isHighlight = idx === 3 || idx === 4 || idx === 6;
+      const isHighlight = highlightedWordIndices.includes(idx);
       return (
         <span
           key={idx}
@@ -122,10 +126,10 @@ export function ErpHero({ content }: ErpHeroProps) {
                   gradientFrom={(content as any)?.titleGradientFrom}
                   gradientTo={(content as any)?.titleGradientTo}
                   enableAnimation={(content as any)?.enableTitleGradientAnimation}
-                  className="text-4xl sm:text-[46px] font-black leading-[1.12] tracking-tight pb-6 text-left"
+                  className="text-4xl sm:text-[46px] font-bold leading-[1.12] tracking-tight pb-6 text-left"
                 />
               ) : (
-                <h1 className="text-4xl sm:text-[46px] font-black leading-[1.12] tracking-tight pb-6" style={{ color: titleColor }}>
+                <h1 className="text-4xl sm:text-[46px] font-bold leading-[1.12] tracking-tight pb-6" style={{ color: titleColor }}>
                   {highlightTitle(titleText)}
                 </h1>
               )}

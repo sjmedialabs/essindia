@@ -136,6 +136,7 @@ ALTER TABLE "page_sections" ADD COLUMN IF NOT EXISTS "style_json" jsonb DEFAULT 
 ALTER TABLE "page_sections" ADD COLUMN IF NOT EXISTS "settings_json" jsonb DEFAULT '{}';
 ALTER TABLE "page_sections" ADD COLUMN IF NOT EXISTS "responsive_json" jsonb DEFAULT '{}';
 ALTER TABLE "page_sections" ADD COLUMN IF NOT EXISTS "animation_json" jsonb DEFAULT '{}';
+ALTER TABLE "navigation_menus" ADD COLUMN IF NOT EXISTS "logo_link" varchar(500) DEFAULT '/';
 
 -- Foreign keys
 ALTER TABLE "categories" ADD CONSTRAINT "categories_seo_id_seo_metadata_id_fk"

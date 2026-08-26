@@ -223,6 +223,7 @@ const RAW_SECTION_REGISTRY: SectionTypeDefinition[] = [
       'titleText',
       'titleColor',
       'titleSecondaryColor',
+      'highlightedWordIndices',
       'descriptionText',
       'descriptionColor',
       'button1Text',
@@ -268,7 +269,7 @@ const RAW_SECTION_REGISTRY: SectionTypeDefinition[] = [
     color: 'bg-blue-50 text-blue-600',
     defaultVariant: 'default',
     supportsVariants: false,
-    fieldOrder: ['heading', 'subheading', 'features'],
+    fieldOrder: ['heading', 'headingColor', 'headingSecondaryColor', 'highlightedWordIndices', 'subheading', 'features'],
   },
   {
     type: 'erp-value',
@@ -2393,7 +2394,7 @@ const RAW_SECTION_REGISTRY: SectionTypeDefinition[] = [
     color: 'bg-[#4B2A63]/10 text-[#4B2A63]',
     defaultVariant: 'default',
     supportsVariants: false,
-    fieldOrder: ['title', 'testimonials']
+    fieldOrder: ['title', 'subtitle', 'testimonials']
   },
   {
     type: 'landing2-why-ess',
@@ -2548,12 +2549,12 @@ const RAW_SECTION_REGISTRY: SectionTypeDefinition[] = [
   {
     type: 'landing1-cta',
     label: 'Landing 1 CTA',
-    description: 'Direct call to action block with customizable colors',
+    description: 'Direct call to action block with customizable colors and contact form',
     icon: Layout,
     color: 'bg-[#4B2A63]/10 text-[#4B2A63]',
     defaultVariant: 'default',
     supportsVariants: false,
-    fieldOrder: ['badge', 'title', 'description', 'whatWeGet', 'mobileNumber']
+    fieldOrder: ['badge', 'title', 'description', 'whatWeGet', 'icon', 'contactTitle', 'mobileNumber', 'form']
   },
   {
     type: 'landing1-challenges',

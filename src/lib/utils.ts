@@ -45,7 +45,7 @@ export function getHeroBackgroundStyles(
 
   // 3 colors
   return {
-    backgroundImage: `radial-gradient(100% 100% at 50% 0%, ${colors[0]} 0%, ${colors[1]} 50%, ${colors[2]} 100%)`,
+    backgroundImage: `linear-gradient(135deg, ${colors[0]} 0%, ${colors[1]} 50%, ${colors[2]} 100%)`,
     backgroundColor: 'transparent',
     ...((defaultStyles && 'color' in defaultStyles) ? { color: defaultStyles.color } : {})
   };

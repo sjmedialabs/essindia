@@ -10,7 +10,15 @@ export interface Landing1CtaContent {
   title?: string;
   description?: string;
   whatWeGet?: string[];
+  icon?: string;
+  contactTitle?: string;
   mobileNumber?: string;
+  form?: {
+    title?: string;
+    disclaimerText?: string;
+    buttonText?: string;
+    note?: string;
+  };
 }
 
 const DEFAULT_CONTENT: Landing1CtaContent = {
@@ -24,11 +32,26 @@ const DEFAULT_CONTENT: Landing1CtaContent = {
     'ROI Assessment',
     'No Obligation'
   ],
-  mobileNumber: '+91 80 0000 0000'
+  icon: '',
+  contactTitle: 'Prefer to talk now?',
+  mobileNumber: '+91 80 0000 0000',
+  form: {
+    title: 'Schedule your free demo',
+    disclaimerText: 'I agree to the Privacy Policy and consent to be contacted about ESS ERP.',
+    buttonText: 'Schedule Free Demo',
+    note: 'Your data is secure and never shared.'
+  }
 };
 
 export function Landing1Cta({ content }: { content?: Landing1CtaContent }) {
-  const data = { ...DEFAULT_CONTENT, ...content };
+  const data = {
+    ...DEFAULT_CONTENT,
+    ...content,
+    form: {
+      ...DEFAULT_CONTENT.form,
+      ...content?.form
+    }
+  };
   const pathname = usePathname();
 
   // Form states
@@ -145,19 +168,27 @@ export function Landing1Cta({ content }: { content?: Landing1CtaContent }) {
               )}
             </div>
 
-            {/* Prefer to talk now callout */}
-            {data.mobileNumber && (
+            {/* Prefer to talk now / Contact callout */}
+            {(data.mobileNumber || data.contactTitle || data.icon) && (
               <div className="mt-10 bg-indigo-50/40 border border-indigo-100/50 rounded-2xl p-4 flex items-center gap-4">
-                <div className="p-2.5 bg-indigo-50 rounded-xl text-indigo-600 shrink-0">
-                  <Phone className="w-5 h-5" />
+                <div className="p-2.5 bg-indigo-50 rounded-xl text-indigo-600 shrink-0 flex items-center justify-center">
+                  {data.icon ? (
+                    <img src={data.icon} alt="Contact Icon" className="w-5 h-5 object-contain" />
+                  ) : (
+                    <Phone className="w-5 h-5" />
+                  )}
                 </div>
                 <div>
-                  <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-                    Prefer to talk now?
-                  </p>
-                  <a href={`tel:${data.mobileNumber.replace(/\s+/g, '')}`} className="text-sm font-bold text-indigo-900 hover:underline">
-                    {data.mobileNumber}
-                  </a>
+                  {data.contactTitle && (
+                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+                      {data.contactTitle}
+                    </p>
+                  )}
+                  {data.mobileNumber && (
+                    <a href={`tel:${data.mobileNumber.replace(/\s+/g, '')}`} className="text-sm font-bold text-indigo-900 hover:underline">
+                      {data.mobileNumber}
+                    </a>
+                  )}
                 </div>
               </div>
             )}
@@ -165,9 +196,11 @@ export function Landing1Cta({ content }: { content?: Landing1CtaContent }) {
 
           {/* Right Column (Form) */}
           <div className="lg:col-span-7 p-8 md:p-12">
-            <h3 className="text-xl font-extrabold text-slate-900 mb-6">
-              Schedule your free demo
-            </h3>
+            {data.form?.title && (
+              <h3 className="text-xl font-extrabold text-slate-900 mb-6">
+                {data.form.title}
+              </h3>
+            )}
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -255,7 +288,7 @@ export function Landing1Cta({ content }: { content?: Landing1CtaContent }) {
                 </div>
               </div>
 
-              {/* Checkbox */}
+              {/* Checkbox & Disclaimer */}
               <div className="flex items-start gap-2.5 mt-6">
                 <input
                   type="checkbox"
@@ -265,7 +298,7 @@ export function Landing1Cta({ content }: { content?: Landing1CtaContent }) {
                   className="rounded border-slate-350 text-indigo-600 focus:ring-indigo-500 mt-1 cursor-pointer w-4 h-4 shrink-0"
                 />
                 <label htmlFor="agree-checkbox" className="text-xs text-slate-500 leading-normal select-none cursor-pointer">
-                  I agree to the <span className="font-bold text-[#49288a] hover:underline">Privacy Policy</span> and consent to be contacted about ESS ERP.
+                  {data.form?.disclaimerText || 'I agree to the Privacy Policy and consent to be contacted about ESS ERP.'}
                 </label>
               </div>
 
@@ -281,16 +314,18 @@ export function Landing1Cta({ content }: { content?: Landing1CtaContent }) {
                   </>
                 ) : (
                   <>
-                    Schedule Free Demo <ArrowRight className="w-4 h-4" />
+                    {data.form?.buttonText || 'Schedule Free Demo'} <ArrowRight className="w-4 h-4" />
                   </>
                 )}
               </button>
 
-              {/* Footer text */}
-              <div className="flex items-center justify-center gap-1.5 text-[10px] text-slate-400 mt-4 font-semibold tracking-wide">
-                <ShieldCheck className="w-4 h-4 text-emerald-500" />
-                Your data is secure and never shared.
-              </div>
+              {/* Note / Footer text */}
+              {data.form?.note && (
+                <div className="flex items-center justify-center gap-1.5 text-[10px] text-slate-400 mt-4 font-semibold tracking-wide">
+                  <ShieldCheck className="w-4 h-4 text-emerald-500" />
+                  {data.form.note}
+                </div>
+              )}
             </form>
           </div>
 
