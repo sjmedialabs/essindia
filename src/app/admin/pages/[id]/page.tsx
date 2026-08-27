@@ -874,13 +874,13 @@ const DEFAULT_INDUSTRIES = [
   'Financial Services'
 ];
 
-interface BlogManagerProps {
-  pageId: string;
-  onRefresh: () => void;
+export interface BlogManagerProps {
+  pageId?: string;
+  onRefresh?: () => void;
   blogListSection?: PageSection;
 }
 
-function BlogManager({ pageId, onRefresh, blogListSection }: BlogManagerProps) {
+export function BlogManager({ pageId, onRefresh, blogListSection }: BlogManagerProps) {
   const topics = React.useMemo(() => {
     const sectionContent = blogListSection?.content as any;
     const rawTopics = sectionContent?.topics;
@@ -961,6 +961,86 @@ function BlogManager({ pageId, onRefresh, blogListSection }: BlogManagerProps) {
 
   // Modal active tab control
   const [activeTab, setActiveTab] = React.useState<'hero' | 'author' | 'content' | 'conclusion'>('hero');
+  const [editingBlogId, setEditingBlogId] = React.useState<string | null>(null);
+  const [isFetchingDetail, setIsFetchingDetail] = React.useState(false);
+
+  const resetForm = React.useCallback(() => {
+    setTitle('');
+    setSlug('');
+    setSlugTouched(false);
+    setCategory('');
+    setIndustry('');
+    setDate('May 15,2026');
+    setReadTime('3min read');
+    setHeroBgImage('');
+    setBgColor('');
+    setGradientFrom('#4A3AFF');
+    setGradientVia('#4842E9');
+    setGradientTo('#6095FF');
+
+    setAuthorCardAvatar('https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150&auto=format&fit=crop&q=80');
+    setAuthorCardName('Saurabh Singh');
+    setAuthorCardRole('Managing Director');
+    setAuthorCardBio('With over 15 years of experience driving large-scale digital initiatives...');
+
+    setContentSegments([]);
+    setConclusionParagraphs([]);
+    setCalcTitle('Calculate your app development timeline!');
+    setCalcDisclaimer('');
+    setCalcPoints([]);
+    setStatus('draft');
+    setEditingBlogId(null);
+    setActiveTab('hero');
+  }, []);
+
+  const handleEditBlog = async (blogId: string) => {
+    setIsFetchingDetail(true);
+    setEditingBlogId(blogId);
+    try {
+      const res = await fetch(`/api/admin/pages/${blogId}`);
+      if (!res.ok) throw new Error('Failed to fetch blog details');
+      const pageData = await res.json();
+
+      setTitle(pageData.title || '');
+      setSlug(pageData.slug || '');
+      setSlugTouched(true);
+      setStatus(pageData.status === 'published' ? 'published' : 'draft');
+
+      const detailSection = pageData.sections?.find((s: any) => s.type === 'blog-detail-block');
+      if (detailSection && detailSection.content) {
+        const c = detailSection.content;
+        setCategory(c.category || c.topic || '');
+        setIndustry(c.industry || '');
+        setHeroBgImage(c.heroBgImage || '');
+        setBgColor(c.bgColor || '');
+        setGradientFrom(c.gradientFrom || '#4A3AFF');
+        setGradientVia(c.gradientVia || '#4842E9');
+        setGradientTo(c.gradientTo || '#6095FF');
+        setDate(c.date || 'May 15,2026');
+        setReadTime(c.readTime || '3min read');
+
+        setAuthorCardAvatar(c.authorCardAvatar || 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150&auto=format&fit=crop&q=80');
+        setAuthorCardName(c.authorCardName || 'Saurabh Singh');
+        setAuthorCardRole(c.authorCardRole || 'Managing Director');
+        setAuthorCardBio(c.authorCardBio || '');
+
+        setContentSegments(Array.isArray(c.contentSegments) ? c.contentSegments : []);
+        setConclusionParagraphs(Array.isArray(c.conclusionParagraphs) ? c.conclusionParagraphs : []);
+
+        setCalcTitle(c.calcTitle || 'Calculate your app development timeline!');
+        setCalcDisclaimer(c.calcDisclaimer || '');
+        setCalcPoints(Array.isArray(c.calcPoints) ? c.calcPoints : []);
+      }
+
+      setActiveTab('hero');
+      setShowCreateModal(true);
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to load blog post details');
+      setEditingBlogId(null);
+    } finally {
+      setIsFetchingDetail(false);
+    }
+  };
 
   const fetchBlogs = React.useCallback(async () => {
     setIsLoading(true);
@@ -968,11 +1048,26 @@ function BlogManager({ pageId, onRefresh, blogListSection }: BlogManagerProps) {
       const res = await fetch('/api/admin/pages');
       if (res.ok) {
         const tree = await res.json();
+        let targetPageId = pageId;
 
-        // Find current page in tree
+        if (!targetPageId) {
+          const findBlogNode = (nodes: any[]): any => {
+            for (const node of nodes) {
+              if (node.fullPath === '/blogs' || node.slug === 'blogs') return node;
+              if (node.children) {
+                const found = findBlogNode(node.children);
+                if (found) return found;
+              }
+            }
+            return null;
+          };
+          const bNode = findBlogNode(tree);
+          if (bNode) targetPageId = bNode.id;
+        }
+
         const findNode = (nodes: any[]): any => {
           for (const node of nodes) {
-            if (node.id === pageId) return node;
+            if (node.id === targetPageId) return node;
             if (node.children) {
               const found = findNode(node.children);
               if (found) return found;
@@ -985,7 +1080,17 @@ function BlogManager({ pageId, onRefresh, blogListSection }: BlogManagerProps) {
         if (blogNode && blogNode.children) {
           setBlogs(blogNode.children);
         } else {
-          setBlogs([]);
+          const allBlogPages: any[] = [];
+          const collectBlogs = (nodes: any[]) => {
+            for (const node of nodes) {
+              if (node.fullPath?.includes('/blogs/') || node.slug?.startsWith('blog')) {
+                allBlogPages.push(node);
+              }
+              if (node.children) collectBlogs(node.children);
+            }
+          };
+          collectBlogs(tree);
+          setBlogs(allBlogPages);
         }
       }
     } catch (err) {
@@ -994,6 +1099,35 @@ function BlogManager({ pageId, onRefresh, blogListSection }: BlogManagerProps) {
       setIsLoading(false);
     }
   }, [pageId]);
+
+  const [updatingStatusId, setUpdatingStatusId] = React.useState<string | null>(null);
+
+  const handleStatusChange = async (blogId: string, newStatus: 'draft' | 'published') => {
+    setUpdatingStatusId(blogId);
+    try {
+      const action = newStatus === 'published' ? 'publish' : 'unpublish';
+      const res = await fetch(`/api/admin/pages/${blogId}/actions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action }),
+      });
+
+      if (res.ok) {
+        toast.success(`Status updated to ${newStatus}`);
+        setBlogs((prev) =>
+          prev.map((b) => (b.id === blogId ? { ...b, status: newStatus } : b))
+        );
+        if (onRefresh) onRefresh();
+      } else {
+        const data = await res.json().catch(() => ({}));
+        toast.error(data.error || 'Failed to update status');
+      }
+    } catch (err) {
+      toast.error('Failed to update status');
+    } finally {
+      setUpdatingStatusId(null);
+    }
+  };
 
   const fetchTemplates = React.useCallback(async () => {
     try {
@@ -1035,7 +1169,7 @@ function BlogManager({ pageId, onRefresh, blogListSection }: BlogManagerProps) {
       if (res.ok) {
         toast.success('Blog post deleted successfully');
         fetchBlogs();
-        onRefresh();
+        if (onRefresh) onRefresh();
       } else {
         toast.error('Failed to delete blog post');
       }
@@ -1056,7 +1190,77 @@ function BlogManager({ pageId, onRefresh, blogListSection }: BlogManagerProps) {
     }
     setIsCreating(true);
     try {
-      // Find Blog Detail Template
+      if (editingBlogId) {
+        // UPDATE EXISTING BLOG
+        await fetch(`/api/admin/pages/${editingBlogId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title, slug }),
+        });
+
+        const getPageRes = await fetch(`/api/admin/pages/${editingBlogId}`);
+        const pageData = await getPageRes.json();
+        const detailSection = pageData.sections?.find((s: any) => s.type === 'blog-detail-block');
+
+        if (detailSection) {
+          const defaultContent = detailSection.content || {};
+          const updatedContent = {
+            ...defaultContent,
+            heroBgImage: heroBgImage || undefined,
+            category: category || undefined,
+            industry: industry || undefined,
+            bgColor: bgColor || undefined,
+            gradientFrom: gradientFrom || '#4A3AFF',
+            gradientVia: gradientVia || '#4842E9',
+            gradientTo: gradientTo || '#6095FF',
+            heroTitle: title || undefined,
+            title: title || undefined,
+            date: date || undefined,
+            readTime: readTime || '3min read',
+
+            authorCardAvatar: authorCardAvatar || undefined,
+            authorCardName: authorCardName || undefined,
+            authorCardRole: authorCardRole || undefined,
+            authorCardBio: authorCardBio || undefined,
+
+            contentSegments: contentSegments || [],
+            conclusionParagraphs: conclusionParagraphs || [],
+
+            calcTitle: calcTitle || 'Calculate your app development timeline!',
+            calcDisclaimer: calcDisclaimer || undefined,
+            calcPoints: calcPoints || [],
+          };
+
+          await fetch(`/api/admin/pages/${editingBlogId}/sections/${detailSection.id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ content: updatedContent }),
+          });
+        }
+
+        if (status === 'published') {
+          await fetch(`/api/admin/pages/${editingBlogId}/actions`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'publish' }),
+          });
+        } else {
+          await fetch(`/api/admin/pages/${editingBlogId}/actions`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ action: 'unpublish' }),
+          });
+        }
+
+        toast.success('Blog post updated successfully');
+        setShowCreateModal(false);
+        resetForm();
+        fetchBlogs();
+        if (onRefresh) onRefresh();
+        return;
+      }
+
+      // CREATE NEW BLOG
       const blogDetailTemplate = templates.find((t: any) =>
         t.templateSections?.some((ts: any) => ts.type === 'blog-detail-block')
       );
@@ -1068,6 +1272,26 @@ function BlogManager({ pageId, onRefresh, blogListSection }: BlogManagerProps) {
         );
       }
 
+      let targetParentId = pageId;
+      if (!targetParentId) {
+        const res = await fetch('/api/admin/pages');
+        if (res.ok) {
+          const tree = await res.json();
+          const findBlogNode = (nodes: any[]): any => {
+            for (const node of nodes) {
+              if (node.fullPath === '/blogs' || node.slug === 'blogs') return node;
+              if (node.children) {
+                const found = findBlogNode(node.children);
+                if (found) return found;
+              }
+            }
+            return null;
+          };
+          const bNode = findBlogNode(tree);
+          if (bNode) targetParentId = bNode.id;
+        }
+      }
+
       // 1. Create the page
       const createPageRes = await fetch('/api/admin/pages', {
         method: 'POST',
@@ -1075,7 +1299,7 @@ function BlogManager({ pageId, onRefresh, blogListSection }: BlogManagerProps) {
         body: JSON.stringify({
           title,
           slug,
-          parentId: pageId,
+          parentId: targetParentId || null,
           templateId,
           pageType: 'standard',
           status: 'draft',
@@ -1162,34 +1386,10 @@ function BlogManager({ pageId, onRefresh, blogListSection }: BlogManagerProps) {
       toast.success('Blog post created successfully');
       setShowCreateModal(false);
 
-      // Reset form
-      setTitle('');
-      setSlug('');
-      setSlugTouched(false);
-      setCategory('');
-      setIndustry('');
-      setDate('May 15,2026');
-      setReadTime('3min read');
-      setHeroBgImage('');
-      setBgColor('');
-      setGradientFrom('#4A3AFF');
-      setGradientVia('#4842E9');
-      setGradientTo('#6095FF');
-
-      // Reset author card
-      setAuthorCardAvatar('https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150&auto=format&fit=crop&q=80');
-      setAuthorCardName('Saurabh Singh');
-      setAuthorCardRole('Managing Director');
-      setAuthorCardBio('With over 15 years of experience driving large-scale digital initiatives...');
-
-      // Reset content segments & conclusion
-      setContentSegments([]);
-      setConclusionParagraphs([]);
-      setCalcTitle('Calculate your app development timeline!');
-      setActiveTab('hero');
+      resetForm();
 
       fetchBlogs();
-      onRefresh();
+      if (onRefresh) onRefresh();
     } catch (err: any) {
       toast.error(err.message || 'Failed to create blog post');
     } finally {
@@ -1210,7 +1410,10 @@ function BlogManager({ pageId, onRefresh, blogListSection }: BlogManagerProps) {
           </p>
         </div>
         <Button
-          onClick={() => setShowCreateModal(true)}
+          onClick={() => {
+            resetForm();
+            setShowCreateModal(true);
+          }}
           className="bg-[#4B2A63] hover:bg-[#3B198F] text-white rounded-full px-6 gap-2 h-10 shadow-sm"
         >
           <Plus className="w-4 h-4" />
@@ -1282,16 +1485,20 @@ function BlogManager({ pageId, onRefresh, blogListSection }: BlogManagerProps) {
                     {new Date(blog.updatedAt).toLocaleDateString()}
                   </td>
                   <td className="py-3.5 px-2 text-center">
-                    <span
+                    <select
+                      value={blog.status || 'draft'}
+                      onChange={(e) => handleStatusChange(blog.id, e.target.value as 'draft' | 'published')}
+                      disabled={updatingStatusId === blog.id}
                       className={cn(
-                        'text-[9px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-tighter',
+                        'text-[11px] font-bold px-2.5 py-1 rounded-full uppercase tracking-tight border focus:outline-none focus:ring-2 focus:ring-[#4B2A63]/20 cursor-pointer transition-all',
                         blog.status === 'published'
-                          ? 'bg-emerald-50 text-emerald-600'
-                          : 'bg-amber-50 text-amber-600'
+                          ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
+                          : 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100'
                       )}
                     >
-                      {blog.status}
-                    </span>
+                      <option value="draft" className="bg-white text-slate-800 font-medium">Draft</option>
+                      <option value="published" className="bg-white text-slate-800 font-medium">Published</option>
+                    </select>
                   </td>
                   <td className="py-3.5 px-2 text-right">
                     <div className="flex justify-end gap-1">
@@ -1299,19 +1506,15 @@ function BlogManager({ pageId, onRefresh, blogListSection }: BlogManagerProps) {
                         variant="ghost"
                         size="icon"
                         className="h-8 w-8 text-[#4B2A63] hover:bg-[#4B2A63]/5"
-                        onClick={() => (window.location.href = `/admin/pages/${blog.id}`)}
+                        onClick={() => handleEditBlog(blog.id)}
                         title="Edit Blog Post Content"
+                        disabled={isFetchingDetail && editingBlogId === blog.id}
                       >
-                        <Edit className="w-4 h-4" />
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 text-rose-500 hover:bg-rose-50"
-                        onClick={() => handleDelete(blog.id)}
-                        title="Delete Blog Post"
-                      >
-                        <Trash2 className="w-4 h-4" />
+                        {isFetchingDetail && editingBlogId === blog.id ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <Edit className="w-4 h-4" />
+                        )}
                       </Button>
                     </div>
                   </td>
@@ -1337,10 +1540,10 @@ function BlogManager({ pageId, onRefresh, blogListSection }: BlogManagerProps) {
                 <div>
                   <h3 className="font-bold text-slate-900 text-lg flex items-center gap-2">
                     <BookOpen className="w-5 h-5 text-[#4B2A63]" />
-                    Create New Blog Post
+                    {editingBlogId ? 'Edit Blog Post' : 'Create New Blog Post'}
                   </h3>
                   <p className="text-xs text-slate-400 mt-0.5">
-                    This will create a new dynamic page and pre-configure the blog details content.
+                    {editingBlogId ? 'Update article details, content segments, and conclusion.' : 'This will create a new dynamic page and pre-configure the blog details content.'}
                   </p>
                 </div>
                 <button
@@ -1449,7 +1652,7 @@ function BlogManager({ pageId, onRefresh, blogListSection }: BlogManagerProps) {
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
+                    <div className="flex flex-col gap-4">
                       <ColorPickerField
                         fieldKey="bgColor"
                         label="Hero BG Color"
@@ -2058,10 +2261,10 @@ function BlogManager({ pageId, onRefresh, blogListSection }: BlogManagerProps) {
                       {isCreating ? (
                         <>
                           <Loader2 className="w-4 h-4 animate-spin" />
-                          Creating...
+                          {editingBlogId ? 'Saving...' : 'Creating...'}
                         </>
                       ) : (
-                        'Create Blog Post'
+                        editingBlogId ? 'Save Changes' : 'Create Blog Post'
                       )}
                     </Button>
                   </div>

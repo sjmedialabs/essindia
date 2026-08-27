@@ -25,6 +25,7 @@ import {
   Monitor,
   ClipboardList,
   ArrowRightLeft,
+  BookOpen,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -51,6 +52,7 @@ const navGroups = [
     items: [
       { icon: ImageIcon, label: 'Media Library', href: '/admin/media' },
       { icon: FileText, label: 'Case Studies', href: '/admin/case-studies' },
+      { icon: BookOpen, label: 'Blogs', href: '/admin/blogs' },
       { icon: Briefcase, label: 'Careers', href: '/admin/careers' },
       { icon: Settings, label: 'Footer Settings', href: '/admin/footer' },
       // { icon: Briefcase, label: 'Solutions', href: '/admin/solutions' },
