@@ -1,5 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
+import { FormattedText } from '@/components/ui/FormattedText';
 
 interface RegulatoryPoint {
   label: string;
@@ -66,12 +67,15 @@ export function HospitalRegulatory({ content }: HospitalRegulatoryProps) {
 
           {/* Right Text & Points */}
           <div className="lg:w-1/2 w-full">
-            <h2 className="text-3xl md:text-4xl font-bold text-[#2a2d7c] mb-6 whitespace-pre-line">
-              {heading}
-            </h2>
-            <p className="text-gray-500 text-sm md:text-base leading-relaxed mb-10 max-w-lg">
-              {description}
-            </p>
+            <FormattedText
+              content={heading}
+              as="h2"
+              className="text-3xl md:text-4xl font-bold text-[#2a2d7c] mb-6 whitespace-pre-line"
+            />
+            <FormattedText
+              content={description}
+              className="text-gray-500 text-sm md:text-base leading-relaxed mb-10 max-w-lg"
+            />
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {points.map((point, idx) => (
@@ -79,7 +83,7 @@ export function HospitalRegulatory({ content }: HospitalRegulatoryProps) {
                   key={idx}
                   className="bg-white border-2 border-[#2a2d7c]/30 text-[#2a2d7c] font-bold text-sm px-6 py-4 rounded-2xl shadow-sm hover:shadow-md hover:border-[#2a2d7c]/60 transition-all flex items-center justify-start text-left"
                 >
-                  {point.label}
+                  <FormattedText content={point.label} />
                 </div>
               ))}
             </div>

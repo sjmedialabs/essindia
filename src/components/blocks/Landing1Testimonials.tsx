@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Star } from 'lucide-react';
+import { FormattedText } from '@/components/ui/FormattedText';
 
 export interface TestimonialItem {
   avatar: string;
@@ -110,9 +111,10 @@ export function Landing1Testimonials({ content }: { content?: Landing1Testimonia
               </div>
 
               {/* Quote */}
-              <p className="text-slate-600 text-xs leading-relaxed font-medium">
-                {test.quote}
-              </p>
+              <FormattedText
+                content={test.quote}
+                className="text-slate-600 text-xs leading-relaxed font-medium"
+              />
 
             </div>
           ))}

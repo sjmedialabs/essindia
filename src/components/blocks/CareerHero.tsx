@@ -4,6 +4,7 @@ import React from 'react';
 import { getHeroBackgroundStyles } from '@/lib/utils';
 import { motion } from 'framer-motion';
 import { HeroTitle } from '@/components/ui/HeroTitle';
+import { FormattedText } from '@/components/ui/FormattedText';
 
 export default function CareerHero({ content }: { content?: any }) {
   const {
@@ -52,15 +53,16 @@ export default function CareerHero({ content }: { content?: any }) {
               className="text-5xl md:text-6xl lg:text-[72px] font-thin tracking-wide mb-8 max-w-5xl mx-auto leading-[1.15] justify-center"
             />
           ) : (
-            <h1
+            <FormattedText
+              content={title}
+              as="h1"
               className="text-5xl md:text-6xl lg:text-[72px] font-thin tracking-wide text-white mb-8 max-w-5xl mx-auto leading-[1.15]"
-              dangerouslySetInnerHTML={{ __html: title.replace(/\n/g, '<br />') }}
             />
           )}
 
-          <p
+          <FormattedText
+            content={description}
             className="text-white/90 text-sm md:text-[15px] max-w-2xl mx-auto leading-tight tracking-wide"
-            dangerouslySetInnerHTML={{ __html: description.replace(/\n/g, '<br />') }}
           />
         </motion.div>
       </div>

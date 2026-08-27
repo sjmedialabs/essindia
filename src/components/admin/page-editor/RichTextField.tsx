@@ -88,17 +88,7 @@ export function RichTextField({ fieldKey, label, value, onChange, placeholder, m
       if (html === '<p></p>' || html === '') {
         onChange('');
       } else {
-        // Detect if there are multiple paragraphs or formatting tags (e.g. strong, em, u, s, a, ul, ol, li, blockquote, h1-h3, br)
-        const pCount = (html.match(/<p>/g) || []).length;
-        const withoutP = html.replace(/<\/?p>/g, '').trim();
-        const hasFormatting = pCount > 1 || (withoutP.includes('<') && withoutP.includes('>'));
-        
-        if (hasFormatting) {
-          onChange(html);
-        } else {
-          // If it's single paragraph plain text without formatting, save clean plain text
-          onChange(ed.getText());
-        }
+        onChange(html);
       }
     },
     editorProps: {

@@ -13,6 +13,7 @@ interface IntegrationItem {
   ctaText?: string;
   ctaUrl?: string;
   ctaFormType?: string;
+  enableCta?: boolean;
 }
 
 interface Category {
@@ -288,7 +289,7 @@ export function AssFeaturesGrid({ content }: { content?: AssFeaturesGridContent 
                       {item.description}
                     </p>
 
-                    {item.ctaText && (
+                    {item.enableCta !== false && Boolean(item.ctaText) && (
                       <a
                         href={item.ctaUrl || '#'}
                         className="text-[#27256B] text-xs font-black flex items-center gap-1.5 hover:gap-2.5 transition-all duration-300 mt-auto"

@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
+import { FormattedText } from '@/components/ui/FormattedText';
 
 export interface TestimonialCardItem {
   quote: string;
@@ -113,13 +114,10 @@ export function Landing2Testimonials({ content }: { content?: Landing2Testimonia
 
                 {/* Customer Quote */}
                 {item.quote && (
-                  <h3 className="text-slate-900 text-xl md:text-2xl font-bold leading-snug tracking-tight mb-3">
-                    {item.quote.includes('<p>') || item.quote.includes('<strong>') || item.quote.includes('<em>') || item.quote.includes('<span>') || item.quote.includes('<br>') ? (
-                      <span dangerouslySetInnerHTML={{ __html: item.quote }} />
-                    ) : (
-                      item.quote
-                    )}
-                  </h3>
+                  <FormattedText
+                    content={item.quote}
+                    className="text-slate-900 text-xl md:text-2xl font-bold leading-snug tracking-tight mb-3"
+                  />
                 )}
 
                 {/* Customer Author Name */}

@@ -4,6 +4,7 @@ import * as React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ChevronDown, ChevronUp, SlidersHorizontal } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { FormattedText } from '@/components/ui/FormattedText';
 
 interface Testimonial {
   quote: string;
@@ -310,9 +311,10 @@ export function TestimonialsSection({ content }: TestimonialsSectionProps) {
                           </div>
 
                           {/* Quote text */}
-                          <p className="text-slate-600 text-sm leading-relaxed">
-                            {item.quote}
-                          </p>
+                          <FormattedText
+                            content={item.quote}
+                            className="text-slate-600 text-sm leading-relaxed"
+                          />
                         </div>
 
                         {/* Author info footer */}

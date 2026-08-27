@@ -5,10 +5,14 @@ import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { MotionSection } from '@/components/animations/MotionSection';
 import { useCtaAction, type CtaFormType } from '@/hooks/useCtaAction';
+import { getHeroBackgroundStyles } from '@/lib/utils';
 import { HeroTitle } from '@/components/ui/HeroTitle';
 
 interface ErpHeroContent {
   bgColor?: string;
+  gradientColor1?: string;
+  gradientColor2?: string;
+  gradientColor3?: string;
   badgeBgColor?: string;
   badgeText?: string;
   badgeColor?: string;
@@ -43,7 +47,7 @@ export function ErpHero({ content }: ErpHeroProps) {
   const [isBtn1Hovered, setIsBtn1Hovered] = React.useState(false);
   const [isBtn2Hovered, setIsBtn2Hovered] = React.useState(false);
 
-  const bgColor = content?.bgColor || '#fdfeff';
+  const heroBgStyle = getHeroBackgroundStyles(content, { backgroundColor: content?.bgColor || '#fdfeff' });
   const badgeBgColor = content?.badgeBgColor || '#391781';
   const badgeText = content?.badgeText || 'ERP Overview';
   const badgeColor = content?.badgeColor || '#ffffff';
@@ -92,7 +96,7 @@ export function ErpHero({ content }: ErpHeroProps) {
   };
 
   return (
-    <section className="relative w-full min-h-[80vh] flex items-center py-14 overflow-hidden" style={{ backgroundColor: bgColor }}>
+    <section className="relative w-full min-h-[80vh] flex items-center py-14 overflow-hidden" style={heroBgStyle}>
       {/* Background Grid Pattern */}
       {/* <div className="absolute inset-0 bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] opacity-60 -z-10" /> */}
 

@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
+import { FormattedText } from '@/components/ui/FormattedText';
 
 export interface RetailFeatureItem {
   description: string;
@@ -80,7 +81,7 @@ export function RetailFeatures({ content }: { content: RetailFeaturesContent }) 
                 transition={{ delay: idx * 0.1 }}
                 className="bg-white text-[#666666] p-5 rounded shadow-lg min-h-[90px] flex items-center"
               >
-                <p className="text-sm font-medium leading-snug">{feat.description}</p>
+                <FormattedText content={feat.description} className="text-sm font-medium leading-snug" />
               </motion.div>
             ))}
           </div>
@@ -113,7 +114,7 @@ export function RetailFeatures({ content }: { content: RetailFeaturesContent }) 
                 transition={{ delay: idx * 0.1 }}
                 className="bg-white text-[#666666] p-5 rounded shadow-lg min-h-[90px] flex items-center"
               >
-                <p className="text-sm font-medium leading-snug">{feat.description}</p>
+                <FormattedText content={feat.description} className="text-sm font-medium leading-snug" />
               </motion.div>
             ))}
           </div>

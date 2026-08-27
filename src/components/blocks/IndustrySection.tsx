@@ -164,7 +164,7 @@ export function IndustrySection({ content }: IndustrySectionProps) {
           {/* Cards Scroll Track */}
           <div
             ref={scrollRef}
-            className="flex gap-6 overflow-x-auto scroll-smooth py-4 px-1 no-scrollbar snap-x snap-mandatory"
+            className="flex items-stretch gap-6 overflow-x-auto scroll-smooth py-4 px-1 no-scrollbar snap-x snap-mandatory"
             style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
           >
             {industries.map((ind, index) => (
@@ -175,7 +175,7 @@ export function IndustrySection({ content }: IndustrySectionProps) {
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: index * 0.05 }}
                 whileHover={{ y: -10, transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] } }}
-                className="bg-white rounded-[24px] overflow-hidden flex flex-col h-full shadow-[0_20px_40px_-15px_rgba(0,0,0,0.4)] hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.5)] transition-shadow duration-500 cursor-pointer group shrink-0 w-[280px] sm:w-[300px] md:w-[310px] lg:w-[calc((100%-4.5rem)/4)] snap-start"
+                className="bg-white rounded-[24px] overflow-hidden flex flex-col shadow-[0_20px_40px_-15px_rgba(0,0,0,0.4)] hover:shadow-[0_40px_80px_-20px_rgba(0,0,0,0.5)] transition-shadow duration-500 cursor-pointer group shrink-0 w-[280px] sm:w-[300px] md:w-[310px] lg:w-[calc((100%-4.5rem)/4)] snap-start"
               >
                 {/* Image Container */}
                 <div className="h-[220px] relative bg-slate-100 overflow-hidden">
@@ -197,7 +197,7 @@ export function IndustrySection({ content }: IndustrySectionProps) {
                   <h4 className="text-[17px] font-bold text-slate-900 mb-3 group-hover:text-[#462885] transition-colors">
                     {ind.name}
                   </h4>
-                  <p className="text-[13px] text-slate-500 leading-relaxed line-clamp-3">
+                  <p className="text-[13px] text-slate-500 leading-relaxed">
                     {ind.description}
                   </p>
                 </div>

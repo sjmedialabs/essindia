@@ -760,18 +760,24 @@ export class PageAdminRepository {
     const section = await db.query.pageSections.findFirst({
       where: eq(pageSections.id, sectionId),
       with: { page: true },
-    });
+    }).catch(() => null);
 
     if (!section) {
-      // Fallback: Check if it's a template section
-      const templateSection = await db.query.templateSections.findFirst({
-        where: eq(templateSections.id, sectionId),
-      }).catch(() => null);
-
-      if (templateSection) {
-        await db.delete(templateSections).where(eq(templateSections.id, sectionId));
+      // Direct delete fallback from pageSections
+      const [deletedPageSec] = await db.delete(pageSections).where(eq(pageSections.id, sectionId)).returning().catch(() => []);
+      if (deletedPageSec) {
+        if (deletedPageSec.pageId) {
+          await this.saveRevision(deletedPageSec.pageId).catch(() => null);
+        }
         return true;
       }
+
+      // Fallback: Check if it's a template section
+      const [deletedTemplateSec] = await db.delete(templateSections).where(eq(templateSections.id, sectionId)).returning().catch(() => []);
+      if (deletedTemplateSec) {
+        return true;
+      }
+
       return false;
     }
 

@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
+import { FormattedText } from '@/components/ui/FormattedText';
 
 interface QualityContentData {
   title1?: string;
@@ -58,35 +59,43 @@ export function QualityContent({ content }: QualityContentProps) {
             className="space-y-6"
           >
             <div>
-              <h2 className="text-xl md:text-4xl font-semibold text-slate-900 tracking-tight">
-                {data.title1}
-              </h2>
-              <h3 className="text-xs md:text-md  font-normal text-slate-900 mt-0">
-                {data.isoTitle}
-              </h3>
+              <FormattedText
+                content={data.title1}
+                as="h2"
+                className="text-xl md:text-4xl font-semibold text-slate-900 tracking-tight"
+              />
+              <FormattedText
+                content={data.isoTitle}
+                as="h3"
+                className="text-xs md:text-md font-normal text-slate-900 mt-0"
+              />
             </div>
 
             {/* ISO */}
             <div className="space-y-3">
-
-              <p className="text-slate-500 font-light leading-relaxed text-xs md:text-[15px]">
-                {data.isoDescription}
-              </p>
+              <FormattedText
+                content={data.isoDescription}
+                className="text-slate-500 font-light leading-relaxed text-xs md:text-[15px]"
+              />
             </div>
 
             {/* SEI CMM */}
             <div className="space-y-4 pt-4">
               <div className="space-y-3">
-                <h3 className="text-base md:text-lg font-bold text-slate-900">
-                  {data.cmmTitle}
-                </h3>
-                <p className="text-slate-500 font-light leading-relaxed text-xs md:text-[15px]">
-                  {data.cmmDescription1}
-                </p>
+                <FormattedText
+                  content={data.cmmTitle}
+                  as="h3"
+                  className="text-base md:text-lg font-bold text-slate-900"
+                />
+                <FormattedText
+                  content={data.cmmDescription1}
+                  className="text-slate-500 font-light leading-relaxed text-xs md:text-[15px]"
+                />
               </div>
-              <p className="text-slate-500 font-light leading-relaxed text-xs md:text-[15px]">
-                {data.cmmDescription2}
-              </p>
+              <FormattedText
+                content={data.cmmDescription2}
+                className="text-slate-500 font-light leading-relaxed text-xs md:text-[15px]"
+              />
             </div>
           </motion.div>
 
@@ -98,17 +107,20 @@ export function QualityContent({ content }: QualityContentProps) {
             transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
             className="space-y-8 pt-6 border-t border-slate-100"
           >
-            <h2 className="text-3xl md:text-4xl font-semibold text-slate-900 tracking-tight">
-              {data.title2}
-            </h2>
+            <FormattedText
+              content={data.title2}
+              as="h2"
+              className="text-3xl md:text-4xl font-semibold text-slate-900 tracking-tight"
+            />
 
             <div className="space-y-5">
               {data.policies?.map((policy, idx) => (
                 <div key={idx} className="flex items-start gap-4">
                   <GoldCheckCircle />
-                  <p className="text-slate-600 font-light leading-relaxed text-xs md:text-[15px] pt-0.5">
-                    {policy}
-                  </p>
+                  <FormattedText
+                    content={policy}
+                    className="text-slate-600 font-light leading-relaxed text-xs md:text-[15px] pt-0.5"
+                  />
                 </div>
               ))}
             </div>

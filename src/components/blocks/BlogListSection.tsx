@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { usePathname } from 'next/navigation';
 import { useInternalNavigate } from '@/hooks/useInternalNavigate';
 import { HeroTitle } from '@/components/ui/HeroTitle';
+import { FormattedText } from '@/components/ui/FormattedText';
 
 import { defaultBlogs, type BlogPost } from '@/lib/blogs-data';
 
@@ -175,23 +176,16 @@ export function BlogListSection({ content }: BlogListSectionProps) {
               className="text-4xl md:text-6xl font-black font-extralight tracking-tight leading-tight justify-center"
             />
           ) : (
-            <motion.h1
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.1 }}
+            <FormattedText
+              content={heading}
+              as="h1"
               className="text-4xl md:text-6xl font-black font-extralight text-white tracking-tight leading-tight"
-            >
-              {heading}
-            </motion.h1>
+            />
           )}
-          <motion.p
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
+          <FormattedText
+            content={subheading}
             className="text-sm text-slate-200/90 max-w-2xl font-light leading-relaxed mb-4"
-          >
-            {subheading}
-          </motion.p>
+          />
         </div>
       </div>
 

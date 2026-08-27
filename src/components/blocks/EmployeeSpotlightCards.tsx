@@ -3,6 +3,7 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { FormattedText } from '@/components/ui/FormattedText';
 
 const EMPLOYEES = [
   {
@@ -267,24 +268,10 @@ export function EmployeeSpotlightCards({ content }: { content?: any }) {
                     </h3>
                   </div>
 
-                  <div className="text-gray-500 leading-relaxed text-sm md:text-[15px] font-medium max-w-3xl whitespace-pre-line">
-                    {typeof selectedEmp.description === 'string' ? (
-                      selectedEmp.description.includes('<') || selectedEmp.description.includes('&lt;') ? (
-                        <div
-                          dangerouslySetInnerHTML={{
-                            __html: selectedEmp.description
-                              .replace(/&lt;br\s*\/?!?&gt;/gi, '<br />')
-                              .replace(/&lt;p&gt;/gi, '<p>')
-                              .replace(/&lt;\/p&gt;/gi, '</p>')
-                          }}
-                        />
-                      ) : (
-                        selectedEmp.description
-                      )
-                    ) : (
-                      selectedEmp.description
-                    )}
-                  </div>
+                  <FormattedText
+                    content={selectedEmp.description}
+                    className="text-gray-500 leading-relaxed text-sm md:text-[15px] font-medium max-w-3xl whitespace-pre-line"
+                  />
 
                   {selectedEmp.quote && (
                     <div className="font-bold text-black text-lg md:text-xl pt-2 border-l-4 border-purple-400 pl-4">

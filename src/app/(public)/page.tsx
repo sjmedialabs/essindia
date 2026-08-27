@@ -14,13 +14,17 @@ import { applyCmsRedirect } from '@/lib/seo/apply-cms-redirect';
 export const revalidate = 60;
 
 async function getHomePageData() {
-  const globals = await siteSettingsRepository.getSeoGlobals();
-  const defaultPath = globals.defaultHomePage && globals.defaultHomePage !== '/' ? globals.defaultHomePage : '/';
-  
-  if (defaultPath !== '/') {
-    await applyCmsRedirect(defaultPath);
-    const targetPage = await pageRepository.getPageByPath(defaultPath);
-    if (targetPage) return { page: targetPage, path: defaultPath };
+  try {
+    const globals = await siteSettingsRepository.getSeoGlobals();
+    const defaultPath = globals.defaultHomePage && globals.defaultHomePage !== '/' ? globals.defaultHomePage : '/';
+    
+    if (defaultPath !== '/') {
+      await applyCmsRedirect(defaultPath);
+      const targetPage = await pageRepository.getPageByPath(defaultPath);
+      if (targetPage) return { page: targetPage, path: defaultPath };
+    }
+  } catch {
+    // Ignore settings error
   }
   
   const indexPage = await pageRepository.getPageBySlug('index');

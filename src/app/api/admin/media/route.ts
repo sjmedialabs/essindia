@@ -21,7 +21,10 @@ async function optimizeImageBuffer(
   }
 
   try {
-    const sharpModule = await import('sharp');
+    const sharpModule = await import('sharp').catch(() => null);
+    if (!sharpModule) {
+      return { buffer, mimeType, ext: mimeType.split('/')[1] || 'bin' };
+    }
     const sharp = sharpModule.default || sharpModule;
     const optimized = await sharp(buffer)
       .rotate()

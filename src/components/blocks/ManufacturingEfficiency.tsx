@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
+import { FormattedText } from '@/components/ui/FormattedText';
 
 const defaultCapabilities = [
   'Lorem ipsum',
@@ -36,10 +37,15 @@ export default function ManufacturingEfficiency({ content }: { content?: any }) 
               <div className="text-[14px] font-bold text-slate-900">
                 {sectionTitle}
               </div>
-              <h2 className="text-3xl lg:text-4xl font-bold text-[#27256b] leading-[1.1] tracking-tight" dangerouslySetInnerHTML={{ __html: sectionSubtitle }} />
-              <p className="text-slate-600 text-[17px] max-w-xl pb-2">
-                {description}
-              </p>
+              <FormattedText
+                content={sectionSubtitle}
+                as="h2"
+                className="text-3xl lg:text-4xl font-bold text-[#27256b] leading-[1.1] tracking-tight"
+              />
+              <FormattedText
+                content={description}
+                className="text-slate-600 text-[17px] max-w-xl pb-2"
+              />
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2">
@@ -48,9 +54,11 @@ export default function ManufacturingEfficiency({ content }: { content?: any }) 
                   key={i}
                   className="bg-transparent border-[1px] border-[#27256b] px-4 py-2 rounded-xl text-center transition-all hover:bg-[#27256b]/5 flex items-center justify-center shadow-sm"
                 >
-                  <span className="text-[14px] font-bold text-black">
-                    {item}
-                  </span>
+                  <FormattedText
+                    content={item}
+                    as="span"
+                    className="text-[14px] font-bold text-black"
+                  />
                 </div>
               ))}
             </div>

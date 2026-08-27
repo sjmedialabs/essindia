@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { FormattedText } from '@/components/ui/FormattedText';
 import { MotionSection } from '@/components/animations/MotionSection';
 import { Check, Calendar, Zap, Layers, BarChart3 } from 'lucide-react';
 
@@ -250,11 +251,7 @@ function renderFormattedHeading(text: string, secondaryColor?: string, highlight
 
 function renderHighlightedText(text: string) {
   if (!text) return null;
-  if (text.includes('<p>') || text.includes('<strong>')) {
-    return <div dangerouslySetInnerHTML={{ __html: text }} />;
-  }
-
-  return <span>{text}</span>;
+  return <FormattedText content={text} />;
 }
 
 export default ErpFeaturesTab;

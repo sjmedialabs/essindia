@@ -6,6 +6,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { HeroTitle } from '@/components/ui/HeroTitle';
+import { FormattedText } from '@/components/ui/FormattedText';
 
 interface HospitalHeroContent {
   gradientColor1?: string;
@@ -94,31 +95,20 @@ export function HospitalHero({ content }: HospitalHeroProps) {
                 enableAnimation={(content as any)?.enableTitleGradientAnimation}
                 className="text-4xl sm:text-5xl lg:text-6xl font-light leading-[1.1] mb-6 text-left"
               />
-            ) : title.includes('<p>') ? (
-              <div
-                className="text-4xl sm:text-5xl lg:text-6xl font-light leading-[1.1] mb-6 prose prose-invert max-w-none"
-                style={{ color: titleColor }}
-                dangerouslySetInnerHTML={{ __html: title.replace(/<br\s*\/?>/gi, ' ') }}
-              />
             ) : (
-              <h1
+              <FormattedText
+                content={title}
+                as="h1"
                 className="text-4xl sm:text-5xl lg:text-6xl font-light leading-[1.1] mb-6"
                 style={{ color: titleColor }}
-                dangerouslySetInnerHTML={{ __html: title.replace(/<br\s*\/?>/gi, ' ') }}
               />
             )}
 
-            {description.includes('<p>') || description.includes('<') ? (
-              <div
-                className="text-base sm:text-lg max-w-xl leading-relaxed mb-8 prose prose-invert max-w-none prose-p:my-2"
-                style={{ color: descriptionColor }}
-                dangerouslySetInnerHTML={{ __html: description }}
-              />
-            ) : (
-              <p className="text-base sm:text-lg max-w-xl leading-relaxed mb-8" style={{ color: descriptionColor }}>
-                {description}
-              </p>
-            )}
+            <FormattedText
+              content={description}
+              className="text-base sm:text-lg max-w-xl leading-relaxed mb-8"
+              style={{ color: descriptionColor }}
+            />
 
             <div className="flex flex-wrap items-center gap-4">
               <Link

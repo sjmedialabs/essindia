@@ -41,13 +41,28 @@ export function isHiddenCmsField(key: string, sectionType?: string, keyPath?: st
     }
   }
 
-  // Hide categoryTabs, image, and title fields for categories in AssFeaturesGrid section
+  // Hide top-level title, categoryTabs, image, and title fields for categories in AssFeaturesGrid section
   if (sectionType === 'ass-features-grid') {
     if (lower === 'categorytabs' || lower === 'category_tabs') return true;
+    if (!keyPath || keyPath === key) {
+      if (lower === 'title') return true;
+    }
     if (keyPath && keyPath.includes('categories') && !keyPath.includes('items')) {
       if (lower === 'image' || lower === 'title') {
         return true;
       }
+    }
+  }
+
+  // Restrict why-ess (Value Prop) section to title, description, image1, image2, image3, and reasons (with title and description)
+  if (sectionType === 'why-ess') {
+    if (key === 'points') return true;
+    const allowed = ['title', 'description', 'image1', 'image2', 'image3', 'reasons'];
+    if (keyPath && keyPath !== key) {
+      const allowedPointFields = ['title', 'description'];
+      if (!allowedPointFields.includes(key)) return true;
+    } else {
+      if (!allowed.includes(key)) return true;
     }
   }
 
@@ -363,6 +378,14 @@ export function humanLabel(
     if (key === 'calcPoints') return 'Form Points';
   }
 
+  if (options?.sectionType === 'why-ess' && key === 'points') {
+    return 'Reasons';
+  }
+
+  if (options?.sectionType === 'retail-mobile-dashboard' && key === 'features') {
+    return 'Points';
+  }
+
   if (options?.sectionType === 'landing2-why-ess') {
     if (key === 'title') return 'Feature Title';
     if (key === 'description') return 'Feature Description';
@@ -400,9 +423,10 @@ const ICON_PATTERNS = ['icon'];
 export function detectFieldType(
   key: string,
   value: JsonValue,
-  sectionType?: string
+  sectionType?: string,
+  keyPath?: string
 ): FieldType {
-  if (key === 'enableTitleGradientAnimation' || (key.startsWith('enable') && key.toLowerCase().includes('animation'))) return 'boolean';
+  if (key === 'enableCta' || key === 'enableTitleGradientAnimation' || (key.startsWith('enable') && key.toLowerCase().includes('animation'))) return 'boolean';
   if (value === null || value === undefined) return 'null';
   if (key.toLowerCase() === 'rating') return 'ratingSelect';
   if (typeof value === 'boolean') return 'boolean';
@@ -413,16 +437,37 @@ export function detectFieldType(
   if (typeof value === 'string') {
     const lower = key.toLowerCase();
 
-    if (lower.includes('button') && lower.includes('text')) {
+    if (lower.includes('color') || lower.includes('gradientstart') || lower.includes('gradientend') || lower.includes('gradientfrom') || lower.includes('gradientto')) {
+      return 'color';
+    }
+
+    if (lower.includes('cta') && (lower.includes('text') || lower.includes('label') || lower.includes('title') || lower.includes('btn') || lower.includes('button'))) {
       return 'text';
     }
-    if (lower.includes('btn') && lower.includes('text')) {
-      return 'text';
-    }
-    if (lower === 'ctalabel' || lower === 'ctatext' || lower === 'buttontext') {
+    if (lower === 'ctatext' || lower === 'ctalabel' || lower === 'ctatitle' || lower === 'buttontext' || lower === 'btntext' || lower.includes('buttontext') || lower.includes('btntext') || lower.includes('button1text') || lower.includes('button2text')) {
       return 'text';
     }
 
+    if (sectionType === 'erp-hero' || sectionType === 'blog-list-block') {
+      if (lower === 'title' || lower === 'titletext' || lower === 'heading' || lower === 'headingtext') return 'text';
+      if (lower.includes('description') || lower.includes('desc')) return 'textarea';
+    }
+
+    if (sectionType === 'erp-transform') {
+      if (lower === 'description' && (!keyPath || !keyPath.includes('items'))) return 'textarea';
+    }
+
+    if (sectionType === 'mfg-demand') {
+      if (lower === 'paragraph1' || lower === 'paragraph2' || lower.includes('paragraph')) return 'richtext';
+    }
+
+    if (lower.includes('paragraph') || lower.includes('paragraphs')) {
+      return 'textarea';
+    }
+
+    if ((sectionType === 'employee-spotlight-hero' || sectionType === 'mfg-hero' || sectionType === 'mfg-process' || sectionType === 'retail-hero' || sectionType === 'erp-value' || sectionType === 'erp-intro' || sectionType === 'erp-modules' || sectionType === 'erp-modules-grid' || sectionType === 'why-ess' || sectionType === 'sticky-card' || sectionType === 'sticky-floating-card' || sectionType?.includes('industr')) && (lower === 'description' || lower === 'desc' || lower.includes('description'))) {
+      return 'textarea';
+    }
     if (sectionType === 'ass-features-grid' && (lower === 'description' || lower === 'desc')) {
       return 'textarea';
     }

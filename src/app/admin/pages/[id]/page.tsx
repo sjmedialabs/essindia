@@ -2738,6 +2738,8 @@ export default function PageEditor() {
         return next;
       });
       await fetchPage();
+    } else {
+      toast.error('Failed to delete section');
     }
   };
 

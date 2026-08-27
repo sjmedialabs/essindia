@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
+import { FormattedText } from '@/components/ui/FormattedText';
 
 export interface RetailNurtureContent {
   title?: string;
@@ -64,13 +65,7 @@ export function RetailNurture({ content }: { content: RetailNurtureContent }) {
 
             <div className="space-y-4 text-left md:text-left text-[#b2b2b2] text-sm leading-relaxed">
               {paragraphs.map((para, idx) => (
-                <p key={idx}>
-                  {typeof para === 'string' && (para.includes('<p>') || para.includes('<')) ? (
-                    <span dangerouslySetInnerHTML={{ __html: para }} />
-                  ) : (
-                    para
-                  )}
-                </p>
+                <FormattedText key={idx} content={para} />
               ))}
             </div>
           </motion.div>

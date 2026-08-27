@@ -1,5 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
+import { FormattedText } from '@/components/ui/FormattedText';
 
 interface OverviewCard {
   title: string;
@@ -45,12 +46,15 @@ export function HospitalOverview({ content }: HospitalOverviewProps) {
     <section className="py-14 px-6 bg-white border-b">
       <div className="container mx-auto max-w-7xl">
         <div className=" mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold text-[#2a2d7c] mb-6 text-center">
-            {heading}
-          </h2>
-          <p className="text-gray-600 max-w-7xl mx-auto text-sm md:text-base leading-relaxed">
-            {description}
-          </p>
+          <FormattedText
+            content={heading}
+            as="h2"
+            className="text-3xl md:text-4xl font-bold text-[#2a2d7c] mb-6 text-center"
+          />
+          <FormattedText
+            content={description}
+            className="text-gray-600 max-w-7xl mx-auto text-sm md:text-base leading-relaxed"
+          />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -64,10 +68,15 @@ export function HospitalOverview({ content }: HospitalOverviewProps) {
                   className="object-cover transition-transform duration-500 hover:scale-105"
                 />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-4 text-center">{card.title}</h3>
-              <p className="text-gray-500 text-sm leading-relaxed">
-                {card.description}
-              </p>
+              <FormattedText
+                content={card.title}
+                as="h3"
+                className="text-xl font-bold text-gray-900 mb-4 text-center"
+              />
+              <FormattedText
+                content={card.description}
+                className="text-gray-500 text-sm leading-relaxed"
+              />
             </div>
           ))}
         </div>
