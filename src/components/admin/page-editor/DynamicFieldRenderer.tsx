@@ -884,7 +884,12 @@ function ArrayField({
             }
             sortedKeys = moduleOrder.filter(k => k in objItem);
           } else if (fieldKey.toLowerCase().includes('items')) {
-            let itemOrder = ['icon', 'text', 'title', 'description', 'image', 'ctaText', 'ctaUrl'];
+            let itemOrder = ['icon', 'text', 'title', 'description', 'image', 'ctaText', 'ctaUrl', 'enableCta'];
+            if (sectionType === 'ass-features-grid') {
+              if (!('enableCta' in objItem)) {
+                objItem.enableCta = true;
+              }
+            }
             if (sectionType === 'oracle-apex-approach') {
               itemOrder = ['image', 'title'];
             } else if (sectionType === 'staffing-technologies') {

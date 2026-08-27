@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
+import { FormattedText } from '@/components/ui/FormattedText';
 
 const defaultModels = [
   {
@@ -59,10 +60,15 @@ export default function ManufacturingModels({ content }: { content?: any }) {
           <div className="text-[14px] font-bold text-slate-800">
             {sectionTitle}
           </div>
-          <h2 className="text-3xl md:text-4xl lg:text-[44px] font-extrabold text-[#27256b] leading-[1.1] tracking-tight" dangerouslySetInnerHTML={{ __html: sectionSubtitle }} />
-          <p className="text-slate-500 text-[16px] max-w-3xl mx-auto pt-2">
-            {sectionDescription}
-          </p>
+          <FormattedText
+            content={sectionSubtitle}
+            as="h2"
+            className="text-3xl md:text-4xl lg:text-[44px] font-extrabold text-[#27256b] leading-[1.1] tracking-tight"
+          />
+          <FormattedText
+            content={sectionDescription}
+            className="text-slate-500 text-[16px] max-w-3xl mx-auto pt-2"
+          />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -83,10 +89,15 @@ export default function ManufacturingModels({ content }: { content?: any }) {
                 />
               </div>
               <div className="p-5 flex-1 flex flex-col">
-                <h3 className="text-[17px] font-bold text-[#27256b]">{model.title}</h3>
-                <p className="text-[13px] text-slate-500">
-                  {model.desc}
-                </p>
+                <FormattedText
+                  content={model.title}
+                  as="h3"
+                  className="text-[17px] font-bold text-[#27256b]"
+                />
+                <FormattedText
+                  content={model.desc}
+                  className="text-[13px] text-slate-500"
+                />
               </div>
             </motion.div>
           ))}

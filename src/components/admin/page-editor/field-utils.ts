@@ -41,9 +41,12 @@ export function isHiddenCmsField(key: string, sectionType?: string, keyPath?: st
     }
   }
 
-  // Hide categoryTabs, image, and title fields for categories in AssFeaturesGrid section
+  // Hide top-level title, categoryTabs, image, and title fields for categories in AssFeaturesGrid section
   if (sectionType === 'ass-features-grid') {
     if (lower === 'categorytabs' || lower === 'category_tabs') return true;
+    if (!keyPath || keyPath === key) {
+      if (lower === 'title') return true;
+    }
     if (keyPath && keyPath.includes('categories') && !keyPath.includes('items')) {
       if (lower === 'image' || lower === 'title') {
         return true;
@@ -423,7 +426,7 @@ export function detectFieldType(
   sectionType?: string,
   keyPath?: string
 ): FieldType {
-  if (key === 'enableTitleGradientAnimation' || (key.startsWith('enable') && key.toLowerCase().includes('animation'))) return 'boolean';
+  if (key === 'enableCta' || key === 'enableTitleGradientAnimation' || (key.startsWith('enable') && key.toLowerCase().includes('animation'))) return 'boolean';
   if (value === null || value === undefined) return 'null';
   if (key.toLowerCase() === 'rating') return 'ratingSelect';
   if (typeof value === 'boolean') return 'boolean';
@@ -445,8 +448,8 @@ export function detectFieldType(
       return 'text';
     }
 
-    if (sectionType === 'erp-hero') {
-      if (lower === 'title' || lower === 'titletext' || lower === 'heading') return 'text';
+    if (sectionType === 'erp-hero' || sectionType === 'blog-list-block') {
+      if (lower === 'title' || lower === 'titletext' || lower === 'heading' || lower === 'headingtext') return 'text';
       if (lower.includes('description') || lower.includes('desc')) return 'textarea';
     }
 
@@ -462,7 +465,7 @@ export function detectFieldType(
       return 'textarea';
     }
 
-    if ((sectionType === 'mfg-hero' || sectionType === 'mfg-process' || sectionType === 'retail-hero' || sectionType === 'erp-value' || sectionType === 'erp-intro' || sectionType === 'erp-modules' || sectionType === 'erp-modules-grid' || sectionType === 'why-ess' || sectionType === 'sticky-card' || sectionType === 'sticky-floating-card' || sectionType?.includes('industr')) && (lower === 'description' || lower === 'desc' || lower.includes('description'))) {
+    if ((sectionType === 'employee-spotlight-hero' || sectionType === 'mfg-hero' || sectionType === 'mfg-process' || sectionType === 'retail-hero' || sectionType === 'erp-value' || sectionType === 'erp-intro' || sectionType === 'erp-modules' || sectionType === 'erp-modules-grid' || sectionType === 'why-ess' || sectionType === 'sticky-card' || sectionType === 'sticky-floating-card' || sectionType?.includes('industr')) && (lower === 'description' || lower === 'desc' || lower.includes('description'))) {
       return 'textarea';
     }
     if (sectionType === 'ass-features-grid' && (lower === 'description' || lower === 'desc')) {

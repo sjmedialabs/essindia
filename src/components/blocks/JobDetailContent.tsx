@@ -3,6 +3,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { CheckCircle2, Users, UploadCloud } from 'lucide-react';
+import { FormattedText } from '@/components/ui/FormattedText';
 
 export default function JobDetailContent({ content }: { content?: any }) {
   const {
@@ -78,9 +79,10 @@ export default function JobDetailContent({ content }: { content?: any }) {
               {/* About Section */}
               <div className="mb-12">
                 <h2 className="text-[22px] font-bold text-slate-900 mb-4">{aboutTitle}</h2>
-                <p className="text-[15px] leading-relaxed text-slate-600 font-light">
-                  {aboutText}
-                </p>
+                <FormattedText
+                  content={aboutText}
+                  className="text-[15px] leading-relaxed text-slate-600 font-light"
+                />
               </div>
 
               {/* Dynamic List Sections */}
@@ -91,7 +93,11 @@ export default function JobDetailContent({ content }: { content?: any }) {
                     {section.items.map((item: string, iIdx: number) => (
                       <li key={iIdx} className="flex items-start">
                         <CheckCircle2 className="w-[18px] h-[18px] text-[#4B2A63] mr-3 mt-1 flex-shrink-0" strokeWidth={2} />
-                        <span className="text-[15px] text-slate-600 font-light leading-relaxed">{item}</span>
+                        <FormattedText
+                          content={item}
+                          as="span"
+                          className="text-[15px] text-slate-600 font-light leading-relaxed"
+                        />
                       </li>
                     ))}
                   </ul>

@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
+import { FormattedText } from '@/components/ui/FormattedText';
 
 export interface RetailWhyErpContent {
   title?: string;
@@ -47,13 +48,7 @@ export function RetailWhyErp({ content }: { content: RetailWhyErpContent }) {
             <h2 className="text-3xl md:text-4xl font-bold text-indigo-900 mb-6 tracking-tight">
               {title}
             </h2>
-            <div className="text-lg text-slate-600 leading-relaxed text-justify md:text-left">
-              {typeof paragraph === 'string' && (paragraph.includes('<p>') || paragraph.includes('<')) ? (
-                <span dangerouslySetInnerHTML={{ __html: paragraph }} />
-              ) : (
-                paragraph
-              )}
-            </div>
+            <FormattedText content={paragraph} className="text-lg text-slate-600 leading-relaxed text-justify md:text-left" />
           </motion.div>
           
         </div>

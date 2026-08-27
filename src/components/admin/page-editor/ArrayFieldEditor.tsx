@@ -143,6 +143,8 @@ export function ArrayFieldEditor({
       } else if (lowerKey === 'items') {
         if (sectionType === 'staffing-technologies') {
           defaultObj = { label: '' };
+        } else if (sectionType === 'ass-features-grid') {
+          defaultObj = { image: '', title: '', description: '', ctaText: '', ctaUrl: '', enableCta: true };
         } else {
           defaultObj = { image: '', title: '', description: '', ctaText: '', ctaUrl: '' };
         }
