@@ -16,23 +16,26 @@ interface FormattedTextProps extends Omit<React.HTMLAttributes<HTMLDivElement>, 
 export function FormattedText({ content, as: Component = 'div', className, ...props }: FormattedTextProps) {
   if (!content) return null;
 
-  // Unescape HTML entities if DB content contains encoded tags (e.g. &lt;p&gt; or &lt;strong&gt;)
+  // Unescape HTML entities if DB content contains encoded tags (e.g. &lt;p&gt;, &lt;ul&gt;, &lt;li&gt;, &lt;strong&gt;)
   let rawStr = typeof content === 'string' ? content : '';
-  if (rawStr.includes('&lt;') && rawStr.includes('&gt;')) {
+  if (rawStr.includes('&lt;') || rawStr.includes('&gt;') || rawStr.includes('&amp;')) {
     rawStr = rawStr
       .replace(/&lt;/g, '<')
       .replace(/&gt;/g, '>')
       .replace(/&amp;/g, '&')
       .replace(/&quot;/g, '"')
-      .replace(/&#39;/g, "'");
+      .replace(/&#39;/g, "'")
+      .replace(/&#x2F;/g, '/');
   }
 
   const isHtml = rawStr.includes('<') && rawStr.includes('>');
 
+  const containerClass = className ? `formatted-text-content ${className}` : 'formatted-text-content';
+
   if (isHtml) {
     return (
       <Component
-        className={className}
+        className={containerClass}
         dangerouslySetInnerHTML={{ __html: rawStr }}
         {...props}
       />
@@ -40,7 +43,7 @@ export function FormattedText({ content, as: Component = 'div', className, ...pr
   }
 
   return (
-    <Component className={className} {...props}>
+    <Component className={containerClass} {...props}>
       {rawStr}
     </Component>
   );

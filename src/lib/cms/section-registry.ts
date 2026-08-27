@@ -150,7 +150,7 @@ const RAW_SECTION_REGISTRY: SectionTypeDefinition[] = [
     color: 'bg-rose-50 text-rose-600',
     defaultVariant: 'default',
     supportsVariants: false,
-    fieldOrder: ['title', 'description', 'image1', 'image2', 'image3', 'points'],
+    fieldOrder: ['title', 'description', 'image1', 'image2', 'image3', 'reasons'],
   },
   {
     type: 'portfolio',
@@ -363,6 +363,7 @@ const RAW_SECTION_REGISTRY: SectionTypeDefinition[] = [
     color: 'bg-cyan-50 text-cyan-600',
     defaultVariant: 'default',
     supportsVariants: false,
+    fieldOrder: ['modules'],
   },
   {
     type: 'retail-clients',

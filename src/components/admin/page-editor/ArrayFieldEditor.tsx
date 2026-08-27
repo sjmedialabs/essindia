@@ -66,6 +66,10 @@ export function ArrayFieldEditor({
       onChange([...value, { title: '', description: '' }]);
       return;
     }
+    if (sectionType === 'retail-mobile-dashboard' && fieldKey === 'features') {
+      onChange([...value, '']);
+      return;
+    }
     if (value.length > 0) {
       const template = createEmptyFromTemplate(value[0]);
       onChange([...value, template]);
@@ -75,6 +79,10 @@ export function ArrayFieldEditor({
       const lowerKey = fieldKey.toLowerCase();
       
       if (lowerKey === 'features' || lowerKey === 'tabs') {
+        if (sectionType === 'retail-mobile-dashboard') {
+          onChange([...value, '']);
+          return;
+        }
         defaultObj = { 
           label: '', 
           desc: '', 
@@ -101,6 +109,8 @@ export function ArrayFieldEditor({
       } else if (lowerKey === 'modules') {
         if (sectionType === 'landing1-suite') {
           defaultObj = { name: '', desc: '', image: '', highlighted: false };
+        } else if (sectionType === 'retail-mobile-dashboard') {
+          defaultObj = { title: '', features: [] };
         } else {
           defaultObj = { image: '', title: '', description: '', ctaLabel: 'READ MORE', ctaUrl: '#' };
         }

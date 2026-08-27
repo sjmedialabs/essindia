@@ -6,25 +6,26 @@ import { SECTION_REGISTRY } from '@/lib/cms/section-registry';
 
 export async function GET() {
   try {
-    const [pagesResult, templatesResult, leadsResult, topTemplates, recentPages] = await Promise.all([
-      db.select({
-        status: pages.status,
-        count: sql<number>`count(*)`
-      }).from(pages).groupBy(pages.status),
-      db.select({ count: sql<number>`count(*)` }).from(templates),
-      db.select({ count: sql<number>`count(*)` }).from(formSubmissions),
-      db.query.templates.findMany({
-        orderBy: (templateTable, { desc }) => [
-          desc(templateTable.usageCount),
-          desc(templateTable.updatedAt),
-        ],
-        limit: 10,
-      }),
-      db.query.pages.findMany({
-        orderBy: (pageTable, { desc }) => [desc(pageTable.updatedAt)],
-        limit: 7,
-      }),
-    ]);
+    const pagesResult = await db.select({
+      status: pages.status,
+      count: sql<number>`count(*)`
+    }).from(pages).groupBy(pages.status);
+
+    const templatesResult = await db.select({ count: sql<number>`count(*)` }).from(templates);
+    const leadsResult = await db.select({ count: sql<number>`count(*)` }).from(formSubmissions);
+    
+    const topTemplates = await db.query.templates.findMany({
+      orderBy: (templateTable, { desc }) => [
+        desc(templateTable.usageCount),
+        desc(templateTable.updatedAt),
+      ],
+      limit: 10,
+    });
+
+    const recentPages = await db.query.pages.findMany({
+      orderBy: (pageTable, { desc }) => [desc(pageTable.updatedAt)],
+      limit: 7,
+    });
 
     const totalPages = pagesResult.reduce((acc, row) => acc + Number(row.count), 0);
     const publishedPages = pagesResult.find(r => r.status === 'published')?.count || 0;

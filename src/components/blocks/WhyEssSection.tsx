@@ -47,7 +47,7 @@ export function WhyEssSection({ content }: WhyEssSectionProps) {
   const image1 = content?.image1 || "/why-ess-main.png";
   const image2 = content?.image2 || "/why-ess-revenue.png";
   const image3 = content?.image3 || "/why-ess-stats.png";
-  const points = content?.points || defaultPoints;
+  const points = (content as any)?.reasons || content?.points || defaultPoints;
 
   return (
     <section className="py-14 bg-[#F8F9FA] overflow-hidden relative">
@@ -126,7 +126,7 @@ export function WhyEssSection({ content }: WhyEssSectionProps) {
 
           {/* Right Side - Cards List */}
           <StaggerContainer className="w-full lg:w-1/2 flex flex-col justify-center gap-6 lg:pl-16 mt-20 lg:mt-0">
-            {points.map((point, index) => (
+            {points.map((point: Point, index: number) => (
               <motion.div
                 key={index}
                 variants={{

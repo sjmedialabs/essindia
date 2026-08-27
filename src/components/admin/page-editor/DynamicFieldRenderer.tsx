@@ -38,7 +38,7 @@ export function DynamicFieldRenderer({
 
   const fieldLabel = humanLabel(fieldKey, { sectionType, keyPath });
 
-  let fieldType = detectFieldType(fieldKey, value, sectionType);
+  let fieldType = detectFieldType(fieldKey, value, sectionType, keyPath);
   if (sectionType === 'career-perks' || keyPath.includes('perks') || fieldKey.toLowerCase().includes('perk')) {
     if (fieldType === 'richtext' || fieldType === 'text') {
       fieldType = 'textarea';
@@ -866,8 +866,13 @@ function ArrayField({
               }
             }
           } else if (fieldKey === 'modules') {
-            let moduleOrder = ['image', 'name', 'title', 'desc', 'description', 'ctaLabel', 'ctaHoverBgColor', 'ctaHoverTextColor', 'ctaUrl', 'ctaFormType'];
-            if (sectionType === 'landing1-suite') {
+            let moduleOrder = ['image', 'name', 'title', 'desc', 'description', 'features', 'ctaLabel', 'ctaHoverBgColor', 'ctaHoverTextColor', 'ctaUrl', 'ctaFormType'];
+            if (sectionType === 'retail-mobile-dashboard') {
+              if (!Array.isArray(objItem.features)) {
+                objItem.features = [];
+              }
+              moduleOrder = ['title', 'features'];
+            } else if (sectionType === 'landing1-suite') {
               moduleOrder = ['name', 'desc', 'image'];
               for (const k of ['name', 'desc', 'image']) {
                 if (!(k in objItem)) objItem[k] = '';

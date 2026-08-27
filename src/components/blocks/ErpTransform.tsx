@@ -3,6 +3,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { MotionSection } from '@/components/animations/MotionSection';
+import { FormattedText } from '@/components/ui/FormattedText';
 
 interface ErpTransformItem {
   image?: string;
@@ -84,16 +85,10 @@ export function ErpTransform({ content }: ErpTransformProps) {
           </MotionSection>
           
           <MotionSection variant="fadeUp" delay={0.15}>
-            {description.includes('<p>') ? (
-              <div 
-                className="text-slate-500 text-lg prose prose-lg max-w-none prose-p:my-2 mx-auto"
-                dangerouslySetInnerHTML={{ __html: description }}
-              />
-            ) : (
-              <p className="text-slate-500 text-lg">
-                {description}
-              </p>
-            )}
+            <FormattedText
+              content={description}
+              className="text-slate-500 text-lg mx-auto"
+            />
           </MotionSection>
         </div>
 
@@ -112,13 +107,13 @@ export function ErpTransform({ content }: ErpTransformProps) {
               className="group bg-white rounded-[32px] px-6 py-4 border-2 border-gray-200 shadow-[0_4px_30px_rgba(0,0,0,0.015)] hover:shadow-[0_24px_60px_-15px_rgba(75,42,99,0.06)] transition-all duration-500 hover:-translate-y-1 flex flex-col lg:flex-row gap-8 items-center cursor-pointer"
             >
               {/* Left Side: Custom Image Container */}
-              <div className=" rounded-3xl flex items-center justify-center shrink-0 transition-colors duration-300 overflow-hidden">
-                <div className="w-full h-full flex items-center justify-center transition-transform duration-500 group-hover:scale-105">
+              <div className="w-full sm:w-[260px] md:w-[300px] lg:w-[320px] h-[180px] sm:h-[200px] md:h-[220px] rounded-2xl flex items-center justify-center shrink-0 transition-colors duration-300 overflow-hidden bg-slate-50/50">
+                <div className="w-full h-full flex items-center justify-center transition-transform duration-500 group-hover:scale-105 p-2">
                   {item.image ? (
                     <img 
                       src={item.image} 
                       alt={item.title} 
-                      className="w-full h-full object-contain"
+                      className="w-full h-full object-contain rounded-xl"
                     />
                   ) : (
                     <span className="w-8 h-8 rounded bg-[#4B2A63]/10" />
@@ -131,16 +126,10 @@ export function ErpTransform({ content }: ErpTransformProps) {
                 <h3 className="text-lg md:text-3xl font-medium text-[#777777] tracking-tight group-hover:text-slate-900 transition-colors duration-300">
                   {item.title}
                 </h3>
-                {item.description?.includes('<p>') ? (
-                  <div 
-                    className="text-slate-500 text-base text-justify prose prose-sm max-w-none prose-p:my-2"
-                    dangerouslySetInnerHTML={{ __html: item.description }}
-                  />
-                ) : (
-                  <p className="text-slate-500 text-base text-justify">
-                    {item.description}
-                  </p>
-                )}
+                <FormattedText
+                  content={item.description}
+                  className="text-slate-500 text-base text-justify"
+                />
               </div>
             </motion.div>
           ))}
